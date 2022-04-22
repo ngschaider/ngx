@@ -1,7 +1,10 @@
 [
-    "callbacks",
+    "base",
+    "admin",
+    "callback",
     "character",
-    "commands",
+    "character_selector",
+    "command",
     "death",
     "deferral",
     "game",
@@ -9,8 +12,9 @@
     "paycheck",
     "scaleform",
     "streaming",
-    "tasks",
+    "task",
     "user",
-    "utils",
-    "weapons"
+    "skin",
+    "util",
+    "weapon"
 ]

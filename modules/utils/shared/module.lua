@@ -1,5 +1,6 @@
-run("math.lua");
-run("table.lua");
+run("shared/date.lua");
+run("shared/math.lua");
+run("shared/table.lua");
 
 local charset = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
@@ -10,6 +11,6 @@ module.GetRandomString = function(length)
         local randomNumber = math.random(1, charset:len());
 		return module.GetRandomString(length - 1) .. charset:sub(randomNumber, randomNumber);
 	else
-		return '';
+		return "";
 	end
 end;

@@ -1,129 +1,55 @@
+local callback = M("callback");
+local notification = M("notification");
+local event = M("event");
+local notification = M("notification");
+local utils = M("utils");
 
------ Admin commnads from ngx_adminplus
+event.onServer("admin:tpm", function()
+	local blipMarker = GetFirstBlipInfoId(8);
 
-RegisterNetEvent("ngx:tpm", function()
-	local PlayerPedId = PlayerPedId
-	local GetEntityCoords = GetEntityCoords
-	local GetGroundZFor_3dCoord = GetGroundZFor_3dCoord
+	if not DoesBlipExist(blipMarker) then
+		notification.showNotification("Kein Wegpunkt gesetzt.", true, false, 140);
+		return;
+	end
 
-	NGX.TriggerServerCallback("ngx:isUserAdmin", function(admin)
-		if admin then
-			local blipMarker = GetFirstBlipInfoId(8)
-			if not DoesBlipExist(blipMarker) then
-					NGX.ShowNotification('No Waypoint Set.', true, false, 140)
-					return 'marker'
-			end
-	
-			-- Fade screen to hide how clients get teleported.
-			DoScreenFadeOut(650)
-			while not IsScreenFadedOut() do
-					Wait(0)
-			end
-	
-			local ped, coords = PlayerPedId(), GetBlipInfoIdCoord(blipMarker)
-			local vehicle = GetVehiclePedIsIn(ped, false)
-			local oldCoords = GetEntityCoords(ped)
-	
-			-- Unpack coords instead of having to unpack them while iterating.
-			-- 825.0 seems to be the max a player can reach while 0.0 being the lowest.
-			local x, y, groundZ, Z_START = coords['x'], coords['y'], 850.0, 950.0
-			local found = false
-			if vehicle > 0 then
-					FreezeEntityPosition(vehicle, true)
-			else
-					FreezeEntityPosition(ped, true)
-			end
-	
-			for i = Z_START, 0, -25.0 do
-					local z = i
-					if (i % 2) ~= 0 then
-							z = Z_START - i
-					end
-	
-					NewLoadSceneStart(x, y, z, x, y, z, 50.0, 0)
-					local curTime = GetGameTimer()
-					while IsNetworkLoadingScene() do
-							if GetGameTimer() - curTime > 1000 then
-									break
-							end
-							Wait(0)
-					end
-					NewLoadSceneStop()
-					SetPedCoordsKeepVehicle(ped, x, y, z)
-	
-					while not HasCollisionLoadedAroundEntity(ped) do
-							RequestCollisionAtCoord(x, y, z)
-							if GetGameTimer() - curTime > 1000 then
-									break
-							end
-							Wait(0)
-					end
-	
-					-- Get ground coord. As mentioned in the natives, this only works if the client is in render distance.
-					found, groundZ = GetGroundZFor_3dCoord(x, y, z, false)
-					if found then
-							Wait(0)
-							SetPedCoordsKeepVehicle(ped, x, y, groundZ)
-							break
-					end
-					Wait(0)
-			end
-	
-			-- Remove black screen once the loop has ended.
-			DoScreenFadeIn(650)
-			if vehicle > 0 then
-					FreezeEntityPosition(vehicle, false)
-			else
-					FreezeEntityPosition(ped, false)
-			end
-	
-			if not found then
-					-- If we can't find the coords, set the coords to the old ones.
-					-- We don't unpack them before since they aren't in a loop and only called once.
-					SetPedCoordsKeepVehicle(ped, oldCoords['x'], oldCoords['y'], oldCoords['z'] - 1.0)
-					NGX.ShowNotification('Successfully Teleported', true, false, 140)
-			end
-	
-			-- If Z coord was found, set coords in found coords.
-			SetPedCoordsKeepVehicle(ped, x, y, groundZ)
-			NGX.ShowNotification('Successfully Teleported', true, false, 140)
-		end
-	end)
+	local coords = GetBlipInfoIdCoord(blipMarker);
+	utils.teleport(coords);
 end)
 
-local noclip = false
-RegisterNetEvent("ngx:noclip", function(input)
-	NGX.TriggerServerCallback("ngx:isUserAdmin", function(admin)
-		if admin then
-			local player = PlayerId()
+event.onServer("admin:printCoords", function()
+	local pos = GetEntityCoords(PlayerPedId());
+	print(pos.x, pos.y, pos.z);
+end);
 
-			local msg = "disabled"
-			if(noclip == false)then
-				noclip_pos = GetEntityCoords(PlayerPedId(), false)
-			end
+local noclip = false;
+event.onServer("admin:noclip", function(input)
+	local player = PlayerId();
 
-			noclip = not noclip
+	local msg = "disabled";
+	if not noclip then
+		noclip_pos = GetEntityCoords(PlayerPedId(), false);
+	end
 
-			if(noclip)then
-				msg = "enabled"
-			end
+	noclip = not noclip;
 
-			TriggerEvent("chatMessage", "Noclip has been ^2^*" .. msg)
-		end
-	end)
+	if noclip then
+		msg = "enabled";
+	end
+
+	notification.showNotification("Noclip has been ^2^*" .. msg);
 end)
 
 local heading = 0
 CreateThread(function()
 	while true do
-		Wait(0)
+		Citizen.Wait(0)
 
-		if(noclip)then
+		if noclip then
 			SetEntityCoordsNoOffset(PlayerPedId(), noclip_pos.x, noclip_pos.y, noclip_pos.z, 0, 0, 0)
 
 			if(IsControlPressed(1, 34))then
 				heading = heading + 1.5
-				if(heading > 360)then
+				if heading > 360 then
 					heading = 0
 				end
 
@@ -132,7 +58,7 @@ CreateThread(function()
 
 			if(IsControlPressed(1, 9))then
 				heading = heading - 1.5
-				if(heading < 0)then
+				if heading < 0 then
 					heading = 360
 				end
 
@@ -160,21 +86,15 @@ CreateThread(function()
 	end
 end)
 
-RegisterNetEvent("ngx:killPlayer", function()
+event.onServer("admin:killPlayer", function()
   SetEntityHealth(PlayerPedId(), 0)
 end)
 
-RegisterNetEvent("ngx:freezePlayer", function(input)
+event.onServer("admin:freezePlayer", function(freeze)
     local player = PlayerId();
 	local playerPed = PlayerPedId();
 
-    if input == "freeze" then
-        SetEntityCollision(playerPed, false)
-        FreezeEntityPosition(playerPed, true)
-        SetPlayerInvincible(player, true)
-    elseif input == "unfreeze" then
-        SetEntityCollision(playerPed, true)
-	    FreezeEntityPosition(playerPed, false)
-        SetPlayerInvincible(player, false)
-    end
+	SetEntityCollision(playerPed, not freeze);
+	FreezeEntityPosition(playerPed, freeze);
+	SetPlayerInvincible(player, freeze);
 end)

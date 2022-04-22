@@ -1,6 +1,5 @@
 local streaming = M("streaming");
 local utils = M("utils");
-local game = M("game");
 
 module.GetPedMugshot = function(ped, transparent)
 	if DoesEntityExist(ped) then
@@ -41,7 +40,7 @@ module.Teleport = function(entity, coords, cb)
 end
 
 module.SpawnObject = function(object, coords, cb, networked)
-	local model = type(object) == 'number' and object or GetHashKey(object)
+	local model = type(object) == "number" and object or GetHashKey(object)
 	local vector = type(coords) == "vector3" and coords or vec(coords.x, coords.y, coords.z)
 	networked = networked == nil and true or networked
 
@@ -56,8 +55,9 @@ module.SpawnObject = function(object, coords, cb, networked)
 end
 
 module.SpawnLocalObject = function(object, coords, cb)
-	game.SpawnObject(object, coords, cb, false)
+	module.SpawnObject(object, coords, cb, false)
 end
+
 
 module.DeleteVehicle = function(vehicle)
 	SetEntityAsMissionEntity(vehicle, false, true)
@@ -70,9 +70,13 @@ module.DeleteObject = function(object)
 end
 
 module.SpawnVehicle = function(vehicle, coords, heading, cb, networked)
-	local model = (type(vehicle) == 'number' and vehicle or GetHashKey(vehicle))
+	local model = (type(vehicle) == "number" and vehicle or GetHashKey(vehicle))
 	local vector = type(coords) == "vector3" and coords or vec(coords.x, coords.y, coords.z)
-	networked = networked == nil and true or networked
+
+	if networked == nil then
+		networked = true;
+	end
+
 	CreateThread(function()
 		streaming.RequestModel(model)
 
@@ -86,7 +90,7 @@ module.SpawnVehicle = function(vehicle, coords, heading, cb, networked)
 		SetVehicleHasBeenOwnedByPlayer(vehicle, true)
 		SetVehicleNeedsToBeHotwired(vehicle, false)
 		SetModelAsNoLongerNeeded(model)
-		SetVehRadioStation(vehicle, 'OFF')
+		SetVehRadioStation(vehicle, "OFF")
 
 		RequestCollisionAtCoord(vector.xyz)
 		while not HasCollisionLoadedAroundEntity(vehicle) do
@@ -111,12 +115,12 @@ module.IsVehicleEmpty = function(vehicle)
 end
 
 module.GetObjects = function() -- Leave the function for compatibility
-	return GetGamePool('CObject')
+	return GetGamePool("CObject")
 end
 
 module.GetPeds = function(onlyOtherPeds)
 	local peds = {};
-	local ped = PlayerPedId(),
+	local ped = PlayerPedId();
 	local pool = GetGamePool("CPed");
 
 	for k,v in pairs(pool) do
@@ -129,25 +133,30 @@ module.GetPeds = function(onlyOtherPeds)
 end
 
 module.GetVehicles = function() -- Leave the function for compatibility
-	return GetGamePool('CVehicle')
+	return GetGamePool("CVehicle")
 end
 
 module.GetPlayers = function(onlyOtherPlayers, returnKeyValue, returnPeds)
-	local players, myPlayer = {}, PlayerId()
+	local players = {};
+	local myPlayer = PlayerId();
 
 	for k,player in ipairs(GetActivePlayers()) do
-		local ped = GetPlayerPed(player)
+		local ped = GetPlayerPed(player);
 
-		if DoesEntityExist(ped) and ((onlyOtherPlayers and player ~= myPlayer) or not onlyOtherPlayers) then
+		if DoesEntityExist(ped) and (not onlyOtherPeds or player ~= myPlayer) then	
 			if returnKeyValue then
-				players[player] = ped
+				players[player] = ped;
 			else
-				players[#players + 1] = returnPeds and ped or player
+				if returnPeds then
+					table.insert(players, ped);
+				else
+					table.insert(players, player);
+				end
 			end
 		end
 	end
 
-	return players
+	return players;
 end
 
 module.GetClosestObject = function(coords, modelFilter)
@@ -165,6 +174,7 @@ end
 module.GetClosestVehicle = function(coords, modelFilter)
 	return module.GetClosestEntity(module.GetVehicles(), false, coords, modelFilter)
 end
+
 
 local function EnumerateEntitiesWithinDistance(entities, isPlayerEntities, coords, maxDistance)
 	local nearbyEntities = {}
@@ -455,7 +465,7 @@ module.DrawText3D = function(coords, text, size, font)
 	SetTextFont(font)
 	SetTextProportional(1)
 	SetTextColour(255, 255, 255, 215)
-	BeginTextCommandDisplayText('STRING')
+	BeginTextCommandDisplayText("STRING")
 	SetTextCentre(true)
 	AddTextComponentSubstringPlayerName(text)
 	SetDrawOrigin(vector.xyz, 0)

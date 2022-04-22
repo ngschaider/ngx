@@ -1,7 +1,8 @@
 local utils = M("utils");
+local event = M("event");
 
 CreateThread(function()
-	local isDead = false
+	local isDead = false;
 
 	while true do
 		Wait(0)
@@ -60,8 +61,7 @@ PlayerKilledByPlayer = function(killerServerId, killerClientId, deathCause)
 		killerClientId = killerClientId
 	}
 
-	TriggerEvent('ngx:onPlayerDeath', data)
-	TriggerServerEvent('ngx:onPlayerDeath', data)
+	event.emitShared("death:playerDied", data);
 end
 
 PlayerKilled = function(deathCause)
@@ -79,6 +79,5 @@ PlayerKilled = function(deathCause)
 		deathCause = deathCause
 	}
 
-	TriggerEvent('ngx:onPlayerDeath', data)
-	TriggerServerEvent('ngx:onPlayerDeath', data)
+	event.emitShared("death:playerDied", data);
 end

@@ -1,7 +1,7 @@
 module.ShowFreemodeMessage = function(title, msg, sec)
-	local scaleform = module.RequestScaleformMovie('MP_BIG_MESSAGE_FREEMODE')
+	local scaleform = module.RequestScaleformMovie("MP_BIG_MESSAGE_FREEMODE")
 
-	BeginScaleformMovieMethod(scaleform, 'SHOW_SHARD_WASTED_MP_MESSAGE')
+	BeginScaleformMovieMethod(scaleform, "SHOW_SHARD_WASTED_MP_MESSAGE")
 	ScaleformMovieMethodAddParamTextureNameString(title)
 	ScaleformMovieMethodAddParamTextureNameString(msg)
 	EndScaleformMovieMethod()
@@ -17,21 +17,21 @@ module.ShowFreemodeMessage = function(title, msg, sec)
 end
 
 module.ShowBreakingNews = function(title, msg, bottom, sec)
-	local scaleform = module.RequestScaleformMovie('BREAKING_NEWS')
+	local scaleform = module.RequestScaleformMovie("BREAKING_NEWS")
 
-	BeginScaleformMovieMethod(scaleform, 'SET_TEXT')
+	BeginScaleformMovieMethod(scaleform, "SET_TEXT")
 	ScaleformMovieMethodAddParamTextureNameString(msg)
 	ScaleformMovieMethodAddParamTextureNameString(bottom)
 	EndScaleformMovieMethod()
 
-	BeginScaleformMovieMethod(scaleform, 'SET_SCROLL_TEXT')
+	BeginScaleformMovieMethod(scaleform, "SET_SCROLL_TEXT")
 	ScaleformMovieMethodAddParamInt(0) -- top ticker
 	ScaleformMovieMethodAddParamInt(0) -- Since this is the first string, start at 0
 	ScaleformMovieMethodAddParamTextureNameString(title)
 
 	EndScaleformMovieMethod()
 
-	BeginScaleformMovieMethod(scaleform, 'DISPLAY_SCROLL_TEXT')
+	BeginScaleformMovieMethod(scaleform, "DISPLAY_SCROLL_TEXT")
 	ScaleformMovieMethodAddParamInt(0) -- Top ticker
 	ScaleformMovieMethodAddParamInt(0) -- Index of string
 
@@ -48,9 +48,9 @@ module.ShowBreakingNews = function(title, msg, bottom, sec)
 end
 
 module.ShowPopupWarning = function(title, msg, bottom, sec)
-	local scaleform = module.RequestScaleformMovie('POPUP_WARNING')
+	local scaleform = module.RequestScaleformMovie("POPUP_WARNING")
 
-	BeginScaleformMovieMethod(scaleform, 'SHOW_POPUP_WARNING')
+	BeginScaleformMovieMethod(scaleform, "SHOW_POPUP_WARNING")
 
 	ScaleformMovieMethodAddParamFloat(500.0) -- black background
 	ScaleformMovieMethodAddParamTextureNameString(title)
@@ -71,9 +71,9 @@ module.ShowPopupWarning = function(title, msg, bottom, sec)
 end
 
 module.ShowTrafficMovie = function(sec)
-	local scaleform = module.RequestScaleformMovie('TRAFFIC_CAM')
+	local scaleform = module.RequestScaleformMovie("TRAFFIC_CAM")
 
-	BeginScaleformMovieMethod(scaleform, 'PLAY_CAM_MOVIE')
+	BeginScaleformMovieMethod(scaleform, "PLAY_CAM_MOVIE")
 
 	EndScaleformMovieMethod()
 

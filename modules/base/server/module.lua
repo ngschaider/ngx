@@ -1,2 +1,2 @@
-SetMapName('San Andreas');
-SetGameType('NGX');
+SetMapName("San Andreas");
+SetGameType("NGX");

@@ -1,37 +1,40 @@
-module.ShowNotification = function(msg)
-	BeginTextCommandThefeedPost('STRING')
+local event = M("event");
+
+module.showNotification = function(msg)
+	BeginTextCommandThefeedPost("STRING")
 	AddTextComponentSubstringPlayerName(msg)
 	EndTextCommandThefeedPostTicker(0,1)
 end
-RegisterNetEvent('ngx:ShowNotification', NGX.ShowNotification);
+event.onServer("notification:showNotification", NGX.ShowNotification);
 
-module.ShowAdvancedNotification = function(sender, subject, msg, textureDict, iconType, flash, saveToBrief, hudColorIndex)
+module.showAdvancedNotification = function(sender, subject, msg, textureDict, iconType, flash, saveToBrief, hudColorIndex)
 	if saveToBrief == nil then saveToBrief = true end
-	AddTextEntry('ngxAdvancedNotification', msg)
-	BeginTextCommandThefeedPost('ngxAdvancedNotification')
+	AddTextEntry("ngxAdvancedNotification", msg)
+	BeginTextCommandThefeedPost("ngxAdvancedNotification")
 	if hudColorIndex then ThefeedSetNextPostBackgroundColor(hudColorIndex) end
 	EndTextCommandThefeedPostMessagetext(textureDict, textureDict, false, iconType, sender, subject)
 	EndTextCommandThefeedPostTicker(flash or false, saveToBrief)
 end
-RegisterNetEvent('ngx:ShowAdvancedNotification', NGX.ShowAdvancedNotification);
+event.onServer("notification:showAdvancedNotification", NGX.ShowAdvancedNotification);
 
-module.ShowHelpNotification = function(msg, thisFrame, beep, duration)
-	AddTextEntry('ngxHelpNotification', msg)
+module.showHelpNotification = function(msg, thisFrame, beep, duration)
+	AddTextEntry("ngxHelpNotification", msg)
 
 	if thisFrame then
-		DisplayHelpTextThisFrame('ngxHelpNotification', false)
+		DisplayHelpTextThisFrame("ngxHelpNotification", false)
 	else
 		if beep == nil then beep = true end
-		BeginTextCommandDisplayHelp('ngxHelpNotification')
+		BeginTextCommandDisplayHelp("ngxHelpNotification")
 		EndTextCommandDisplayHelp(0, false, beep, duration or -1)
 	end
 end
-RegisterNetEvent('ngx:ShowHelpNotification', NGX.ShowHelpNotification);
+event.onServer("notification:showHelpNotification", module.ShowHelpNotification);
 
-module.ShowFloatingHelpNotification = function(msg, coords)
-	AddTextEntry('ngxFloatingHelpNotification', msg)
+module.showFloatingHelpNotification = function(msg, coords)
+	AddTextEntry("ngxFloatingHelpNotification", msg)
 	SetFloatingHelpTextWorldPosition(1, coords)
 	SetFloatingHelpTextStyle(1, 1, 2, -1, 3, 0)
-	BeginTextCommandDisplayHelp('ngxFloatingHelpNotification')
+	BeginTextCommandDisplayHelp("ngxFloatingHelpNotification")
 	EndTextCommandDisplayHelp(2, false, false, -1)
 end
+event.onServer("notification:showHelpNotification", module.showFloatingHelpNotification);

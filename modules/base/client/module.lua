@@ -1,3 +1,5 @@
+local event = M("event");
+
 -- Disable default idle camera
 Citizen.CreateThread(function()
 	while true do
@@ -10,8 +12,12 @@ end);
 Citizen.CreateThread(function()
     while true do
 		if NetworkIsSessionStarted() then
-			TriggerServerEvent("ngx:OnPlayerJoined");
-			TriggerEvent("ngx:OnPlayerJoined");
+			event.emitShared("base:playerJoined");
+
+			if IsScreenFadedOut() then
+				DoScreenFadeIn();
+			end
+
 			return;
 		end
 		Citizen.Wait(100);

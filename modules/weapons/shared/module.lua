@@ -1,7 +1,7 @@
-run("config.lua");
+run("shared/config.lua");
 
 module.GetWeapon = function(weaponName)
-	weaponName = string.upper(weaponName)
+	weaponName = weaponName:upper();
 
 	for k,v in ipairs(Config.Weapons) do
 		if v.name == weaponName then
@@ -23,7 +23,7 @@ module.GetWeaponList = function()
 end
 
 module.GetWeaponLabel = function(weaponName)
-	weaponName = string.upper(weaponName)
+	weaponName = weaponName:upper();
 
 	for k,v in ipairs(Config.Weapons) do
 		if v.name == weaponName then
@@ -33,8 +33,8 @@ module.GetWeaponLabel = function(weaponName)
 end
 
 module.GetWeaponComponent = function(weaponName, weaponComponent)
-	weaponName = string.upper(weaponName)
-	local weapons = Config.Weapons
+	weaponName = weaponName:upper();
+	local weapons = Config.Weapons;
 
 	for k,v in ipairs(Config.Weapons) do
 		if v.name == weaponName then

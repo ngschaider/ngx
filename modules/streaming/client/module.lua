@@ -1,16 +1,18 @@
 module.RequestModel = function(modelHash, cb)
-	modelHash = (type(modelHash) == 'number' and modelHash or GetHashKey(modelHash))
+	if type(modelHash) ~= "number" then
+		modelHash = GetHashKey(modelHash);
+	end
 
 	if not HasModelLoaded(modelHash) and IsModelInCdimage(modelHash) then
-		RequestModel(modelHash)
+		RequestModel(modelHash);
 
 		while not HasModelLoaded(modelHash) do
-			Wait(0)
+			Citizen.Wait(0);
 		end
 	end
 
 	if cb ~= nil then
-		cb()
+		cb();
 	end
 end
 
@@ -19,12 +21,12 @@ module.RequestStreamedTextureDict = function(textureDict, cb)
 		RequestStreamedTextureDict(textureDict)
 
 		while not HasStreamedTextureDictLoaded(textureDict) do
-			Wait(0)
+			Citizen.Wait(0);
 		end
 	end
 
 	if cb ~= nil then
-		cb()
+		cb();
 	end
 end
 
@@ -33,12 +35,12 @@ module.RequestNamedPtfxAsset = function(assetName, cb)
 		RequestNamedPtfxAsset(assetName)
 
 		while not HasNamedPtfxAssetLoaded(assetName) do
-			Wait(0)
+			Citizen.Wait(0);
 		end
 	end
 
 	if cb ~= nil then
-		cb()
+		cb();
 	end
 end
 
@@ -47,12 +49,12 @@ module.RequestAnimSet = function(animSet, cb)
 		RequestAnimSet(animSet)
 
 		while not HasAnimSetLoaded(animSet) do
-			Wait(0)
+			Citizen.Wait(0);
 		end
 	end
 
 	if cb ~= nil then
-		cb()
+		cb();
 	end
 end
 
@@ -61,12 +63,12 @@ module.RequestAnimDict = function(animDict, cb)
 		RequestAnimDict(animDict)
 
 		while not HasAnimDictLoaded(animDict) do
-			Wait(0)
+			Citizen.Wait(0);
 		end
 	end
 
 	if cb ~= nil then
-		cb()
+		cb();
 	end
 end
 
@@ -75,11 +77,11 @@ module.RequestWeaponAsset = function(weaponHash, cb)
 		RequestWeaponAsset(weaponHash)
 
 		while not HasWeaponAssetLoaded(weaponHash) do
-			Wait(0)
+			Citizen.Wait(0);
 		end
 	end
 
 	if cb ~= nil then
-		cb()
+		cb();
 	end
 end

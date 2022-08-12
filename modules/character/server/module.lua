@@ -1,60 +1,121 @@
 local utils = M("utils");
+local callback = M("callback");
 local userClass = M("user");
+local event = M("event");
+local logger = M("logger");
 
-local CreatePlayer = function(userId, firstname, lastname, dateofbirth, height)
-	local characterId = MySQL.insert.await("INSERT INTO characters (user_id, firstname, lastname, dateofbirth, height) VALUES (?, ?, ?, ?, ?)", {
-		userId, firstname, lastname, dateofbirth, height
+local characters = {};
+
+module.Create = function(userId, firstname, lastname, dateofbirth, height, skin)
+	local skinStr = json.encode(skin);
+	print(skinStr);
+	local id = MySQL.insert.await("INSERT INTO characters (user_id, firstname, lastname, dateofbirth, height, skin, position_x, position_y, position_z) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", {
+		userId, firstname, lastname, dateofbirth, height, skinStr, 213.78, -900.12, 29.69
 	});
 
-	return characterId;
+	return id;
 end;
 
-local ConstructCharacter = function(characterId)
-	local results = MySQL.prepare.await("SELECT user_id, firstname, lastname, dateofbirth, height FROM characters WHERE id=?", {characterId});
-
+local Construct = function(id)
 	local self = {};
 
-	self.id = results[1].id;
-	self.user = userClass.GetByPlayerId(results[1].user_id);
+	self.id = tonumber(id);
+	self.rpcWhitelist = {"getId", "getName", "getLastPosition", "getUserId", "getHeight", "getDateOfBirth"};
 
-	self.SetPosition = function(coords)
-		self.user.TriggerEvent('ngx:teleport', coords);
+	self.getId = function()
+		return self.id;
 	end;
 
-	self.GetPosition = function(vector)
-		local ped = GetPlayerPed(self.player.id);
-		return GetEntityCoords(ped);
+	self.getUserId = function()
+		local userId = MySQL.scalar.await("SELECT user_id FROM characters WHERE id=?", {self.id});
+		return tonumber(userId);
+	end;
+
+	self.getUser = function()
+		local userId = self.getUserId();
+		return userClass.getById(userId);
+	end;
+
+	self.setPosition = function(coords)
+		self.getUser().emit("utils:teleport", coords);
+	end;
+
+	self.getLastPosition = function()
+		local results = MySQL.single.await("SELECT position_x, position_y, position_z FROM characters WHERE id=?", {self.id});
+		return {
+			x = tonumber(results.position_x),
+			y = tonumber(results.position_y),
+			z = tonumber(results.position_z),
+		};
 	end;
 	
-	self.GetName = function()
-		local results = MySQL.prepare.await("SELECT firstname, lastname FROM characters WHERE id=?", {self.id});
-		return results[1].firstname .. " " .. results[1].lastname;
+	self.getName = function()
+		local result = MySQL.single.await("SELECT firstname, lastname FROM characters WHERE id=?", {self.id});
+		return result.firstname .. " " .. result.lastname;
 	end;
+
+	self.getHeight = function()
+		local height = MySQL.scalar.await("SELECT height FROM characters WHERE id=?", {self.id});
+		return height;
+	end;
+
+	self.getDateOfBirth = function()
+		local dateOfBirth = MySQL.scalar.await("SELECT dateofbirth FROM characters WHERE id=?", {self.id});
+		return dateOfBirth;
+	end;
+
+	self.getSkin = function()
+        local skinStr = MySQL.scalar.await("SELECT skin FROM characters WHERE id=?", {self.id});
+        return json.decode(skinStr);
+    end;
+    table.insert(self.rpcWhitelist, "getSkin");
+
+    self.setSkin = function(skin)
+        local skinStr = json.encode(skin);
+        MySQL.update.await("UPDATE characters SET skin=? WHERE id=?", {skinStr, character.id});
+    end;
+    table.insert(self.rpcWhitelist, "setSkin");
 
 	return self;
 end
 
-callbacks.RegisterServerCallback("ngx:GetCharacterData", function(clientId, cb, key, ...)
-	local player = NGX.GetPlayerFromId(clientId);
+module.getById = function(id)
+	if not characters[id] then
+		characters[id] = Construct(id);
+	end
 
-	if not player.character then
-		cb(nil);
+	return characters[id];
+end;
+
+module.getByPlayerId = function(playerId)
+	local user = userClass.getByPlayerId(playerId);
+	
+	if not user then
+		logger.debug("User with player id " .. playerId .. " not found - returning nil");
+		return nil;
+	end
+
+	return user.getCurrentCharacter();
+end;
+
+callback.register("character:rpc", function(playerId, cb, id, name, ...)
+	local character = module.getById(id);
+
+	if not character then
+		logger.warn("Character not found - rpc failed");
 		return;
 	end
 
-	local whitelist = {"job", "name", "account", "accounts"};
+	if character.getUser().getPlayerId() ~= playerId then
+		logger.warn("Character not owned by requester - rpc failed");
+		return;
+	end	
 
-	if not utils.table.Contains(whitelist, key) then
+	if not utils.table.contains(character.rpcWhitelist, name) then
+		logger.warn("Requested character rpc " .. name .. " not whitelisted - skipping");
 		return;
 	end
 
-	-- concatenate "get" and `key` with the first letter uppercased
-	local functionName = "get" .. key:gsub("^%l", string.upper);
-
-	cb(player.character[functionName](...));
+	cb(character[name](...));
 end);
 
-module.GetByPlayerId = function(playerId)
-	local user = userClass.GetByPlayerId(playerId);
-	return user.GetCharacter();
-end;

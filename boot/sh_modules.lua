@@ -24,14 +24,14 @@ local GetEntryPoints = function(moduleName)
     return entryPoints;
 end;
 
-local CreateModuleEnv = function(moduleName)
+local CreateEnv = function(moduleName)
     local env = {};
 
     env.run = function(file, _env) 
-        return ESX.EvalFile(resourceName, "modules/" .. moduleName .. "/" .. file, _env or env);
+        return NGX.EvalFile(resourceName, "modules/" .. moduleName .. "/" .. file, _env or env);
     end;
 
-    env.print = function(...)
+    --[[env.print = function(...)
         local args = {...};
 
         local str = "^7[^5" .. moduleName .. "^7]";
@@ -41,7 +41,7 @@ local CreateModuleEnv = function(moduleName)
         end
 
         print(str);
-    end;
+    end;]]
     
     env.module = {};
 
@@ -55,7 +55,7 @@ M = function(moduleName)
         return loadedModules[moduleName];
     end
 
-    local moduleEnv = CreateModuleEnv(moduleName);
+    local moduleEnv = CreateEnv(moduleName);
     local entryPoints = GetEntryPoints(moduleName);
 
     local success = true;
@@ -70,7 +70,7 @@ M = function(moduleName)
         loadedModules[moduleName] = moduleEnv.module;
         return loadedModules[moduleName];
     else
-        NGX.Logger.Error('module [' .. moduleName .. '] does not exist', '@' .. resourceName .. ':boot/sh_modules.lua');
+        NGX.LogError('module [' .. moduleName .. '] does not exist', '@' .. resourceName .. ':boot/sh_modules.lua');
     end
 
     return nil;

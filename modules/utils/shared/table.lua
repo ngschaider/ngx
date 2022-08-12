@@ -1,39 +1,39 @@
 module.table = {};
 
-module.table.Dump = function(table, nb)
+module.table.dump = function(table, nb)
 	if nb == nil then
 		nb = 0;
 	end
 
 	if type(table) == "table" then
-		local s = '';
+		local s = "";
 		for i = 1, nb + 1, 1 do
 			s = s .. "    ";
 		end
 
 		s = "{\n";
 		for k,v in pairs(table) do
-			if type(k) ~= "number" then 
+			if type(k) ~= "number" then
 				k = '"' .. k .. '"';
 			end
 			for i = 1, nb, 1 do
 				s = s .. "    ";
 			end
-			s = s .. "["..k.."] = " .. utils.table.Dump(v, nb + 1) .. ",\n";
+			s = s .. "["..k.."] = " .. module.table.dump(v, nb + 1) .. ",\n";
 		end
 
 		for i = 1, nb, 1 do
 			s = s .. "    ";
 		end
 
-		return s .. '}';
+		return s .. "}";
 	else
 		return tostring(table);
 	end
 end;
 
 -- nil proof alternative to #table
-module.table.Size = function(t)
+module.table.size = function(t)
 	local count = 0;
 
 	for _,_ in pairs(t) do
@@ -43,7 +43,7 @@ module.table.Size = function(t)
 	return count;
 end
 
-module.table.Set = function(t)
+module.table.set = function(t)
 	local set = {};
 	for k,v in ipairs(t) do 
 		set[v] = true;
@@ -51,7 +51,11 @@ module.table.Set = function(t)
 	return set;
 end
 
-module.table.IndexOf = function(t, value)
+module.table.indexOf = function(t, value)
+	if not t then 
+		return -1; 
+	end
+
 	for i=1, #t, 1 do
 		if t[i] == value then
 			return i;
@@ -59,13 +63,18 @@ module.table.IndexOf = function(t, value)
 	end
 
 	return -1;
-end
-
-module.table.Contains = function(t, value)
-	return module.IndexOf(t, value) ~= -1;
 end;
 
-module.table.ContainsKey = function(t, value)
+module.table.remove = function(t, value)
+	local index = module.table.indexOf(t, value);
+	t[index] = nil;
+end;
+
+module.table.contains = function(t, value)
+	return module.table.indexOf(t, value) ~= -1;
+end;
+
+module.table.containsKey = function(t, value)
 	for k,v in pairs(t) do
 		if k == value then
 			return true;
@@ -75,7 +84,7 @@ module.table.ContainsKey = function(t, value)
 	return false;
 end;
 
-module.table.LastIndexOf = function(t, value)
+module.table.lastIndexOf = function(t, value)
 	for i=#t, 1, -1 do
 		if t[i] == value then
 			return i;
@@ -85,7 +94,7 @@ module.table.LastIndexOf = function(t, value)
 	return -1;
 end;
 
-module.table.Find = function(t, cb)
+module.table.find = function(t, cb)
 	for i=1, #t, 1 do
 		if cb(t[i]) then
 			return t[i];
@@ -95,7 +104,7 @@ module.table.Find = function(t, cb)
 	return nil;
 end;
 
-module.table.FindIndex = function(t, cb)
+module.table.findIndex = function(t, cb)
 	for i=1, #t, 1 do
 		if cb(t[i]) then
 			return i;
@@ -105,7 +114,7 @@ module.table.FindIndex = function(t, cb)
 	return -1;
 end;
 
-module.table.Filter = function(t, cb)
+module.table.filter = function(t, cb)
 	local newTable = {};
 
 	for i=1, #t, 1 do
@@ -117,7 +126,7 @@ module.table.Filter = function(t, cb)
 	return newTable;
 end;
 
-module.table.Map = function(t, cb)
+module.table.map = function(t, cb)
 	local newTable = {};
 
 	for i=1, #t, 1 do
@@ -127,7 +136,7 @@ module.table.Map = function(t, cb)
 	return newTable;
 end;
 
-module.table.Reverse = function(t)
+module.table.reverse = function(t)
 	local newTable = {};
 
 	for i=#t, 1, -1 do
@@ -137,7 +146,7 @@ module.table.Reverse = function(t)
 	return newTable;
 end;
 
-module.table.Clone = function(t)
+module.table.clone = function(t)
 	if type(t) ~= "table" then 
 		return t;
 	end
@@ -146,7 +155,7 @@ module.table.Clone = function(t)
 	local target = {};
 
 	for k,v in pairs(t) do
-		if type(v) == 'table' then
+		if type(v) == "table" then
 			target[k] = module.Clone(v);
 		else
 			target[k] = v;
@@ -160,7 +169,7 @@ end;
 
 -- create a new table with values of t1 and t2
 -- keys are lost in the process
-module.table.Concat = function(t1, t2)
+module.table.concat = function(t1, t2)
 	local res = {};
 
 	for k,v in pairs(t1) do
@@ -174,9 +183,9 @@ module.table.Concat = function(t1, t2)
 	return res;
 end;
 
-module.table.Join = function(t, sep)
-	local sep = sep or ',';
-	local res = '';
+module.table.join = function(t, sep)
+	local sep = sep or ",";
+	local res = "";
 
 	for i=1, #t, 1 do
 		if i > 1 then
@@ -191,7 +200,7 @@ end;
 
 -- Credit: https://stackoverflow.com/a/15706820
 -- Description: sort function for pairs
-module.table.Sort = function(t, order)
+module.table.sort = function(t, order)
 	-- collect the keys
 	local keys = {};
 

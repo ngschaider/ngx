@@ -1,99 +1,146 @@
+local logger = M("logger");
 local utils = M("utils");
-local callbacks = M("callbacks");
+local callback = M("callback");
+local event = M("event");
+local game = M("game");
+local characterClass = M("character");
 
 local users = {};
 
-local CreateUser = function()
-    local userId = MySQL.insert.await("INSERT INTO players (identifier) VALUES (?)", {identifier});
+local Create = function(identifier)
+    local id = MySQL.insert.await("INSERT INTO users (identifier) VALUES (?)", {identifier});
+	local user = module.getById(id);
 
-	return ConstructUser(userId);
+	return user;
 end
 
-local ConstructUser = function(userId)
+local Construct = function(id)
 	local self = {};
 
-	local results = MySQL.prepare.await("SELECT identifier FROM players WHERE id=?", {userId});
+	self.id = id;
+	self.identifier = MySQL.scalar.await("SELECT identifier FROM users WHERE id=?", {self.id});
 
-	local identifier = results[1].identifier;
-	local id = userId;
-	local character = nil;
+	if not self.identifier then
+		return nil;
+	end
 
-	self.TriggerEvent = function(eventName, ...)
-		TriggerClientEvent(eventName, self.playerId, ...);
-	end;
-	
-	self.SetCharacter = function(character)
-		self.character = character;
-	end;
-	
-	self.GetCharacter = function()
-		return self.character;
+	self.rpcWhitelist = {};
+
+	self.emit = function(name, ...)
+		event.emitClient(name, self.getPlayerId(), ...);
 	end;
 
-	self.GetCharacters = function()
-		return MySQL.prepare.await("SELECT * FROM characters WHERE user_id=?", {self.id});
+	self.getPlayerId = function()
+		for k,v in pairs(GetPlayers()) do
+			if utils.getIdentifier(v) == self.identifier then
+				return tonumber(v);
+			end
+		end
+		
+		return nil;
 	end;
 
-	self.Kick = function(reason)
+	self.getIsOnline = function()
+		return self.getPlayerId() ~= nil;
+	end;
+
+	self.kick = function(reason)
+		if not self.getIsOnline() then 
+			return 
+		end
 		DropPlayer(self.playerId, reason);
 	end;
 
-	self.GetIdentifier = function()
+	self.getIdentifier = function()
 		return self.identifier;
 	end;
 
-	self.ShowNotification = function(msg)
-		self.TriggerEvent('ngx:ShowNotification', msg)
+	self.showNotification = function(msg)
+		self.emit("notification:showNotification", msg);
 	end;
 
-	self.ShowHelpNotification = function(msg, thisFrame, beep, duration)
-		self.TriggerEvent('ngx:ShowHelpNotification', msg, thisFrame, beep, duration)
+	self.showHelpNotification = function(msg, thisFrame, beep, duration)
+		self.emit("notification:showHelpNotification", msg, thisFrame, beep, duration);
+	end;
+
+	self.getCurrentCharacterId = function()
+		return self.currentCharacterId;
+	end;
+	table.insert(self.rpcWhitelist, "setCurrentCharacterId")
+
+	self.setCurrentCharacterId = function(id)
+		self.currentCharacterId = id;
+	end;
+	table.insert(self.rpcWhitelist, "setCurrentCharacterId")
+
+	self.getCurrentCharacter = function()
+		local id = self.getCurrentCharacterId();
+		return characterClass.getById(id);
+	end;
+
+	self.createCharacter = function(firstname, lastname, dateofbirth, height, skin)
+		local characterId = characterClass.Create(self.id, firstname, lastname, dateofbirth, height, skin);
+		return characterId;
+	end;
+	table.insert(self.rpcWhitelist, "createCharacter");
+
+	self.getCharacterIds = function()
+		local results = MySQL.query.await("SELECT id FROM characters WHERE user_id=?", {self.id});
+		
+		local ids = {};
+		for k,v in pairs(results) do
+			table.insert(ids, v.id);
+		end
+		return ids;
+	end;
+	table.insert(self.rpcWhitelist, "getCharacterIds");
+
+	self.getCharacters = function()
+		local ids = user.getCharacterIds();	
+	
+		local characters = {};
+		for k,v in pairs(results) do
+			local character = module.getById(v.id);
+			table.insert(characters, character);
+		end
+		return characters;
 	end;
 
 	return self;
 end;
 
-module.GetByUserId = function(userId)
-	if not players[userId] then
-		players[userId] = ConstructPlayer(userId);
+module.getById = function(id)
+	if not users[id] then
+		users[id] = Construct(id);
 	end
 
-	return players[userId];
+	return users[id];
 end;
 
-module.GetByIdentifier = function(identifier)
-	local results = MySQL.prepare.await("SELECT id FROM users WHERE identifier=?", {identifier});
-
-	for k,v in pairs(users) do
-		if v.GetIdentifier() == identifier then
-			return v;
-		end
-	end
-
-	return CreatePlayer(identifier);
-end;
-
-module.GetByPlayerId = function(playerId)
-	for k,v in pairs(users) do
-		if v.playerId == playerId then
-			return v;
-		end
-	end
+module.getByIdentifier = function(identifier)
+	local id = MySQL.scalar.await("SELECT id FROM users WHERE identifier=?", {identifier});
 	
-	return CreatePlayer(identifier);
+	if id then
+		return module.getById(id);
+	else
+		local user = Create(identifier);
+		users[user.id] = user;
+		return user;
+	end
 end;
 
-callbacks.RegisterServerCallback("ngx:user:GetData", function(clientId, cb, key, ...)
-	local user = module.GetByPlayerId(clientId);
-	
-	local whitelist = {"characters"};
+module.getByPlayerId = function(playerId)
+	local identifier = utils.getIdentifier(playerId);
+	return module.getByIdentifier(identifier);
+end;
 
-	if not utils.table.Contains(whitelist, key) then
+callback.register("user:rpc", function(playerId, cb, name, ...)
+	local user = module.getByPlayerId(playerId);
+	
+	if not utils.table.contains(user.rpcWhitelist, name) then
+		logger.warn("function name " .. name .. " not in whitelist - user rpc failed.");
 		return;
 	end
 
-	-- concatenate "Get" and `key` with the first letter uppercased
-	local functionName = "Get" .. key:gsub("^%l", string.upper);
-
-	cb(user[functionName](...));
+	cb(user[name](...));
 end);

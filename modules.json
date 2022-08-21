@@ -1,5 +1,17 @@
 [
+    "admin",
     "base",
+    "callback",
     "character",
-    "character_selector"
+    "character_selector",
+    "charcreator",
+    "command",
+    "eval",
+    "event",
+    "logger",
+    "save",
+    "skin",
+    "streaming",
+    "user",
+    "utils"
 ]

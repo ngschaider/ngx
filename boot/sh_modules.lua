@@ -14,8 +14,8 @@ local GetEntryPoints = function(moduleName)
 
     local entryPoints = {};
 
-    for k,v in pairs(sides) do
-        local path = 'modules/' .. moduleName .. '/' .. v .. '/module.lua';
+    for k,side in pairs(sides) do
+        local path = 'modules/' .. moduleName .. '/' .. side .. '.lua';
         if LoadResourceFile(resourceName, path) then
             table.insert(entryPoints, path);
         end
@@ -54,6 +54,8 @@ M = function(moduleName)
     if loadedModules[moduleName] then
         return loadedModules[moduleName];
     end
+
+    print("[^2INFO^7] Loading module " .. moduleName);
 
     local moduleEnv = CreateEnv(moduleName);
     local entryPoints = GetEntryPoints(moduleName);

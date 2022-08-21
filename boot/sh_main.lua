@@ -38,4 +38,4 @@ for k,v in pairs(modules) do
     M(v);
 end
 
-print('[^2INFO^7] ^5NGX^0 initialized with ' .. #modules .. " modules.");
+--print('[^2INFO^7] ^5NGX^0 initialized with ' .. #modules .. " modules.");

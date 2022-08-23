@@ -2,14 +2,25 @@ local utils = M("utils");
 local callback = M("callback");
 local event = M("event");
 local logger = M("logger");
+local inventoryClass = M("inventory");
 
 local characters = {};
 
 module.Create = function(userId, firstname, lastname, dateofbirth, height, skin)
+	local inventoryId = inventoryClass.Create(20);
+
 	local skinStr = json.encode(skin);
-	print(skinStr);
-	local id = MySQL.insert.await("INSERT INTO characters (user_id, firstname, lastname, dateofbirth, height, skin, position_x, position_y, position_z) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", {
-		userId, firstname, lastname, dateofbirth, height, skinStr, 213.78, -900.12, 29.69
+	local id = MySQL.insert.await("INSERT INTO characters (user_id, firstname, lastname, dateofbirth, height, skin, position_x, position_y, position_z, inventory_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", {
+		userId, 
+		firstname, 
+		lastname, 
+		dateofbirth, 
+		height, 
+		skinStr, 
+		213.78, 
+		-900.12, 
+		29.69,
+		inventoryId,
 	});
 
 	return id;
@@ -86,6 +97,17 @@ local Construct = function(id)
         MySQL.update.await("UPDATE characters SET skin=? WHERE id=?", {skinStr, character.id});
     end;
     table.insert(self.rpcWhitelist, "setSkin");
+
+	self.getInventoryId = function()
+		local inventoryId = MySQL.scalar.await("SELECT inventory_id FROM characters WHERE id=?", {self.id});
+		return inventoryId;
+	end;
+	table.insert(self.rpcWhitelist, "getInventoryId");
+
+	self.getInventory = function()
+		local inventoryId = self.getInventoryId();
+		return inventoryClass.getById(inventoryId);
+	end;
 
 	return self;
 end

@@ -29,8 +29,10 @@ end;
 -- save when player dropped
 event.on("event:playerDropped", function(playerId, reason)
     local character = characterClass.getByPlayerId(playerId);
-    print("Saving " .. character.getName() .. " because they left.");
-    SaveCharacter(character);
+    if character then
+        print("Saving " .. character.getName() .. " because they left.");
+        SaveCharacter(character);
+    end
 end);
 
 --[[

@@ -3,6 +3,7 @@ local utils = M("utils");
 local logger = M("logger");
 local event = M("event");
 local skin = M("skin");
+local inventoryClass = M("inventory");
 
 local characters = {};
 
@@ -15,7 +16,7 @@ local Construct = function(id)
 
 	self.id = id;
 
-	self.getName = function(cb)
+	self.getName = function()
 		local p = promise.new();
 		rpc("getName", function(name)
 			p:resolve(name);
@@ -23,7 +24,7 @@ local Construct = function(id)
 		return Citizen.Await(p);
 	end;
 
-	self.getLastPosition = function(cb)
+	self.getLastPosition = function()
 		local p = promise.new()
 		rpc("getLastPosition", function(lastPosition)
 			p:resolve(lastPosition)
@@ -31,7 +32,7 @@ local Construct = function(id)
 		return Citizen.Await(p);
 	end;
 
-	self.getSkin = function(cb)
+	self.getSkin = function()
 		local p = promise.new();
 		rpc("getSkin", function(skin)
 			p:resolve(skin);
@@ -39,12 +40,25 @@ local Construct = function(id)
 		return Citizen.Await(p);
 	end;
 	
-	self.setSkin = function(skin, cb)
+	self.setSkin = function(skin)
 		local p = promise.new();
 		rpc("setSkin", function()
 			p:resolve();
 		end, skin);
 		return Citizen.Await(p);
+	end;
+
+	self.getInventoryId = function()
+		local p = promise.new();
+		rpc("getInventoryId", function(inventoryId)
+			p:resolve(inventoryId);
+		end);
+		return Citizen.Await(p);
+	end;
+
+	self.getInventory = function()
+		local inventoryId = self.getInventoryId();
+		return inventoryClass.getById(inventoryId);
 	end;
 
 	return self;

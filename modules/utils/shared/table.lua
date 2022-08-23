@@ -95,9 +95,11 @@ module.table.lastIndexOf = function(t, value)
 end;
 
 module.table.find = function(t, cb)
-	for i=1, #t, 1 do
-		if cb(t[i]) then
-			return t[i];
+	print("got ", json.encode(t));
+	for k,v in pairs(t) do
+		if cb(v) then
+			print("returning", json.encode(v));
+			return v;
 		end
 	end
 
@@ -105,13 +107,13 @@ module.table.find = function(t, cb)
 end;
 
 module.table.findIndex = function(t, cb)
-	for i=1, #t, 1 do
-		if cb(t[i]) then
-			return i;
+	for k,v in pairs(t) do
+		if cb(v) then
+			return k;
 		end
 	end
 
-	return -1;
+	return nil;
 end;
 
 module.table.filter = function(t, cb)

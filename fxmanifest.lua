@@ -25,16 +25,18 @@ client_scripts {
 }
 
 ui_page {
-	'html/ui.html'
+	'html/ui.html',
 }
 
 files {
 	"modules.json",
+	"modules/**/shared.lua",
 	"modules/**/shared/*.lua",
-	"modules/**/client/*.lua"
+	"modules/**/client.lua",
+	"modules/**/client/*.lua",
 }
 
 dependencies {
 	'oxmysql',
-	"NativeUI"
+	"NativeUI",
 }

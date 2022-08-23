@@ -15,11 +15,14 @@ local GetEntryPoints = function(moduleName)
     local entryPoints = {};
 
     for k,side in pairs(sides) do
-        local path = 'modules/' .. moduleName .. '/' .. side .. '.lua';
+        local path = "modules/" .. moduleName .. "/" .. side .. ".lua";
+        --print(resourceName, path);
         if LoadResourceFile(resourceName, path) then
+            --print("inserting");
             table.insert(entryPoints, path);
         end
     end
+    --print(json.encode(entryPoints));
 
     return entryPoints;
 end;

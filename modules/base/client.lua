@@ -25,10 +25,11 @@ end);
 ]]
 
 local SpawnWithCharacter = function(character)
+	local player = PlayerId();
 	local playerPed = PlayerPedId();
 
 	--print("giving player control 2");
-    SetPlayerControl(PlayerId(), true);
+    SetPlayerControl(player, true);
 
 	--print("unfreezing player 2");
 	FreezeEntityPosition(playerPed, false);
@@ -49,9 +50,12 @@ local SpawnWithCharacter = function(character)
 	--print("Spawning " .. character.getName());
 end;
 
+print("loaded base");
 Citizen.CreateThread(function()
     while true do
+		print("waiting for network session");
 		if NetworkIsSessionStarted() then
+			print("session started");
 			if IsScreenFadedOut() then
 				DoScreenFadeIn();
 			end

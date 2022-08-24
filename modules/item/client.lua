@@ -1,12 +1,10 @@
 local callback = M("callback");
+local OOP = M("oop");
 
-local Construct = class.CreateClass({
-    name = "Item",
-}, function(self, id)
+local Item = OOP.CreateClass("Item", function(self, id)
 	local rpc = function(name, ...)
         local p = promise.new();
 		callback.trigger("item:rpc", function(...) 
-            --print("resolving", ...);
             p:resolve(...);
         end, self.id, name, ...);
         return Citizen.Await(p);
@@ -54,7 +52,6 @@ local Construct = class.CreateClass({
         rpc("use");
     end
 end);
+Item.GetById = Item.constructor;
 
-module.getById = function(id)
-	return Construct(id);
-end;
+module.Item = Item;

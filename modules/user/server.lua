@@ -3,16 +3,11 @@ local utils = M("utils");
 local callback = M("callback");
 local event = M("event");
 local game = M("game");
-local characterClass = M("character");
+local Character = M("character");
+local OOP = M("oop");
 
-local Create = function(identifier)
-    local id = MySQL.insert.await("INSERT INTO users (identifier) VALUES (?)", {identifier});
-	local user = module.getById(id);
 
-	return user;
-end
-
-local Construct = function(id)
+local Character = OOP.CreateClass("Character", function(id)
 	local self = {};
 
 	self.id = id;
@@ -105,72 +100,82 @@ local Construct = function(id)
 	table.insert(self.rpcWhitelist, "getCharacterIds");
 
 	self.getCharacters = function()
-		local ids = user.getCharacterIds();	
+		local ids = self.getCharacterIds();	
 	
 		local characters = {};
 		for k,v in pairs(results) do
-			local character = module.getById(v.id);
+			local character = User.GetById(v.id);
 			table.insert(characters, character);
 		end
 		return characters;
 	end;
 
 	return self;
-end;
+end);
+module.GetById = User.constructor;
 
-module.getById = function(id)
-	return Construct(id);
-end;
+Character.Create = function(identifier)
+    local id = MySQL.insert.await("INSERT INTO users (identifier) VALUES (?)", {identifier});
+	local user = User.GetById(id);
 
-module.getByIdentifier = function(identifier)
+	return user;
+end
+module.Create = User.Create;
+
+User.GetByIdentifier = function(identifier)
 	--logger.debug("user.getByIdentifier", "identifier", identifier);
 	local id = MySQL.scalar.await("SELECT id FROM users WHERE identifier=?", {identifier});
 	--logger.debug("user.getByIdentifier", "id", id);
 
 	if id then
-		return module.getById(id);
+		return User.GetById(id);
 	else
 		local user = Create(identifier);
 		users[user.id] = user;
 		return user;
 	end
 end;
+module.GetByIdentifier = User.GetByIdentifier;
 
-module.getByPlayerId = function(playerId)
+User.GetByPlayerId = function(playerId)
 	--logger.debug("user.getByPlayerId", "playerId", playerId);
 	local identifier = utils.getIdentifier(playerId);
 	--logger.debug("user.getByPlayerId", "identifier", identifier);
-	local user = module.getByIdentifier(identifier);
+	local user = User.GetByIdentifier(identifier);
 	--logger.debug("user.getByPlayerId", "user.id", user.id);
 	return user;
 end;
+module.GetByPlayerId = User.GetByPlayerId;
 
-module.getAllOnlineIds = function()
-	local users = module.getAllOnline();
-	local ret = {};
+User.GetAllOnlineIds = function()
+	local users = User.GetAllOnline();
+	local ids = {};
 	for _,user in pairs(users) do
-		table.insert(ret, user.id);
+		table.insert(ids, user.id);
 	end
-
-	return ret;
+	return ids;
 end;
+module.GetAllOnlineIds = User.GetAllOnlineIds;
+
 callback.register("user:getAllOnlineIds", function(playerId, cb)
-	local ids = module.getAllOnlineIds();
+	local ids = User.GetAllOnlineIds();
 	cb(ids);
 end);
 
-module.getAllOnline = function()
+User.GetAllOnline = function()
 	local playerIds = GetPlayers();
-	local ret = {};
+	local users = {};
 	for _,playerId in pairs(playerIds) do
-		table.insert(ret, module.getByPlayerId(playerId));
+		local user = User.GetByPlayerId(playerId);
+		table.insert(users, user);
 	end
 
-	return ret;
+	return users;
 end;
+module.GetAllOnline = User.GetAllOnline;
 
 callback.register("user:rpc", function(playerId, cb, name, ...)
-	local user = module.getByPlayerId(playerId);
+	local user = User.GetByPlayerId(playerId);
 
 	if not utils.table.contains(user.rpcWhitelist, name) then
 		logger.warn("function name " .. name .. " not in whitelist - user rpc failed.");
@@ -182,7 +187,7 @@ end);
 
 callback.register("user:getSelfId", function(playerId, cb)
 	--print("callback called", playerId, cb);
-	local user = module.getByPlayerId(playerId);
+	local user = User.GetByPlayerId(playerId);
 	--print("calling cb");
 	cb(user.id);
 end);

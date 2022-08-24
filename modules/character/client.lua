@@ -58,4 +58,5 @@ local Character = OOP.CreateClass("Character", function(self, id)
 		return inventoryClass.getById(inventoryId);
 	end;
 end);
+
 module.GetById = Character.constructor;

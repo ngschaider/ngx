@@ -1,9 +1,9 @@
 local logger = M("logger");
 local utils = M("utils");
 local callback = M("callback");
-local oop = M("oop");
+local OOP = M("oop");
 
-local Item = oop.CreateClass("Item", function(self, id)
+local Item = OOP.CreateClass("Item", function(self, id)
     self.id = id;
 
     self.rpcWhitelist = {};
@@ -17,7 +17,7 @@ local Item = oop.CreateClass("Item", function(self, id)
     self.getInventory = function()
         local id = self.getInventoryId();
         if id then
-            return M("inventory").getById(id);
+            return M("inventory").GetById(id);
         else
             return nil;
         end
@@ -62,32 +62,18 @@ local Item = oop.CreateClass("Item", function(self, id)
         end);
     end;
 
-    self.Destroy = function()
+    self.destroy = function()
         MySQL.query.await("DELETE FROM items WHERE id=?", {self.id});
     end;
 end);
 
-Item.GetById = function(id)
-    return Construct(id);
-end;
-
-Item.Create = function(itemName)
-    local classes = class.GetAllClasses();
-    local specificItemClass = utils.table.find(classes, function(class)
-        return class.is_a("Item") and class.name == itemName;
-    end);
-
-    if not specificItemClass then
-        logger.warn("Unkown item name " .. itemName);
-        return;
-    end
-
+Item.Create = function(SpecificItem)
     local id = MySQL.insert.await("INSERT INTO items (name, label) VALUES (?, ?)", {
-        specificItemClass.name,
-        specificItemClass.label,
+        SpecificItem.name,
+        SpecificItem.label,
     });
 
-	return Item.getById(id);
+	return Item.GetById(id);
 end;
 
 callback.register("item:rpc", function(playerId, cb, id, name, ...)
@@ -125,3 +111,14 @@ RegisterCommand("beer", function(playerId, args, rawCommand)
     print("setting item inventory_id", inventory.id);
     item.setInventoryId(inventory.id)
 end, true);
+
+
+
+
+-- Exports
+run("server/beer.lua");
+
+
+module.Item = {
+    GetById = Item.constructor,
+}

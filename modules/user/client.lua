@@ -1,104 +1,83 @@
 local callback = M("callback");
-local characterClass = M("character");
-local class = M("class");
+local Character = M("character");
+local OOP = M("oop");
 
-local users = {};
+local User = OOP.CreateClass("User", function(self, id)
+	local rpc = function(name, ...)
+        local p = promise.new();
+		callback.trigger("item:rpc", function(...) 
+            p:resolve(...);
+        end, self.id, name, ...);
+        return Citizen.Await(p);
+	end;
 
-local rpc = function(name, cb, ...)
-	callback.trigger("user:rpc", cb, name, ...);
-end;
-
-local Construct = class.CreateClass({
-	name = "User",
-}, function(self, id)
 	self.id = id;
 
 	self.getName = function()
-		local p = promise.new();
-		rpc("getName", function(name)
-			p:resolve(name)
-		end);
-		return Citizen.Await(p);
+		return rpc("getName");
 	end;
 
 	self.getCharacterIds = function()
-		local p = promise.new();
-		rpc("getCharacterIds", function(characterIds)
-			p:resolve(characterIds);
-		end);
-		return Citizen.Await(p);
+		return rpc("getCharacterIds")
 	end;
 	
 	self.getCharacters = function()
-		local p = promise.new();
-		rpc("getCharacterIds", function(ids)
-			local characters = {};
-			for _,id in pairs(ids) do
-				local character = characterClass.getById(id);
-				table.insert(characters, character);
-			end
-			p:resolve(characters);
-		end);
-		return Citizen.Await(p);
+		local ids = self.getCharacterIds();
+		local characters = {};
+		for _,id in pairs(ids) do
+			local character = Character.getById(id);
+			table.insert(characters, character);
+		end
+		return characters;
 	end;
 	
 	self.setCurrentCharacterId = function(id)
-		local p = promise.new();
-		--print("setCurrentCharacterId", id);
-		rpc("setCurrentCharacterId", function()
-			p:resolve();
-		end, id);
-		return Citizen.Await(p);
+		rpc("setCurrentCharacterId", id);
 	end;
 	
 	self.getCurrentCharacterId = function()
-		local p = promise.new();
-		rpc("getCurrentCharacterId", function(currentCharacterId)
-			p:resolve(currentCharacterId);
-		end);
-		return Citizen.Await(p);
+		return rpc("getCurrentCharacterId");
 	end;
 	
 	self.getCurrentCharacter = function()
 		local currentCharacterId = self.getCurrentCharacterId();
 		if currentCharacterId then
-			return characterClass.getById(currentCharacterId);
+			return Character.getById(currentCharacterId);
 		else
 			return nil;
 		end
 	end;
 	
 	self.createCharacter = function(firstname, lastname, dateofbirth, height, skin)
-		local p = promise.new();
-		rpc("createCharacter", function(id)
-			local character = characterClass.getById(id);
-			p:resolve(character);
-		end, firstname, lastname, dateofbirth, height, skin);
-		return Citizen.Await(p);
+		local id = rpc("createCharacter", firstname, lastname, dateofbirth, height, skin);
+		return Character.GetById(id);
 	end;
 end);
+module.GetById = User.constructor;
 
-module.getById = function(id)
-	return Construct(id);
-end;
-
-module.getSelf = function()
+User.GetSelf = function()
 	local p = promise.new();
-	callback.trigger("user:getSelfId", function(selfUserId)
-		local selfUser = Construct(selfUserId);
-		p:resolve(selfUser);
+	callback.trigger("user:getSelfId", function(id)
+		p:resolve(id);
 	end);
-	return Citizen.Await(p);
+	local id = Citizen.Await(p);
+	return User.GetById(id);
 end;
+module.GetSelf = User.GetSelf;
 
-module.getAllOnline = function(cb)
+User.GetAllOnline = function(cb)
 	local p = promise.new();
 	callback.trigger("user:getAllOnlineIds", function(ids)
-		local onlineUsers = {};
-		for _,id in pairs(ids) do
-			table.insert(onlineUsers, module.getById(id));
-		end
-		p:resolve(onlineUsers);
+		p:resolve(ids);
 	end);
-	return Citizen.Await(p);
+	local ids = Citizen.Await(p);
+
+	local users = {};
+	for _,id in pairs(ids) do
+		local user = User.GetById(id);
+		table.insert(users, user);
+	end
+
+	return users;
 end;
+module.GetAllOnline = User.GetAllOnline;

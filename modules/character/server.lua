@@ -26,7 +26,7 @@ local Character = OOP.CreateClass("Character", function(self, id)
 	end;
 
 	self.setPosition = function(coords)
-		self.getUser().emit("utils:teleport", coords);
+		utils.teleport(coords);
 	end;
 
 	self.getPosition = function()

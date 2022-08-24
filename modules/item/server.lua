@@ -1,19 +1,9 @@
 local logger = M("logger");
 local utils = M("utils");
 local callback = M("callback");
+local oop = M("oop");
 
-module.Create = function(type)
-    local id = MySQL.insert.await("INSERT INTO items (name, type) VALUES (?, ?)", {
-        ItemClass.defaultName,
-        ItemClass.type,
-    });
-
-	return id;
-end;
-
-local Construct = class.CreateClass({
-    name = "Item",
-}, function(self, id)
+local Item = oop.CreateClass("Item", function(self, id)
     self.id = id;
 
     self.rpcWhitelist = {};
@@ -77,8 +67,27 @@ local Construct = class.CreateClass({
     end;
 end);
 
-module.getById = function(id)
+Item.GetById = function(id)
     return Construct(id);
+end;
+
+Item.Create = function(itemName)
+    local classes = class.GetAllClasses();
+    local specificItemClass = utils.table.find(classes, function(class)
+        return class.is_a("Item") and class.name == itemName;
+    end);
+
+    if not specificItemClass then
+        logger.warn("Unkown item name " .. itemName);
+        return;
+    end
+
+    local id = MySQL.insert.await("INSERT INTO items (name, label) VALUES (?, ?)", {
+        specificItemClass.name,
+        specificItemClass.label,
+    });
+
+	return Item.getById(id);
 end;
 
 callback.register("item:rpc", function(playerId, cb, id, name, ...)
@@ -99,9 +108,9 @@ end);
 
 RegisterCommand("beer", function(playerId, args, rawCommand)
     print("giving player a beer");
-    local itemId = Create("beer");
+    local itemId = Item.Create("beer");
     print("getting beer");
-    local item = module.getById(itemId);
+    local item = Item.getById(itemId);
     print("beer");
 
     print("getting character");

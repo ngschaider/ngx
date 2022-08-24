@@ -6,7 +6,7 @@ local Construct = class.CreateClass({
 	local rpc = function(name, ...)
         local p = promise.new();
 		callback.trigger("item:rpc", function(...) 
-            print("resolving", ...);
+            --print("resolving", ...);
             p:resolve(...);
         end, self.id, name, ...);
         return Citizen.Await(p);
@@ -56,9 +56,5 @@ local Construct = class.CreateClass({
 end);
 
 module.getById = function(id)
-	if not items[id] then
-		items[id] = Construct(id);
-	end
-
-	return items[id];
+	return Construct(id);
 end;

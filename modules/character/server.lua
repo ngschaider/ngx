@@ -3,32 +3,9 @@ local callback = M("callback");
 local event = M("event");
 local logger = M("logger");
 local inventoryClass = M("inventory");
+local OOP = M("oop");
 
-local characters = {};
-
-module.Create = function(userId, firstname, lastname, dateofbirth, height, skin)
-	local inventoryId = inventoryClass.Create(20);
-
-	local skinStr = json.encode(skin);
-	local id = MySQL.insert.await("INSERT INTO characters (user_id, firstname, lastname, dateofbirth, height, skin, position_x, position_y, position_z, inventory_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", {
-		userId, 
-		firstname, 
-		lastname, 
-		dateofbirth, 
-		height, 
-		skinStr, 
-		213.78, 
-		-900.12, 
-		29.69,
-		inventoryId,
-	});
-
-	return id;
-end;
-
-local Construct = class.CreateClass({
-	name = "Character",
-}, function(self, id)
+local Character = OOP.CreateClass("Character", function(self, id)
 	self.id = id;
 	self.rpcWhitelist = {};
 
@@ -109,13 +86,31 @@ local Construct = class.CreateClass({
 		return inventoryClass.getById(inventoryId);
 	end;
 end);
+module.GetById = Character.constructor;
 
-module.getById = function(id)
-	return Construct(id);
+Character.Create = function(userId, firstname, lastname, dateofbirth, height, skin)
+	local inventoryId = inventoryClass.Create(20);
+
+	local skinStr = json.encode(skin);
+	local id = MySQL.insert.await("INSERT INTO characters (user_id, firstname, lastname, dateofbirth, height, skin, position_x, position_y, position_z, inventory_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", {
+		userId, 
+		firstname, 
+		lastname, 
+		dateofbirth, 
+		height, 
+		skinStr, 
+		213.78, 
+		-900.12, 
+		29.69,
+		inventoryId,
+	});
+
+	return id;
 end;
+module.Create = Character.Create;
 
-module.getByPlayerId = function(playerId)
-	local user = M("user").getByPlayerId(playerId);
+Character.GetByPlayerId = function(playerId)
+	local user = M("user").GetByPlayerId(playerId);
 	
 	if not user then
 		logger.debug("User with player id " .. playerId .. " not found - returning nil");
@@ -124,8 +119,9 @@ module.getByPlayerId = function(playerId)
 
 	return user.getCurrentCharacter();
 end;
+module.GetByPlayerId = Character.GetByPlayerId;
 
-module.getAll = function()
+Character.GetAll = function()
 	local ret = {};
 
 	local data = MySQL.query.await("SELECT id FROM characters");
@@ -135,6 +131,7 @@ module.getAll = function()
 
 	return ret;
 end;
+module.GetAll = Character.GetAll;
 
 callback.register("character:rpc", function(playerId, cb, id, name, ...)
 	local character = module.getById(id);

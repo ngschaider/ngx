@@ -1,6 +1,5 @@
 TODO:
 
-- OOP mit Vererbung umsetzen (class-Modul?)
 - Inventarsystem fertig implementieren (Vererbung?)
 - Moduldateien nach Prefix importieren (sv_, cl_, sh_), keine festgelegten Dateinamen mehr
 
@@ -15,3 +14,7 @@ TODO:
 - pet-Modul für Tiere in Charakterbesitz
 - pedestrian-Modul um Standard-NPC-Verkehr zu regeln/auszuschalten
 - zone-Modul / area-Modul um Flächen auszuwählen (reines Utility-Modul)
+
+
+Muss getestet werden:
+- OOP mit Vererbung umsetzen (class-Modul?)

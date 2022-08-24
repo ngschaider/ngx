@@ -1,11 +1,10 @@
 local callback = M("callback");
 local itemClass = M("item");
+local class = M("class");
 
-local inventories = {};
-
-local Construct = function(id)
-	local self = {};
-
+local Construct = class.CreateClass({
+	name = "Inventory",
+}, function(self, id)
 	local rpc = function(name, ...)
 		local p = promise.new();
 		callback.trigger("inventory:rpc", function(...)
@@ -37,14 +36,8 @@ local Construct = function(id)
 
         return items;
     end;
-
-	return self;
-end;
+end);
 
 module.getById = function(id)
-	if not inventories[id] then
-		inventories[id] = Construct(id);
-	end
-
-	return inventories[id];
+	return Construct(id);
 end;

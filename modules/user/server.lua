@@ -5,8 +5,6 @@ local event = M("event");
 local game = M("game");
 local characterClass = M("character");
 
-local users = {};
-
 local Create = function(identifier)
     local id = MySQL.insert.await("INSERT INTO users (identifier) VALUES (?)", {identifier});
 	local user = module.getById(id);
@@ -121,17 +119,13 @@ local Construct = function(id)
 end;
 
 module.getById = function(id)
-	if not users[id] then
-		users[id] = Construct(id);
-	end
-
-	return users[id];
+	return Construct(id);
 end;
 
 module.getByIdentifier = function(identifier)
-	logger.debug("user.getByIdentifier", "identifier", identifier);
+	--logger.debug("user.getByIdentifier", "identifier", identifier);
 	local id = MySQL.scalar.await("SELECT id FROM users WHERE identifier=?", {identifier});
-	logger.debug("user.getByIdentifier", "id", id);
+	--logger.debug("user.getByIdentifier", "id", id);
 
 	if id then
 		return module.getById(id);
@@ -143,11 +137,11 @@ module.getByIdentifier = function(identifier)
 end;
 
 module.getByPlayerId = function(playerId)
-	logger.debug("user.getByPlayerId", "playerId", playerId);
+	--logger.debug("user.getByPlayerId", "playerId", playerId);
 	local identifier = utils.getIdentifier(playerId);
-	logger.debug("user.getByPlayerId", "identifier", identifier);
+	--logger.debug("user.getByPlayerId", "identifier", identifier);
 	local user = module.getByIdentifier(identifier);
-	logger.debug("user.getByPlayerId", "user.id", user.id);
+	--logger.debug("user.getByPlayerId", "user.id", user.id);
 	return user;
 end;
 
@@ -187,8 +181,8 @@ callback.register("user:rpc", function(playerId, cb, name, ...)
 end);
 
 callback.register("user:getSelfId", function(playerId, cb)
-	print("callback called", playerId, cb);
+	--print("callback called", playerId, cb);
 	local user = module.getByPlayerId(playerId);
-	print("calling cb");
+	--print("calling cb");
 	cb(user.id);
 end);

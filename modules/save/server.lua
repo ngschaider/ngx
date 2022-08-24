@@ -3,11 +3,12 @@ local logger = M("logger");
 local event = M("event");
 
 local SaveCharacter = function(character)
-    logger.debug("save", "character.id", character.id);
+    logger.debug("Saving Character", character.id);
+    --logger.debug("save", "character.id", character.id);
     local user = character.getUser();
-    logger.debug("save", "user.id", user.id);
-    logger.debug("save", "user.getIsOnline()", user.getIsOnline());
-    logger.debug("save", "user.getCurrentCharacterId()", user.getCurrentCharacterId());
+    --logger.debug("save", "user.id", user.id);
+    --logger.debug("save", "user.getIsOnline()", user.getIsOnline());
+    --logger.debug("save", "user.getCurrentCharacterId()", user.getCurrentCharacterId());
     if user.getIsOnline() and user.getCurrentCharacterId() == character.id then
         local position = character.getPosition();
         print("Saving position of character", character.getName(), position.x, position.y, position.z);

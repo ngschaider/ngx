@@ -26,10 +26,10 @@ module.Create = function(userId, firstname, lastname, dateofbirth, height, skin)
 	return id;
 end;
 
-local Construct = function(id)
-	local self = {};
-
-	self.id = tonumber(id);
+local Construct = class.CreateClass({
+	name = "Character",
+}, function(self, id)
+	self.id = id;
 	self.rpcWhitelist = {};
 
 	self.getId = function()
@@ -108,16 +108,10 @@ local Construct = function(id)
 		local inventoryId = self.getInventoryId();
 		return inventoryClass.getById(inventoryId);
 	end;
-
-	return self;
-end
+end);
 
 module.getById = function(id)
-	if not characters[id] then
-		characters[id] = Construct(id);
-	end
-
-	return characters[id];
+	return Construct(id);
 end;
 
 module.getByPlayerId = function(playerId)

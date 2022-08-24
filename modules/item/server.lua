@@ -11,9 +11,9 @@ module.Create = function(type)
 	return id;
 end;
 
-local Construct = function(id)
-    local self = {};
-
+local Construct = class.CreateClass({
+    name = "Item",
+}, function(self, id)
     self.id = id;
 
     self.rpcWhitelist = {};
@@ -75,16 +75,14 @@ local Construct = function(id)
     self.Destroy = function()
         MySQL.query.await("DELETE FROM items WHERE id=?", {self.id});
     end;
-
-    return self;
-end;
+end);
 
 module.getById = function(id)
     return Construct(id);
 end;
 
 callback.register("item:rpc", function(playerId, cb, id, name, ...)
-	local item = ItemClass.getById(id);
+	local item = module.getById(id);
 
 	if not item then
 		logger.warn("Item not found - rpc failed");

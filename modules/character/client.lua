@@ -4,12 +4,11 @@ local logger = M("logger");
 local event = M("event");
 local skin = M("skin");
 local inventoryClass = M("inventory");
+local class = M("class");
 
-local characters = {};
-
-local Construct = function(id)
-	local self = {};
-
+local Construct = class.CreateClass({
+	name = "Character",
+}, function(self, id)
 	local rpc = function(name, cb, ...)
 		callback.trigger("character:rpc", cb, self.id, name, ...);
 	end;
@@ -60,14 +59,8 @@ local Construct = function(id)
 		local inventoryId = self.getInventoryId();
 		return inventoryClass.getById(inventoryId);
 	end;
-
-	return self;
-end;
+end);
 
 module.getById = function(id)
-	if not characters[id] then
-		characters[id] = Construct(id);
-	end
-
-	return characters[id];
+	return Construct(id);
 end;

@@ -1,8 +1,7 @@
 local utils = M("utils");
 local callback = M("callback");
 local logger = M("logger");
-
-local inventories = {};
+local class = M("class");
 
 module.Create = function(maxWeight)
 	local id = MySQL.insert.await("INSERT INTO inventories (max_weight) VALUES (?)", {
@@ -12,9 +11,9 @@ module.Create = function(maxWeight)
 	return id;
 end;
 
-local Construct = function(id)
-    local self = {};
-
+local Construct = class.CreateClass({
+	name = "Inventory",
+}, function(self, id)
     self.id = id;
 
 	self.rpcWhitelist = {};
@@ -55,16 +54,10 @@ local Construct = function(id)
 
         return items;
     end;
-
-	return self;
-end;
+end);
 
 module.getById = function(id)
-	if not inventories[id] then
-		inventories[id] = Construct(id);
-	end
-
-	return inventories[id];
+	return Construct(id);
 end;
 
 callback.register("inventory:rpc", function(playerId, cb, id, name, ...)

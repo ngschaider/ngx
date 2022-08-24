@@ -1,12 +1,8 @@
-print("loading client");
-
 local callback = M("callback");
 
-local items = {};
-
-local Construct = function(id)
-	local self = {};
-
+local Construct = class.CreateClass({
+    name = "Item",
+}, function(self, id)
 	local rpc = function(name, ...)
         local p = promise.new();
 		callback.trigger("item:rpc", function(...) 
@@ -57,9 +53,7 @@ local Construct = function(id)
     self.use = function()
         rpc("use");
     end
-
-	return self;
-end;
+end);
 
 module.getById = function(id)
 	if not items[id] then
@@ -68,5 +62,3 @@ module.getById = function(id)
 
 	return items[id];
 end;
-
-print("loaded client");

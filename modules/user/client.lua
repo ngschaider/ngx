@@ -1,5 +1,6 @@
 local callback = M("callback");
 local characterClass = M("character");
+local class = M("class");
 
 local users = {};
 
@@ -7,9 +8,9 @@ local rpc = function(name, cb, ...)
 	callback.trigger("user:rpc", cb, name, ...);
 end;
 
-local Construct = function(id)
-	local self = {};
-
+local Construct = class.CreateClass({
+	name = "User",
+}, function(self, id)
 	self.id = id;
 
 	self.getName = function()
@@ -75,40 +76,23 @@ local Construct = function(id)
 		end, firstname, lastname, dateofbirth, height, skin);
 		return Citizen.Await(p);
 	end;
-
-	return self;
-end;
+end);
 
 module.getById = function(id)
-	if not users[id] then
-		users[id] = Construct(id);
-	end
-	return users[id];
+	return Construct(id);
 end;
-
-local selfUser = nil;
 
 module.getSelf = function()
 	local p = promise.new();
-
-	if selfUser then
-		print("resolving selfUser with cache");
+	callback.trigger("user:getSelfId", function(selfUserId)
+		local selfUser = Construct(selfUserId);
 		p:resolve(selfUser);
-	else
-		print("calling callback");
-		callback.trigger("user:getSelfId", function(selfUserId)
-			print("resolving selfUser");
-			selfUser = Construct(selfUserId);
-			p:resolve(selfUser);
-		end);
-	end
-
+	end);
 	return Citizen.Await(p);
 end;
 
 module.getAllOnline = function(cb)
 	local p = promise.new();
-	
 	callback.trigger("user:getAllOnlineIds", function(ids)
 		local onlineUsers = {};
 		for _,id in pairs(ids) do

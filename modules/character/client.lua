@@ -4,59 +4,45 @@ local logger = M("logger");
 local event = M("event");
 local skin = M("skin");
 local inventoryClass = M("inventory");
-local OOP = M("oop");
+local class = M("class");
 
-local Character = OOP.CreateClass("Character", function(self, id)
-	local rpc = function(name, cb, ...)
-		callback.trigger("character:rpc", cb, self.id, name, ...);
-	end;
+local Character = class("Character");
 
+function Character:initialize(id)
 	self.id = id;
+end
 
-	self.getName = function()
-		local p = promise.new();
-		rpc("getName", function(name)
-			p:resolve(name);
-		end);
-		return Citizen.Await(p);
-	end;
+function Character:_rpc = function(name, ...)
+	local p = promise.new();
+	callback.trigger("character:rpc", function(...)
+		p:resolve(...);
+	end, self.id, name, ...);
+	return Citizen.Await(p);
+end;
 
-	self.getLastPosition = function()
-		local p = promise.new()
-		rpc("getLastPosition", function(lastPosition)
-			p:resolve(lastPosition)
-		end);
-		return Citizen.Await(p);
-	end;
+function Character:getName()
+	return self._rpc("getName");
+end
 
-	self.getSkin = function()
-		local p = promise.new();
-		rpc("getSkin", function(skin)
-			p:resolve(skin);
-		end);
-		return Citizen.Await(p);
-	end;
-	
-	self.setSkin = function(skin)
-		local p = promise.new();
-		rpc("setSkin", function()
-			p:resolve();
-		end, skin);
-		return Citizen.Await(p);
-	end;
+function Character:getLastPosition()
+	return self._rpc("getLastPosition");
+end;
 
-	self.getInventoryId = function()
-		local p = promise.new();
-		rpc("getInventoryId", function(inventoryId)
-			p:resolve(inventoryId);
-		end);
-		return Citizen.Await(p);
-	end;
+function Character:getSkin ()
+	return self._rpc("getSkin");
+end;
 
-	self.getInventory = function()
-		local inventoryId = self.getInventoryId();
-		return inventoryClass.getById(inventoryId);
-	end;
-end);
+function Character:setSkin(skin)
+	self._rpc("setSkin", skin);
+end;
 
-module.GetById = Character.constructor;
+function Character:getInventoryId()
+	return self._rpc("getInventoryId");
+end;
+
+function Character:getInventory()
+	local inventoryId = self.getInventoryId();
+	return inventoryClass.getById(inventoryId);
+end;
+
+module = Character;

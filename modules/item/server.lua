@@ -3,77 +3,79 @@ local utils = M("utils");
 local callback = M("callback");
 local OOP = M("oop");
 
-local Item = OOP.CreateClass("Item", function(self, id)
+local Item = class("Item");
+
+function Item:initialize(id)
     self.id = id;
+end
 
-    self.rpcWhitelist = {};
+Item.static.rpcWhitelist = {};
 
-    self.getInventoryId = function()
-        local id = MySQL.scalar.await("SELECT inventory_id FROM items WHERE id=?", {self.id});
-		return id;
-    end;
-    table.insert(self.rpcWhitelist, "getInventoryId");
-
-    self.getInventory = function()
-        local id = self.getInventoryId();
-        if id then
-            return M("inventory").GetById(id);
-        else
-            return nil;
-        end
-    end;
-
-    self.setInventoryId = function(inventoryId)
-        print("setInventoryId", json.encode(inventoryId), json.encode(self.id));
-        MySQL.update.await("UPDATE items SET inventory_id=? WHERE id=?", {inventoryId, self.id});
-    end;
-    table.insert(self.rpcWhitelist, "setInventoryId");
-
-    self.setInventory = function(inventory)
-        self.setInventoryId(inventory.id);
-    end;
-
-    self.getName = function()
-        local name = MySQL.scalar.await("SELECT name FROM items WHERE id=?", {self.id});
-        return name;
-    end;
-    table.insert(self.rpcWhitelist, "getName");
-
-    self.getType = function()
-        print("querying type");
-        local type = MySQL.scalar.await("SELECT type FROM items WHERE id=?", {self.id});
-        print("got type from db", type);
-        return type;
-    end;
-    table.insert(self.rpcWhitelist, "getType");
-
-    self.use = function()
-        local config = self.getConfig();
-        if config.use then
-            config.use(self);
-        end
-    end;
-    table.insert(self.rpcWhitelist, "use");
-
-    self.getConfig = function()
-        local type = self.getType();
-        utils.table.find(ItemConfigs, function(itemConfig) 
-            return itemConfig.type == type;
-        end);
-    end;
-
-    self.destroy = function()
-        MySQL.query.await("DELETE FROM items WHERE id=?", {self.id});
-    end;
-end);
-
-Item.Create = function(SpecificItem)
+Item.static.Create = function(SpecificItem)
     local id = MySQL.insert.await("INSERT INTO items (name, label) VALUES (?, ?)", {
         SpecificItem.name,
         SpecificItem.label,
     });
 
 	return Item.GetById(id);
+end;
+
+function Item:getInventoryId()
+    local id = MySQL.scalar.await("SELECT inventory_id FROM items WHERE id=?", {self.id});
+    return id;
+end;
+table.insert(self.rpcWhitelist, "getInventoryId");
+
+function Item:getInventory()
+    local id = self.getInventoryId();
+    if id then
+        return M("inventory").GetById(id);
+    else
+        return nil;
+    end
+end;
+
+function Item:setInventoryId (inventoryId)
+    print("setInventoryId", json.encode(inventoryId), json.encode(self.id));
+    MySQL.update.await("UPDATE items SET inventory_id=? WHERE id=?", {inventoryId, self.id});
+end;
+table.insert(self.rpcWhitelist, "setInventoryId");
+
+function Item:setInventory(inventory)
+    self.setInventoryId(inventory.id);
+end;
+
+function Item:getName()
+    local name = MySQL.scalar.await("SELECT name FROM items WHERE id=?", {self.id});
+    return name;
+end;
+table.insert(self.rpcWhitelist, "getName");
+
+function Item:getType()
+    print("querying type");
+    local type = MySQL.scalar.await("SELECT type FROM items WHERE id=?", {self.id});
+    print("got type from db", type);
+    return type;
+end;
+table.insert(self.rpcWhitelist, "getType");
+
+function Item:use()
+    local config = self.getConfig();
+    if config.use then
+        config.use(self);
+    end
+end;
+table.insert(self.rpcWhitelist, "use");
+
+function Item:getConfig()
+    local type = self.getType();
+    utils.table.find(ItemConfigs, function(itemConfig) 
+        return itemConfig.type == type;
+    end);
+end;
+
+function Item:destroy()
+    MySQL.query.await("DELETE FROM items WHERE id=?", {self.id});
 end;
 
 callback.register("item:rpc", function(playerId, cb, id, name, ...)

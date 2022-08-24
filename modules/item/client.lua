@@ -1,57 +1,58 @@
 local callback = M("callback");
-local OOP = M("oop");
+local class = M("class");
 
-local Item = OOP.CreateClass("Item", function(self, id)
-	local rpc = function(name, ...)
-        local p = promise.new();
-		callback.trigger("item:rpc", function(...) 
-            p:resolve(...);
-        end, self.id, name, ...);
-        return Citizen.Await(p);
-	end;
+local Item = class("Item");
 
-	self.id = id;
+function Item:initialize(id)
+    self.id = id;
+end
 
-	self.getName = function()
-		return rpc("getName");
-	end;
+function Item:_rpc(name, ...)
+    local p = promise.new();
+    callback.trigger("item:rpc", function(...) 
+        p:resolve(...);
+    end, self.id, name, ...);
+    return Citizen.Await(p);
+end;
 
-    self.getType = function()
-        return rpc("getType");
-    end;
+function Item:getName()
+    return self._rpc("getName");
+end;
 
-    self.getInventoryId = function()
-        return rpc("getInventoryId");
-    end;
+function Item:getType()
+    return self._rpc("getType");
+end;
 
-    self.getInventory = function()
-        local inventoryId = self.getInventoryId();
-        return M("inventory").getById(inventoryId);
-    end;
+function Item:getInventoryId()
+    return self._rpc("getInventoryId");
+end;
 
-    self.setInventoryId = function(inventoryId)
-        return rpc("setInventoryId", inventoryId);
-    end;
+function Item:getInventory()
+    local inventoryId = self.getInventoryId();
+    return M("inventory").getById(inventoryId);
+end;
 
-    self.setInventory = function(inventory)
-        self.setInventoryId(inventory.id);
-    end;
+function Item:setInventoryId(inventoryId)
+    return self._rpc("setInventoryId", inventoryId);
+end;
 
-    self.getConfig = function()
-        print("getting type");
-        local type = self.getType();
-        print("type=" .. type);
-        print(json.encode(ItemConfigs));
-        utils.table.find(ItemConfigs, function(itemConfig) 
-            print("comparing", itemConfig.type, type);
-            return itemConfig.type == type;
-        end);
-    end;
+function Item:setInventory(inventory)
+    self.setInventoryId(inventory.id);
+end;
 
-    self.use = function()
-        rpc("use");
-    end
-end);
-Item.GetById = Item.constructor;
+function Item:getConfig()
+    print("getting type");
+    local type = self.getType();
+    print("type=" .. type);
+    print(json.encode(ItemConfigs));
+    utils.table.find(ItemConfigs, function(itemConfig) 
+        print("comparing", itemConfig.type, type);
+        return itemConfig.type == type;
+    end);
+end;
 
-module.Item = Item;
+function Item:use()
+    rpc("use");
+end
+
+module = Item;

@@ -24,7 +24,7 @@ function Item:getInventoryId()
     local id = MySQL.scalar.await("SELECT inventory_id FROM items WHERE id=?", {self.id});
     return id;
 end;
-table.insert(self.rpcWhitelist, "getInventoryId");
+table.insert(Item.static.rpcWhitelist, "getInventoryId");
 
 function Item:getInventory()
     local id = self.getInventoryId();
@@ -39,7 +39,7 @@ function Item:setInventoryId (inventoryId)
     print("setInventoryId", json.encode(inventoryId), json.encode(self.id));
     MySQL.update.await("UPDATE items SET inventory_id=? WHERE id=?", {inventoryId, self.id});
 end;
-table.insert(self.rpcWhitelist, "setInventoryId");
+table.insert(Item.static.rpcWhitelist, "setInventoryId");
 
 function Item:setInventory(inventory)
     self.setInventoryId(inventory.id);
@@ -49,7 +49,7 @@ function Item:getName()
     local name = MySQL.scalar.await("SELECT name FROM items WHERE id=?", {self.id});
     return name;
 end;
-table.insert(self.rpcWhitelist, "getName");
+table.insert(Item.static.rpcWhitelist, "getName");
 
 function Item:getType()
     print("querying type");
@@ -57,7 +57,7 @@ function Item:getType()
     print("got type from db", type);
     return type;
 end;
-table.insert(self.rpcWhitelist, "getType");
+table.insert(Item.static.rpcWhitelist, "getType");
 
 function Item:use()
     local config = self.getConfig();
@@ -65,7 +65,7 @@ function Item:use()
         config.use(self);
     end
 end;
-table.insert(self.rpcWhitelist, "use");
+table.insert(Item.static.rpcWhitelist, "use");
 
 function Item:getConfig()
     local type = self.getType();
@@ -115,12 +115,20 @@ RegisterCommand("beer", function(playerId, args, rawCommand)
 end, true);
 
 
+local registeredItems = {};
+function registerItem(item)
+    registeredItems[item.name] = item;
+end;
 
+module.GetItemClass = function(name)
+    return registeredItems[name];
+end
+
+module.GetById = function(id)
+    local name = MySQL.scalar.await("SELECT name FROM items WHERE id=?", {id});
+    local itemClass = module.GetItemClass(name);
+    return itemClass:New(id);
+end;
 
 -- Exports
 run("server/beer.lua");
-
-
-module.Item = {
-    GetById = Item.constructor,
-}

@@ -1,17 +1,13 @@
-local Beer = OOP.ExtendClass("Beer", function(self, ...)
-    self.super(...);
+local class = M("class");
 
-    self.use = function()
-        print("Beer got used!");
-        self.destroy();
-    end;
-end);
+local Beer = class("Beer", Item);
 
-Beer.name = "beer";
-Beer.label = "Bier";
+Beer.static.name = "beer";
+Beer.static.label = "Bier";
 
-Beer.Create = function()
-    Item.Create(Beer);
-end;
+function Beer:use()
+    print("Beer got used!");
+    self.destroy();
+end
 
 module.Beer = Beer;

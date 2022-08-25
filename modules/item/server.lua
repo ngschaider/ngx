@@ -1,7 +1,7 @@
 local logger = M("logger");
 local utils = M("utils");
 local callback = M("callback");
-local OOP = M("oop");
+local class = M("class");
 
 local Item = class("Item");
 
@@ -11,10 +11,10 @@ end
 
 Item.static.rpcWhitelist = {};
 
-Item.static.Create = function(SpecificItem)
+Item.Create = function()
     local id = MySQL.insert.await("INSERT INTO items (name, label) VALUES (?, ?)", {
-        SpecificItem.name,
-        SpecificItem.label,
+        Item.name,
+        Item.label,
     });
 
 	return Item.GetById(id);
@@ -67,13 +67,6 @@ function Item:use()
 end;
 table.insert(Item.static.rpcWhitelist, "use");
 
-function Item:getConfig()
-    local type = self.getType();
-    utils.table.find(ItemConfigs, function(itemConfig) 
-        return itemConfig.type == type;
-    end);
-end;
-
 function Item:destroy()
     MySQL.query.await("DELETE FROM items WHERE id=?", {self.id});
 end;
@@ -116,7 +109,7 @@ end, true);
 
 
 local registeredItems = {};
-function registerItem(item)
+local function registerItem(item)
     registeredItems[item.name] = item;
 end;
 

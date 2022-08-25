@@ -64,18 +64,13 @@ module.GetAllOnline = User.GetAllOnline;
 function User:initialize(id)
 	self.id = id;
 	self.identifier = MySQL.scalar.await("SELECT identifier FROM users WHERE id=?", {self.id});
-
-	if not self.identifier then
-		-- TODO: Maybe create the user here?
-		logger.error("Could not find user - maybe we should create the user here?");
-	end
 end
 
-function User:emit = function(name, ...)
+function User:emit(name, ...)
 	event.emitClient(name, self.getPlayerId(), ...);
 end;
 
-function User:getPlayerId = function()
+function User:getPlayerId()
 	for k,v in pairs(GetPlayers()) do
 		if utils.getIdentifier(v) == self.identifier then
 			return tonumber(v);
@@ -85,7 +80,7 @@ function User:getPlayerId = function()
 	return nil;
 end;
 
-function User:getName = function()
+function User:getName()
 	return GetPlayerName(self.getPlayerId());
 end;
 table.insert(User.static.rpcWhitelist, "getName");
@@ -123,7 +118,7 @@ function User:getCurrentCharacterId()
 end;
 table.insert(User.static.rpcWhitelist, "getCurrentCharacterId")
 
-self.setCurrentCharacterId(id)
+function User:setCurrentCharacterId(id)
 	--print("setCurrentCharacterId", self.currentCharacterId);
 	self.currentCharacterId = id;
 end;
@@ -131,11 +126,11 @@ table.insert(User.static.rpcWhitelist, "setCurrentCharacterId")
 
 function User:getCurrentCharacter()
 	local id = self.getCurrentCharacterId();
-	return characterClass.getById(id);
+	return Character.getById(id);
 end;
 
 function User:createCharacter(firstname, lastname, dateofbirth, height, skin)
-	local characterId = characterClass.Create(self.id, firstname, lastname, dateofbirth, height, skin);
+	local characterId = Character.Create(self.id, firstname, lastname, dateofbirth, height, skin);
 	return characterId;
 end;
 table.insert(User.static.rpcWhitelist, "createCharacter");
@@ -144,7 +139,7 @@ function User:getCharacterIds()
 	local results = MySQL.query.await("SELECT id FROM characters WHERE user_id=?", {self.id});
 	
 	local ids = {};
-	for k,v in pairs(results) do
+	for _,v in pairs(results) do
 		table.insert(ids, v.id);
 	end
 	return ids;
@@ -152,11 +147,11 @@ end;
 table.insert(User.static.rpcWhitelist, "getCharacterIds");
 
 function User:getCharacters()
-	local ids = self.getCharacterIds();	
+	local ids = self.getCharacterIds();
 
 	local characters = {};
-	for k,v in pairs(results) do
-		local character = User.GetById(v.id);
+	for _,id in pairs(ids) do
+		local character = User.GetById(id);
 		table.insert(characters, character);
 	end
 	return characters;

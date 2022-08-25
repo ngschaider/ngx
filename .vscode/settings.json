@@ -1,0 +1,13 @@
+{
+    "Lua.diagnostics.globals": [
+        "MySQL",
+        "RegisterCommand",
+        "run",
+        "json",
+        "promise",
+        "Citizen",
+        "GetPlayers",
+        "GetPlayerName",
+        "DropPlayer"
+    ]
+}

@@ -12,13 +12,13 @@ function Character:initialize(id)
 	self.id = id;
 end
 
-function Character:_rpc = function(name, ...)
+function Character:_rpc(name, ...)
 	local p = promise.new();
 	callback.trigger("character:rpc", function(...)
 		p:resolve(...);
 	end, self.id, name, ...);
 	return Citizen.Await(p);
-end;
+end
 
 function Character:getName()
 	return self._rpc("getName");

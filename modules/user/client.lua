@@ -41,15 +41,15 @@ function User:_rpc(name, ...)
 	return Citizen.Await(p);
 end;
 
-function User:getName = function()
+function User:getName()
 	return self._rpc("getName");
 end;
 
-function User:getCharacterIds = function()
+function User:getCharacterIds()
 	return self._rpc("getCharacterIds")
 end;
 
-function User:getCharacters = function()
+function User:getCharacters()
 	local ids = self.getCharacterIds();
 	local characters = {};
 	for _,id in pairs(ids) do
@@ -59,15 +59,15 @@ function User:getCharacters = function()
 	return characters;
 end;
 
-function User:setCurrentCharacterId = function(id)
+function User:setCurrentCharacterId(id)
 	self._rpc("setCurrentCharacterId", id);
 end;
 
-function User:getCurrentCharacterId = function()
+function User:getCurrentCharacterId()
 	return self._rpc("getCurrentCharacterId");
 end;
 
-function User:getCurrentCharacter = function()
+function User:getCurrentCharacter()
 	local currentCharacterId = self.getCurrentCharacterId();
 	if currentCharacterId then
 		return Character.GetById(currentCharacterId);
@@ -76,8 +76,8 @@ function User:getCurrentCharacter = function()
 	end
 end;
 
-function User:createCharacter = function(firstname, lastname, dateofbirth, height, skin)
-	local id = rpc("createCharacter", firstname, lastname, dateofbirth, height, skin);
+function User:createCharacter(firstname, lastname, dateofbirth, height, skin)
+	local id = self._rpc("createCharacter", firstname, lastname, dateofbirth, height, skin);
 	return Character.GetById(id);
 end;
 

@@ -18,14 +18,6 @@ module.on = function(name, cb)
     return id;
 end;
 
-module.once = function(name, cb)
-    logger.debug("event.once", name);
-    local id = on(name, function(...)
-        module.off(id);
-        cb(...);
-    end);
-end;
-
 module.off = function(name, id)
     logger.debug("event.off", name);
     handlers[name] = handlers[name] or {};

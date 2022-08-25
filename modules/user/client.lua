@@ -4,16 +4,16 @@ local class = M("class");
 
 local User = class("User");
 
-User.static.GetSelf = function()
+function User.static:GetSelf()
 	local p = promise.new();
 	callback.trigger("user:getSelfId", function(id)
 		p:resolve(id);
 	end);
 	local id = Citizen.Await(p);
-	return User.GetById(id);
+	return User:new(id);
 end;
 
-User.static.GetAllOnline = function(cb)
+function User.static:GetAllOnline()
 	local p = promise.new();
 	callback.trigger("user:getAllOnlineIds", function(ids)
 		p:resolve(ids);
@@ -22,7 +22,7 @@ User.static.GetAllOnline = function(cb)
 
 	local users = {};
 	for _,id in pairs(ids) do
-		local user = User.GetById(id);
+		local user = User:new(id);
 		table.insert(users, user);
 	end
 
@@ -34,51 +34,52 @@ function User:initialize(id)
 end
 
 function User:_rpc(name, ...)
+	print("user:rpc", name, self.id);
 	local p = promise.new();
-	callback.trigger("item:rpc", function(...) 
+	callback.trigger("user:rpc", function(...) 
 		p:resolve(...);
 	end, self.id, name, ...);
 	return Citizen.Await(p);
 end;
 
 function User:getName()
-	return self._rpc("getName");
+	return self:_rpc("getName");
 end;
 
 function User:getCharacterIds()
-	return self._rpc("getCharacterIds")
+	return self:_rpc("getCharacterIds")
 end;
 
 function User:getCharacters()
-	local ids = self.getCharacterIds();
+	local ids = self:getCharacterIds();
 	local characters = {};
 	for _,id in pairs(ids) do
-		local character = Character.getById(id);
+		local character = Character:new(id);
 		table.insert(characters, character);
 	end
 	return characters;
 end;
 
 function User:setCurrentCharacterId(id)
-	self._rpc("setCurrentCharacterId", id);
+	self:_rpc("setCurrentCharacterId", id);
 end;
 
 function User:getCurrentCharacterId()
-	return self._rpc("getCurrentCharacterId");
+	return self:_rpc("getCurrentCharacterId");
 end;
 
 function User:getCurrentCharacter()
-	local currentCharacterId = self.getCurrentCharacterId();
+	local currentCharacterId = self:getCurrentCharacterId();
 	if currentCharacterId then
-		return Character.GetById(currentCharacterId);
+		return Character:new(currentCharacterId);
 	else
 		return nil;
 	end
 end;
 
-function User:createCharacter(firstname, lastname, dateofbirth, height, skin)
-	local id = self._rpc("createCharacter", firstname, lastname, dateofbirth, height, skin);
-	return Character.GetById(id);
+function User:createCharacter(firstname, lastname, dateofbirth, skin)
+	local id = self:_rpc("createCharacter", firstname, lastname, dateofbirth, skin);
+	return User:new(id);
 end;
 
 

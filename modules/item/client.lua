@@ -16,43 +16,36 @@ function Item:_rpc(name, ...)
 end;
 
 function Item:getName()
-    return self._rpc("getName");
+    return self:_rpc("getName");
 end;
 
 function Item:getType()
-    return self._rpc("getType");
+    return self:_rpc("getType");
 end;
 
 function Item:getInventoryId()
-    return self._rpc("getInventoryId");
+    return self:_rpc("getInventoryId");
 end;
 
 function Item:getInventory()
-    local inventoryId = self.getInventoryId();
-    return M("inventory").getById(inventoryId);
+    local inventoryId = self:getInventoryId();
+    return M("inventory"):new(inventoryId);
 end;
 
 function Item:setInventoryId(inventoryId)
-    return self._rpc("setInventoryId", inventoryId);
+    return self:_rpc("setInventoryId", inventoryId);
 end;
 
 function Item:setInventory(inventory)
-    self.setInventoryId(inventory.id);
+    self:setInventoryId(inventory.id);
 end;
 
-function Item:getConfig()
-    print("getting type");
-    local type = self.getType();
-    print("type=" .. type);
-    print(json.encode(ItemConfigs));
-    utils.table.find(ItemConfigs, function(itemConfig) 
-        print("comparing", itemConfig.type, type);
-        return itemConfig.type == type;
-    end);
-end;
+function Item:getIsUsable()
+    self:_rpc("getIsUsable");
+end
 
 function Item:use()
-    rpc("use");
+    self:_rpc("use");
 end
 
 module = Item;

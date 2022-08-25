@@ -1,9 +1,5 @@
 local callback = M("callback");
-local utils = M("utils");
-local logger = M("logger");
-local event = M("event");
-local skin = M("skin");
-local inventoryClass = M("inventory");
+local Inventory = M("inventory");
 local class = M("class");
 
 local Character = class("Character");
@@ -21,28 +17,28 @@ function Character:_rpc(name, ...)
 end
 
 function Character:getName()
-	return self._rpc("getName");
+	return self:_rpc("getName");
 end
 
 function Character:getLastPosition()
-	return self._rpc("getLastPosition");
+	return self:_rpc("getLastPosition");
 end;
 
-function Character:getSkin ()
-	return self._rpc("getSkin");
+function Character:getSkin()
+	return self:_rpc("getSkin");
 end;
 
 function Character:setSkin(skin)
-	self._rpc("setSkin", skin);
+	self:_rpc("setSkin", skin);
 end;
 
 function Character:getInventoryId()
-	return self._rpc("getInventoryId");
+	return self:_rpc("getInventoryId");
 end;
 
 function Character:getInventory()
-	local inventoryId = self.getInventoryId();
-	return inventoryClass.getById(inventoryId);
+	local inventoryId = self:getInventoryId();
+	return Inventory:new(inventoryId);
 end;
 
 module = Character;

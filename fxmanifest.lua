@@ -39,4 +39,5 @@ files {
 dependencies {
 	'oxmysql',
 	"NativeUI",
+	"hbw",
 }

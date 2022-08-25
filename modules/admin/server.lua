@@ -4,5 +4,5 @@ local event = M("event");
 
 command.registerCommand("admin", function(user)
     logger.debug("User " .. user.id .. " opened the Admin Menu");
-    event.emitClient("admin:OpenMenu", user.getPlayerId());
+    event.emitClient("admin:OpenMenu", user:getPlayerId());
 end, true);

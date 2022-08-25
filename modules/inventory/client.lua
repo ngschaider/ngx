@@ -1,10 +1,10 @@
 local callback = M("callback");
-local itemClass = M("item");
+local Item = M("item");
 local class = M("class");
 
 local Inventory = class("Inventory");
 
-function Inventory:initialize()
+function Inventory:initialize(id)
 	self.id = id;
 end
 
@@ -17,18 +17,18 @@ function Inventory:_rpc(name, ...)
 end
 
 function Inventory:getMaxWeight()
-	return self._rpc("getMaxWeight");
+	return self:_rpc("getMaxWeight");
 end;
 
 function Inventory:getItemIds()
-	return self._rpc("getItemIds");
+	return self:_rpc("getItemIds");
 end;
 
 function Inventory:getItems()
-	local ids = self.getItemIds();
+	local ids = self:getItemIds();
 	local items = {};
 	for _,id in pairs(ids) do
-		local item = itemClass.getById(itemId);
+		local item = Item:new(id);
 		table.insert(items, item);
 	end
 

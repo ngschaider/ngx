@@ -1,8 +1,6 @@
 local event = M("event");
-local logger = M("logger");
 local streaming = M("streaming");
-local userClass = M("user");
-local characterClass = M("character");
+local User = M("user");
 local charcreator = M("charcreator");
 local utils = M("utils");
 local skin = M("skin");
@@ -46,15 +44,15 @@ module.StartSelection = function(cb)
 	SetCamActive(cam, true);
 	RenderScriptCams(true);
 	
-	local selfUser = userClass.getSelf();
-	local characters = selfUser.getCharacters();
+	local selfUser = User:GetSelf();
+	local characters = selfUser:getCharacters();
 	local menu = NativeUI.CreateMenu("Charakterauswahl");
 	pool:Add(menu);
 
 	menu.Controls.Back.Enabled = false;
 
-	for k,character in pairs(characters) do
-		local characterName = character.getName();
+	for _,character in pairs(characters) do
+		local characterName = character:getName();
 		local item = NativeUI.CreateItem(characterName, "Mit " .. characterName .. " einreisen");
 		menu:AddItem(item);
 
@@ -73,7 +71,8 @@ module.StartSelection = function(cb)
 
 		item.OnSelected = function()
 			--print("onSelected");
-			local skinData = character.getSkin();
+			local skinData = character:getSkin();
+			print("111", json.encode(skinData));
 			skin.setValues(skinData);
 		end;
 	end

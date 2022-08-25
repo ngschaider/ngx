@@ -1,5 +1,5 @@
-local userClass = M("user");
-local characterClass = M("character");
+local User = M("user");
+local Character = M("character");
 local logger = M("logger");
 local job = M("job");
 local event = M("event");
@@ -9,7 +9,7 @@ local validators = {};
 local valueConverters = {};
 
 local convert = function(value, type, args)
-	if converters[type] then
+	if valueConverters[type] then
 		return validators[type](value, table.unpack(args));
 	else
 		return value;
@@ -47,7 +47,7 @@ module.registerCommand = function(commandName, cb, restricted, info)
 	info.rawArgs = info.rawArgs or false;
 
 	RegisterCommand(commandName, function(playerId, args, rawCommand)
-		local user = userClass.getByPlayerId(playerId);
+		local user = User:GetByPlayerId(playerId);
 		if info.rawArgs then
 			cb(user, args);
 		else

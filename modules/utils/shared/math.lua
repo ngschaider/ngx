@@ -13,7 +13,7 @@ end;
 module.math.GroupDigits = function(value)
 	local left, num, right = string.match(value,"^([^%d]*%d)(%d*)(.-)$");
 
-	return left .. (num:reverse():gsub("(%d%d%d)","%1" .. _U("locale_digit_grouping_symbol")):reverse()) .. right;
+	return left .. (num:reverse():gsub("(%d%d%d)","%1."):reverse()) .. right;
 end;
 
 module.math.Trim = function(value)

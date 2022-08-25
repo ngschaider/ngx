@@ -1,17 +1,17 @@
-local characterClass = M("character");
+local Character = M("character");
 local logger = M("logger");
 local event = M("event");
 
 local SaveCharacter = function(character)
     logger.debug("Saving Character", character.id);
     --logger.debug("save", "character.id", character.id);
-    local user = character.getUser();
+    local user = character:getUser();
     --logger.debug("save", "user.id", user.id);
-    --logger.debug("save", "user.getIsOnline()", user.getIsOnline());
-    --logger.debug("save", "user.getCurrentCharacterId()", user.getCurrentCharacterId());
-    if user.getIsOnline() and user.getCurrentCharacterId() == character.id then
-        local position = character.getPosition();
-        print("Saving position of character", character.getName(), position.x, position.y, position.z);
+    --logger.debug("save", "user:getIsOnline()", user:getIsOnline());
+    --logger.debug("save", "user:getCurrentCharacterId()", user:getCurrentCharacterId());
+    if user:getIsOnline() and user:getCurrentCharacterId() == character.id then
+        local position = character:getPosition();
+        print("Saving position of character", character:getName(), position.x, position.y, position.z);
         MySQL.update("UPDATE characters SET position_x=?, position_y=?, position_z=? WHERE id=?", {
             position.x, 
             position.y,
@@ -22,16 +22,16 @@ local SaveCharacter = function(character)
 end;
 
 local SaveCharacters = function()
-    for _, character in pairs(characterClass.getAll()) do
+    for _, character in pairs(Character:GetAll()) do
         SaveCharacter(character);
     end
 end;
 
 -- save when player dropped
 event.on("event:playerDropped", function(playerId, reason)
-    local character = characterClass.getByPlayerId(playerId);
+    local character = Character:GetByPlayerId(playerId);
     if character then
-        print("Saving " .. character.getName() .. " because they left.");
+        print("Saving " .. character:getName() .. " because they left.");
         SaveCharacter(character);
     end
 end);

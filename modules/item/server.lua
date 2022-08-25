@@ -3,22 +3,28 @@ local utils = M("utils");
 local callback = M("callback");
 local class = M("class");
 
-local Item = class("Item");
+Item = class("Item");
+
+Item.static.rpcWhitelist = {};
+Item.static.name = "default";
+Item.static.label = "Default";
+
+function Item.static:Create()
+    print()
+    local id = MySQL.insert.await("INSERT INTO items (name, label) VALUES (?, ?)", {
+        self.name,
+        self.label,
+    });
+
+	return Item:new(id);
+end;
+
+print("    Item.static:Create assigned");
 
 function Item:initialize(id)
     self.id = id;
+    self.usable = false;
 end
-
-Item.static.rpcWhitelist = {};
-
-Item.Create = function()
-    local id = MySQL.insert.await("INSERT INTO items (name, label) VALUES (?, ?)", {
-        Item.name,
-        Item.label,
-    });
-
-	return Item.GetById(id);
-end;
 
 function Item:getInventoryId()
     local id = MySQL.scalar.await("SELECT inventory_id FROM items WHERE id=?", {self.id});
@@ -27,22 +33,23 @@ end;
 table.insert(Item.static.rpcWhitelist, "getInventoryId");
 
 function Item:getInventory()
-    local id = self.getInventoryId();
+    local id = self:getInventoryId();
     if id then
-        return M("inventory").GetById(id);
+        return M("inventory"):new(id);
     else
         return nil;
     end
 end;
 
-function Item:setInventoryId (inventoryId)
-    print("setInventoryId", json.encode(inventoryId), json.encode(self.id));
+function Item:setInventoryId(inventoryId)
+    print("Item:setInventoryId", "inventoryId", inventoryId);
+    print("Item:setInventoryId", "self.id", self.id);
     MySQL.update.await("UPDATE items SET inventory_id=? WHERE id=?", {inventoryId, self.id});
 end;
 table.insert(Item.static.rpcWhitelist, "setInventoryId");
 
 function Item:setInventory(inventory)
-    self.setInventoryId(inventory.id);
+    self:setInventoryId(inventory.id);
 end;
 
 function Item:getName()
@@ -51,19 +58,30 @@ function Item:getName()
 end;
 table.insert(Item.static.rpcWhitelist, "getName");
 
-function Item:getType()
-    print("querying type");
-    local type = MySQL.scalar.await("SELECT type FROM items WHERE id=?", {self.id});
-    print("got type from db", type);
-    return type;
+function Item:getLabel()
+    local label = MySQL.scalar.await("SELECT label FROM items WHERE id=?", {self.id});
+    return label;
 end;
-table.insert(Item.static.rpcWhitelist, "getType");
+table.insert(Item.static.rpcWhitelist, "getLabel");
+
+function Item:getData()
+    local data = MySQL.scalar.await("SELECT data FROM items WHERE id=?", {self.id});
+    return json.decode(data);
+end;
+table.insert(Item.static.rpcWhitelist, "getData");
+
+function Item:setData(data)
+    local dataStr = json.encode(data);
+    MySQL.update.await("UPDATE items SET data=? WHERE id=?", {dataStr, self.id});
+end;
+
+function Item:getIsUsable()
+    return self.isUsable;
+end
+table.insert(Item.static.rpcWhitelist, "getIsUsable");
 
 function Item:use()
-    local config = self.getConfig();
-    if config.use then
-        config.use(self);
-    end
+    logger.warn("Item " .. self:getName() .. " got used but has not usage implemented.");
 end;
 table.insert(Item.static.rpcWhitelist, "use");
 
@@ -72,40 +90,23 @@ function Item:destroy()
 end;
 
 callback.register("item:rpc", function(playerId, cb, id, name, ...)
-	local item = module.getById(id);
+	local item = Item:new(id);
 
 	if not item then
 		logger.warn("Item not found - rpc failed");
 		return;
 	end
 
-	if not utils.table.contains(item.rpcWhitelist, name) then
+	if not utils.table.contains(Item.rpcWhitelist, name) then
 		logger.warn("Requested item rpc " .. name .. " not whitelisted - rpc failed");
 		return;
 	end
 
-	cb(item[name](...));
+	-- we have to pass the item object because we are not using the colon syntax like item:getLabel(...)
+	cb(item[name](item, ...));
 end);
 
-RegisterCommand("beer", function(playerId, args, rawCommand)
-    print("giving player a beer");
-    local itemId = Item.Create("beer");
-    print("getting beer");
-    local item = Item.getById(itemId);
-    print("beer");
 
-    print("getting character");
-    local character = M("character").getByPlayerId(playerId);
-    if not character then
-        logger.debug("failed to get current character");
-        return;
-    end
-
-    print("getting inventory")
-    local inventory = character.getInventory();
-    print("setting item inventory_id", inventory.id);
-    item.setInventoryId(inventory.id)
-end, true);
 
 
 local registeredItems = {};
@@ -117,10 +118,10 @@ module.GetItemClass = function(name)
     return registeredItems[name];
 end
 
-module.GetById = function(id)
+module.GetSpecific = function(id)
     local name = MySQL.scalar.await("SELECT name FROM items WHERE id=?", {id});
-    local itemClass = module.GetItemClass(name);
-    return itemClass:New(id);
+    local specificItemClass = module.GetItemClass(name);
+    return specificItemClass:new(id);
 end;
 
 -- Exports

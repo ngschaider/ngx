@@ -1,11 +1,9 @@
 run("client/config.lua");
 
-local logger = M("logger");
 local event = M("event");
-local callback = M("callback");
 local utils = M("utils");
 local skin = M("skin");
-local userClass = M("user");
+local User = M("user");
 local streaming = M("streaming")
 
 local pool = NativeUI.CreatePool();
@@ -18,7 +16,7 @@ local zoomOffset = nil;
 
 local intensityOptions = {0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
 
--- firstname, lastname, dateofbirth, height
+-- firstname, lastname, dateofbirth
 local data = {};
 
 Citizen.CreateThread(function()
@@ -29,25 +27,26 @@ Citizen.CreateThread(function()
 end);
 
 module.CreateNewCharacter = function(cb)
+    local playerId = PlayerId();
     local ped = PlayerPedId();
 
     local model = "mp_m_freemode_01";
 	streaming.RequestModel(model);
-	SetPlayerModel(player, model);
+	SetPlayerModel(playerId, model);
+    playerId = PlayerPedId(); -- SetPlayerModel changes the ped handle!!!!!
 	SetModelAsNoLongerNeeded(model);
 
+    --print("module.CreateNewCharacter", "ped", ped, PlayerPedId());
 	SetPedDefaultComponentVariation(ped);
 
     print("freezing ped 1");
 	FreezeEntityPosition(ped, true);
 
     utils.teleport({x = -75.015, y = -818.215, z = 325.0});
-    --SetEntityHeading(playerPed, 0.0);
-    
-	SetEntityRotation(ped, 0.0, 0.0, 180.0, 1);
+    SetEntityHeading(playerPed, 0.0);
 
 	cam = CreateCam("DEFAULT_SCRIPTED_CAMERA", true);
-    --SetCamRot(cam, 0.0, 0.0, 0.0, true);
+    SetCamRot(cam, 0.0, 0.0, 0.0, true);
     SetCamValues(0.0, 0.7, 1.0);
     SetCamActive(cam, true);
     RenderScriptCams(true, false, 0, false, false);
@@ -90,18 +89,6 @@ module.CreateNewCharacter = function(cb)
         if dateofbirth and utils.date.isValid(dateofbirth) then
             dateofbirthItem:RightLabel(dateofbirth);
             data.dateofbirth = dateofbirth;
-        end
-    end;
-
-
-    local heightItem = NativeUI.CreateItem("Größe (cm)", "");
-    menu:AddItem(heightItem);
-    heightItem.Activated = function()
-        local height = utils.textPrompt("Größe (cm)", data.height);
-        height = tonumber(height);
-        if height then
-            heightItem:RightLabel(height);
-            data.height = height;
         end
     end;
 
@@ -203,7 +190,7 @@ module.CreateNewCharacter = function(cb)
 	menu:AddItem(saveItem);
 	
 	saveItem.Activated = function(sender, item)
-        if not data.firstname or not data.lastname or not data.dateofbirth or not data.height then
+        if not data.firstname or not data.lastname or not data.dateofbirth then
             return;
         end
 
@@ -212,8 +199,8 @@ module.CreateNewCharacter = function(cb)
 
         --print("creating character");
         local skinData = skin.getValues();
-        local selfUser = userClass.getSelf();
-        local character = selfUser.createCharacter(data.firstname, data.lastname, data.dateofbirth, data.height, skinData);
+        local selfUser = User:GetSelf();
+        local character = selfUser:createCharacter(data.firstname, data.lastname, data.dateofbirth, skinData);
         --print("destroying cam");
         DestroyCam(cam, true);
         RenderScriptCams(false);

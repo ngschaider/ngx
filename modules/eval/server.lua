@@ -1,8 +1,8 @@
 local command = M("command");
 local utils = M("utils");
-local characterClass = M("character");
-local inventoryClass = M("inventory");
-local itemClass = M("item");
+local Character = M("character");
+local Inventory = M("inventory");
+local Item = M("item");
 local logger = M("logger");
 
 RegisterCommand("eval", function(source, args, rawCommand)

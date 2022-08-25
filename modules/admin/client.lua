@@ -1,6 +1,6 @@
 local event = M("event");
 local logger = M("logger");
-local userClass = M("user");
+local User = M("user");
 
 local pool = NativeUI.CreatePool();
 
@@ -8,17 +8,16 @@ local GetPlayerListMenu = function()
     local menu = NativeUI.CreateMenu("Spielerliste", "Spielerliste");
     menu.Settings.MouseEdgeEnabled = false;
 
-    local users = userClass.getAllOnline();
+    local users = User:GetAllOnline();
 
     for _,user in pairs(users) do
-        local userName = user.getName();
+        local userName = user:getName();
 
-        
         local text = "[" .. user.id .."] " .. userName;
 
-        local character = user.getCurrentCharacter();
+        local character = user:getCurrentCharacter();
         if character then
-            text = text .. " (" .. character.getName() .. ")";
+            text = text .. " (" .. character:getName() .. ")";
         end
 
         local userItem = NativeUI.CreateItem(text, "");
@@ -32,16 +31,16 @@ local GetPlayerListMenu = function()
 end;
 
 local GetUserMenu = function(user)
-    local character = user.getCurrentCharacter();
+    local character = user:getCurrentCharacter();
 
     if character then
         local reviveItem = NativeUI.CreateItem("Wiederbeleben", "");
         reviveItem.Activated = function()
             callback.trigger("admin:reviveCharacter", function(success)
                 if success then
-                    userClass.getSelf().showNotification("Charakter " .. character.getName() .. " wurde wiederbelebt");
+                    User:GetSelf().showNotification("Charakter " .. character:getName() .. " wurde wiederbelebt");
                 else
-                    userClass.getSelf().showNotification("Charakter " .. character.getName() .. " konnte nicht wiederbelebt werden");
+                    User:GetSelf().showNotification("Charakter " .. character:getName() .. " konnte nicht wiederbelebt werden");
                 end
             end, character.id);
         end;
@@ -49,8 +48,8 @@ local GetUserMenu = function(user)
 end;
 
 local OpenMenu = function()
-    local selfUser = userClass.getSelf();
-    local characterId = selfUser.getCurrentCharacterId();
+    local selfUser = User:GetSelf();
+    local characterId = selfUser:getCurrentCharacterId();
 
     if characterId == nil then
         return;

@@ -1,4 +1,4 @@
-local userClass = M("user");
+local User = M("user");
 
 local pool = NativeUI.CreatePool();
 
@@ -16,16 +16,16 @@ end);
 RegisterKeyMapping("inventory", "Inventar öffnen", "keyboard", "F2");
 
 function OpenOwnCharacterInventory()
-    local user = userClass.getSelf();
+    local user = User:GetSelf();
     print("got user", user);
-    local character = user.getCurrentCharacter();
+    local character = user:getCurrentCharacter();
     print("got char", character);
     if not character then
         print("returning");
         return
     end
     print("getting inv");
-    local inventory = character.getInventory();
+    local inventory = character:getInventory();
     print("got inv");
     OpenInventory(inventory);
 end;
@@ -39,19 +39,17 @@ function OpenInventory(inventory)
     pool:Add(menu);
 
     print("getting items");
-    local items = inventory.getItems();    
+    local items = inventory:getItems();    
     print("got items");
     for _,item in pairs(items) do
-        print(item.getType());
-        local name = item.getName();
-
+        local name = item:getName();
         local itemEntry = NativeUI.CreateItem(name, "");
         menu:AddItem(itemEntry);
+
         local itemMenu = GetItemMenu(item);
         pool:Add(itemMenu);
         menu:BindMenuToItem(itemMenu, itemEntry);
-
-        menu:AddItem(menuItem);
+        menu:AddItem(itemMenu);
     end
 
     menu:Visible(true);
@@ -61,31 +59,23 @@ end
 
 
 function GetItemMenu(item)
-    local name = item.getName();
+    local name = item:getName();
     local menu = NativeUI.CreateMenu(name, "");
-
-    print("getting item config", name);
-    local itemConfig = item.getConfig();
-    print("got item config", json.encode(itemConfig));
+    print(name);
     
-    if itemConfig.fillMenu then
-        print("fillMenu function called");
-        itemConfig.fillMenu(item, menu);
-    else
-        print("hi");
-        if itemConfig.use then
-            local useItem = NativeUI.CreateItem("Benutzen", "");
-            menu:AddItem(useItem);
+    if item:getIsUsable() then
+        print("adding use item");
+        local useItem = NativeUI.CreateItem("Benutzen", "");
+        menu:AddItem(useItem);
 
-            useItem.Activated = function()
-                item.use();
-            end;
-        end
-
-        print("adding drop item");
-        local dropItem = NativeUI.CreateItem("Fallen lassen", "");
-        menu:AddItem(dropItem);
+        useItem.Activated = function()
+            item.use();
+        end;
     end
+
+    print("adding drop item");
+    local dropItem = NativeUI.CreateItem("Fallen lassen", "");
+    menu:AddItem(dropItem);
 
     return menu;
 end

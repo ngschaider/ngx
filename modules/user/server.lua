@@ -6,42 +6,44 @@ local game = M("game");
 local Character = M("character");
 local class = M("class");
 
+local cachedUsers = {};
+
 local User = class("User");
+
 
 User.static.rpcWhitelist = {};
 
-Character.static.Create = function(identifier)
+function User.static:Create(identifier)
     local id = MySQL.insert.await("INSERT INTO users (identifier) VALUES (?)", {identifier});
-	local user = User.GetById(id);
+	local user = User:new(id);
 
 	return user;
 end;
 
-User.static.GetByIdentifier = function(identifier)
-	--logger.debug("user.getByIdentifier", "identifier", identifier);
+function User.static:GetByIdentifier(identifier)
+	logger.debug("User:GetByIdentifier", "identifier", identifier);
 	local id = MySQL.scalar.await("SELECT id FROM users WHERE identifier=?", {identifier});
-	--logger.debug("user.getByIdentifier", "id", id);
+	logger.debug("User:GetByIdentifier", "id", id);
 
 	if id then
-		return User.GetById(id);
+		return User:new(id);
 	else
-		local user = Create(identifier);
-		users[user.id] = user;
+		local user = User:Create(identifier);
 		return user;
 	end
 end;
 
-User.static.GetByPlayerId = function(playerId)
-	--logger.debug("user.getByPlayerId", "playerId", playerId);
+function User.static:GetByPlayerId(playerId)
+	logger.debug("User:GetByPlayerId", "playerId", playerId);
 	local identifier = utils.getIdentifier(playerId);
-	--logger.debug("user.getByPlayerId", "identifier", identifier);
-	local user = User.GetByIdentifier(identifier);
-	--logger.debug("user.getByPlayerId", "user.id", user.id);
+	logger.debug("User:GetByPlayerId", "identifier", identifier);
+	local user = User:GetByIdentifier(identifier);
+	logger.debug("User:GetByPlayerId", "user.id", user.id);
 	return user;
 end;
 
-User.static.GetAllOnlineIds = function()
-	local users = User.GetAllOnline();
+function User.static:GetAllOnlineIds()
+	local users = User:GetAllOnline();
 	local ids = {};
 	for _,user in pairs(users) do
 		table.insert(ids, user.id);
@@ -49,25 +51,30 @@ User.static.GetAllOnlineIds = function()
 	return ids;
 end;
 
-User.static.GetAllOnline = function()
+function User.static:GetAllOnline()
 	local playerIds = GetPlayers();
 	local users = {};
 	for _,playerId in pairs(playerIds) do
-		local user = User.GetByPlayerId(playerId);
+		local user = User:GetByPlayerId(playerId);
 		table.insert(users, user);
 	end
 
 	return users;
 end;
-module.GetAllOnline = User.GetAllOnline;
 
 function User:initialize(id)
 	self.id = id;
 	self.identifier = MySQL.scalar.await("SELECT identifier FROM users WHERE id=?", {self.id});
+
+	-- copy over all non-database values from the cached object
+	if cachedUsers[id] then
+		self.currentCharacterId = cachedUsers[id].currentCharacterId;
+	end
+	cachedUsers[id] = self;
 end
 
 function User:emit(name, ...)
-	event.emitClient(name, self.getPlayerId(), ...);
+	event.emitClient(name, self:getPlayerId(), ...);
 end;
 
 function User:getPlayerId()
@@ -81,7 +88,7 @@ function User:getPlayerId()
 end;
 
 function User:getName()
-	return GetPlayerName(self.getPlayerId());
+	return GetPlayerName(self:getPlayerId());
 end;
 table.insert(User.static.rpcWhitelist, "getName");
 
@@ -90,11 +97,11 @@ function User:getIsAdmin()
 end;
 
 function User:getIsOnline()
-	return self.getPlayerId() ~= nil;
+	return self:getPlayerId() ~= nil;
 end;
 
 function User:kick(reason)
-	if not self.getIsOnline() then 
+	if not self:getIsOnline() then 
 		return 
 	end
 	DropPlayer(self.playerId, reason);
@@ -105,33 +112,33 @@ function User:getIdentifier()
 end;
 
 function User:showNotification(msg)
-	self.emit("notification:showNotification", msg);
+	self:emit("notification:showNotification", msg);
 end;
 
 function User:showHelpNotification(msg, thisFrame, beep, duration)
-	self.emit("notification:showHelpNotification", msg, thisFrame, beep, duration);
+	self:emit("notification:showHelpNotification", msg, thisFrame, beep, duration);
 end;
 
 function User:getCurrentCharacterId()
-	print("getCurrentCharacterId", self.currentCharacterId);
+	print("User:getCurrentCharacterId", "self.currentCharacterId", self.currentCharacterId);
 	return self.currentCharacterId;
 end;
 table.insert(User.static.rpcWhitelist, "getCurrentCharacterId")
 
 function User:setCurrentCharacterId(id)
-	--print("setCurrentCharacterId", self.currentCharacterId);
+	print("User:setCurrentCharacterId", "id", id);
 	self.currentCharacterId = id;
 end;
 table.insert(User.static.rpcWhitelist, "setCurrentCharacterId")
 
 function User:getCurrentCharacter()
-	local id = self.getCurrentCharacterId();
-	return Character.getById(id);
+	local id = self:getCurrentCharacterId();
+	return Character:new(id);
 end;
 
-function User:createCharacter(firstname, lastname, dateofbirth, height, skin)
-	local characterId = Character.Create(self.id, firstname, lastname, dateofbirth, height, skin);
-	return characterId;
+function User:createCharacter(firstname, lastname, dateOfBirth, skin)
+	local characterId = Character:Create(self.id, firstname, lastname, dateOfBirth, skin);
+	return Character:new(characterId);
 end;
 table.insert(User.static.rpcWhitelist, "createCharacter");
 
@@ -147,11 +154,11 @@ end;
 table.insert(User.static.rpcWhitelist, "getCharacterIds");
 
 function User:getCharacters()
-	local ids = self.getCharacterIds();
+	local ids = self:getCharacterIds();
 
 	local characters = {};
 	for _,id in pairs(ids) do
-		local character = User.GetById(id);
+		local character = User:new(id);
 		table.insert(characters, character);
 	end
 	return characters;
@@ -159,24 +166,29 @@ end;
 
 
 callback.register("user:getAllOnlineIds", function(playerId, cb)
-	local ids = User.GetAllOnlineIds();
+	local ids = User:GetAllOnlineIds();
 	cb(ids);
 end);
 
-callback.register("user:rpc", function(playerId, cb, name, ...)
-	local user = User.GetByPlayerId(playerId);
+callback.register("user:rpc", function(playerId, cb, userId, name, ...)
+	print(userId);
+	local user = User:new(userId);
 
-	if not utils.table.contains(user.rpcWhitelist, name) then
+	if not utils.table.contains(User.rpcWhitelist, name) then
 		logger.warn("function name " .. name .. " not in whitelist - user rpc failed.");
 		return;
 	end
 
-	cb(user[name](...));
+	-- we have to pass the user object because we are not using the colon syntax like user:getCharacterIds(...)
+	cb(user[name](user, ...));
 end);
 
 callback.register("user:getSelfId", function(playerId, cb)
-	--print("callback called", playerId, cb);
-	local user = User.GetByPlayerId(playerId);
-	--print("calling cb");
+	print("callback called", playerId, cb);
+	local user = User:GetByPlayerId(playerId);
+	print("calling cb");
 	cb(user.id);
 end);
+
+
+module = User;

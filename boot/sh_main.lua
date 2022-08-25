@@ -28,11 +28,6 @@ NGX.EvalFile = function(resource, file, env)
     return env, success;
 end;
 
--- placeholder
-_U = function()
-    return ""; 
-end
-
 local modules = json.decode(LoadResourceFile(GetCurrentResourceName(), "modules.json"));
 for k,v in pairs(modules) do
     M(v);

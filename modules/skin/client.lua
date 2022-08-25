@@ -277,7 +277,7 @@ module.getValues = function()
 		blemishes = blemishes,
 		blemishes_opacity = blemishes_opacity,
 		beard = beard,
-		beard = beard_opacity,
+		beard_opacity = beard_opacity,
 		age = age,
 		age_opacity = age_opacity,
 		makeup = makeup,
@@ -309,7 +309,7 @@ module.getValues = function()
 		blush_color = blush_color,
 		lipstick_color1 = lipstick_color1,
 		lipstick_color2 = lipstick_color2,
-		chest_hair_color = chest_chair_color,
+		chest_hair_color = chest_hair_color,
 
 		hair_drawable = GetPedDrawableVariation(playerPed, 2),
 		hair_texture = GetPedTextureVariation(playerPed, 2),
@@ -471,30 +471,31 @@ local applySkin = function(skin)
 	if skin["helmet_1"] == -1 then
 		ClearPedProp(playerPed, 0)
 	else
-		SetPedPropIndex (playerPed, 0, skin.helmet_drawable, skin.helmet_texture, 2) -- Helmet
+		SetPedPropIndex(playerPed, 0, skin.helmet_drawable, skin.helmet_texture, 2) -- Helmet
 	end
 
 	if skin["glasses_1"] == -1 then
 		ClearPedProp(playerPed, 1)
 	else
-		SetPedPropIndex (playerPed, 1, skin.glasses_drawable, skin.glasses_texture, 2) -- Glasses
+		SetPedPropIndex(playerPed, 1, skin.glasses_drawable, skin.glasses_texture, 2) -- Glasses
 	end
 
 	if skin["watches_1"] == -1 then
 		ClearPedProp(playerPed, 6)
 	else
-		SetPedPropIndex (playerPed, 6, skin.watches_drawable, skin.watches_texture, 2) -- Watches
+		SetPedPropIndex(playerPed, 6, skin.watches_drawable, skin.watches_texture, 2) -- Watches
 	end
 
 	if skin["bracelets_1"] == -1 then
 		ClearPedProp(playerPed, 7)
 	else
-		SetPedPropIndex (playerPed, 7, skin.bracelets_drawable, skin.bracelets_texture, 2) -- Bracelets
+		SetPedPropIndex(playerPed, 7, skin.bracelets_drawable, skin.bracelets_texture, 2) -- Bracelets
 	end
 end
 
 -- changes a single key and reloads the skin/clothes if needed
 module.setValue = function(key, val)
+	print("setValue", key, val);
 	local skin = module.getValues();
 	skin[key] = val;
 	module.setValues(skin);
@@ -502,13 +503,14 @@ end;
 
 -- loads an object of values and reloads the skin/clothes if needed
 module.setValues = function(skin)
-	if skin["sex"] and skin["sex"] ~= lastSex then
-		if skin["sex"] == 0 then
+	print("setValues", json.encode(skin));
+	if skin.sex then
+		if skin.sex == 0 then
 			loadDefaultModel(true);
 		else
-            loadDefaultModel(false);
+			loadDefaultModel(false);
 		end
 	end
 
-	applySkin(skin)
+	applySkin(skin);
 end;

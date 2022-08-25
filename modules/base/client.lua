@@ -1,7 +1,6 @@
-local event = M("event");
 local characterSelector = M("character_selector");
 local charcreator = M("charcreator");
-local userClass = M("user");
+local User = M("user");
 local utils = M("utils");
 local skin = M("skin");
 
@@ -10,12 +9,12 @@ Citizen.CreateThread(function()
 	while true do
 		InvalidateIdleCam();
 		InvalidateVehicleIdleCam();
-		Wait(15000);
+		Citizen.Wait(15000);
 	end
 end);
 
---[[
 
+--[[
 Citizen.CreateThread(function()
 	while true do
 		print(json.encode(GetEntityCoords(PlayerPedId())));
@@ -23,6 +22,7 @@ Citizen.CreateThread(function()
 	end
 end);
 ]]
+
 
 local SpawnWithCharacter = function(character)
 	local player = PlayerId();
@@ -35,19 +35,19 @@ local SpawnWithCharacter = function(character)
 	FreezeEntityPosition(playerPed, false);
 
 	--print("teleporting to " .. json.encode(position));
-	local lastPosition = character.getLastPosition();
+	local lastPosition = character:getLastPosition();
 	utils.teleport(lastPosition);
 	
 	SetEntityHeading(playerPed, 0.0);
 
-	local skinData = character.getSkin();
+	local skinData = character:getSkin();
 	skin.setValues(skinData);
 	--print(skinData);
 	--print(json.encode(skinData));
 
-	userClass.getSelf().setCurrentCharacterId(character.id);
+	User:GetSelf():setCurrentCharacterId(character.id);
 	--print("Setting current character id ", character.id);
-	--print("Spawning " .. character.getName());
+	--print("Spawning " .. character:getName());
 end;
 
 print("loaded base");
@@ -63,12 +63,12 @@ Citizen.CreateThread(function()
 			ShutdownLoadingScreen();
 
 			print("getting character ids");
-			local selfUser = userClass.getSelf();
+			local selfUser = User:GetSelf();
 			print("got selfUser");
-			local characterIds = selfUser.getCharacterIds();
+			local characterIds = selfUser:getCharacterIds();
 			print("got character ids");
 			if utils.table.size(characterIds) == 0 then
-				--print("opening charcreator");
+				print("opening charcreator");
 				charcreator.CreateNewCharacter(function(character)
 					SpawnWithCharacter(character);
 				end);

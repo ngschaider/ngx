@@ -1,19 +1,19 @@
-UIMenuItem = setmetatable({}, UIMenuItem)
-UIMenuItem.__index = UIMenuItem
-UIMenuItem.__call = function() return "UIMenuItem", "UIMenuItem" end
+MenuItem = setmetatable({}, MenuItem)
+MenuItem.__index = MenuItem
+MenuItem.__call = function() return "MenuItem", "MenuItem" end
 
-function UIMenuItem.New(Text, Description)
-	_UIMenuItem = {
-		Rectangle = UIResRectangle.New(0, 0, 431, 38, 255, 255, 255, 20),
-		Text = UIResText.New(tostring(Text) or "", 8, 0, 0.33, 245, 245, 245, 255, 0),
+function MenuItem.New(Text, Description)
+	_MenuItem = {
+		Rectangle = ResRectangle:new(0, 0, 431, 38, 255, 255, 255, 20),
+		Text = ResText:new(tostring(Text) or "", 8, 0, 0.33, 245, 245, 245, 255, 0),
 		_Description = tostring(Description) or "";
-		SelectedSprite = Sprite.New("commonmenu", "gradient_nav", 0, 0, 431, 38),
-		LeftBadge = { Sprite = Sprite.New("commonmenu", "", 0, 0, 40, 40), Badge = 0},
-		RightBadge = { Sprite = Sprite.New("commonmenu", "", 0, 0, 40, 40), Badge = 0},
+		SelectedSprite = Sprite:new("commonmenu", "gradient_nav", 0, 0, 431, 38),
+		LeftBadge = { Sprite = Sprite:new("commonmenu", "", 0, 0, 40, 40), Badge = 0},
+		RightBadge = { Sprite = Sprite:new("commonmenu", "", 0, 0, 40, 40), Badge = 0},
 		Label = {
-            Text = UIResText.New("", 0, 0, 0.35, 245, 245, 245, 255, 0, "Right"),
-            MainColour = {R = 255, G = 255, B = 255, A = 255},
-            HighlightColour = {R = 0, G = 0, B = 0, A = 255},
+            Text = ResText:new("", 0, 0, 0.35, 245, 245, 245, 255, 0, "Right"),
+            MainColor = {R = 255, G = 255, B = 255, A = 255},
+            HighlightColor = {R = 0, G = 0, B = 0, A = 255},
         },
 		_Selected = false,
 		_Hovered = false,
@@ -24,18 +24,18 @@ function UIMenuItem.New(Text, Description)
 		Activated = function(menu, item) end,
 		ActivatedPanel = function(menu, item, panel, panelvalue) end,
 	}
-	return setmetatable(_UIMenuItem, UIMenuItem)
+	return setmetatable(_MenuItem, MenuItem)
 end
 
-function UIMenuItem:SetParentMenu(Menu)
-    if Menu ~= nil and Menu() == "UIMenu" then
-        self.ParentMenu = Menu
+function MenuItem:SetParentMenu(Menu)
+    if Menu ~= nil and Menu() == "Menu" then
+        self.parentMenu = Menu
     else
-        return self.ParentMenu
+        return self.parentMenu
     end
 end
 
-function UIMenuItem:Selected(bool)
+function MenuItem:selected(bool)
 	if bool ~= nil then
 		self._Selected = tobool(bool)
 	else
@@ -43,7 +43,7 @@ function UIMenuItem:Selected(bool)
 	end
 end
 
-function UIMenuItem:Hovered(bool)
+function MenuItem:hovered(bool)
 	if bool ~= nil then
 		self._Hovered = tobool(bool)
 	else
@@ -51,7 +51,7 @@ function UIMenuItem:Hovered(bool)
 	end
 end
 
-function UIMenuItem:Enabled(bool)
+function MenuItem:enabled(bool)
 	if bool ~= nil then
 		self._Enabled = tobool(bool)
 	else
@@ -59,7 +59,7 @@ function UIMenuItem:Enabled(bool)
 	end
 end
 
-function UIMenuItem:Description(str)
+function MenuItem:description(str)
 	if tostring(str) and str ~= nil then
 		self._Description = tostring(str)
 	else
@@ -67,7 +67,7 @@ function UIMenuItem:Description(str)
 	end
 end
 
-function UIMenuItem:Offset(X, Y)
+function MenuItem:Offset(X, Y)
 	if tonumber(X) or tonumber(Y) then
 		if tonumber(X) then
 			self._Offset.X = tonumber(X)
@@ -80,70 +80,70 @@ function UIMenuItem:Offset(X, Y)
 	end
 end
 
-function UIMenuItem:Position(Y)
+function MenuItem:position(Y)
 	if tonumber(Y) then
-		self.Rectangle:Position(self._Offset.X, Y + 144 + self._Offset.Y)
-		self.SelectedSprite:Position(0 + self._Offset.X, Y + 144 + self._Offset.Y)
-		self.Text:Position(8 + self._Offset.X, Y + 147 + self._Offset.Y)
-		self.LeftBadge.Sprite:Position(0 + self._Offset.X, Y + 142 + self._Offset.Y)
-		self.RightBadge.Sprite:Position(385 + self._Offset.X, Y + 142 + self._Offset.Y)
-		self.Label.Text:Position(420 + self._Offset.X, Y + 148 + self._Offset.Y)
+		self.rectangle:position(self._Offset.X, Y + 144 + self._Offset.Y)
+		self.selectedSprite:position(0 + self._Offset.X, Y + 144 + self._Offset.Y)
+		self.text:position(8 + self._Offset.X, Y + 147 + self._Offset.Y)
+		self.leftBadge.Sprite:position(0 + self._Offset.X, Y + 142 + self._Offset.Y)
+		self.rightBadge.Sprite:position(385 + self._Offset.X, Y + 142 + self._Offset.Y)
+		self.label.text:position(420 + self._Offset.X, Y + 148 + self._Offset.Y)
 	end
 end
 
-function UIMenuItem:RightLabel(Text, MainColour, HighlightColour)
+function MenuItem:RightLabel(Text, MainColor, HighlightColor)
 	if tostring(Text) and Text ~= nil then
-        if type(MainColour) == "table" then
-            self.Label.MainColour = MainColour
+        if type(MainColor) == "table" then
+            self.label.MainColor = MainColor
         end
-        if type(HighlightColour) == "table" then
-            self.Label.HighlightColour = HighlightColour
+        if type(HighlightColor) == "table" then
+            self.label.HighlightColor = HighlightColor
         end
-		self.Label.Text:Text(tostring(Text))
+		self.label.text:Text(tostring(Text))
 	else
-		return self.Label.Text:Text()
+		return self.label.text:Text()
 	end
 end
 
-function UIMenuItem:SetLeftBadge(Badge)
+function MenuItem:SetLeftBadge(Badge)
 	if tonumber(Badge) then
-		self.LeftBadge.Badge = tonumber(Badge)
+		self.leftBadge.Badge = tonumber(Badge)
 	end
 end
 
-function UIMenuItem:SetRightBadge(Badge)
+function MenuItem:SetRightBadge(Badge)
 	if tonumber(Badge) then
-		self.RightBadge.Badge = tonumber(Badge)
+		self.rightBadge.Badge = tonumber(Badge)
 	end
 end
 
-function UIMenuItem:Text(Text)
+function MenuItem:Text(Text)
 	if tostring(Text) and Text ~= nil then
-		self.Text:Text(tostring(Text))
+		self.text:Text(tostring(Text))
 	else
-		return self.Text:Text()
+		return self.text:Text()
 	end
 end
 
-function UIMenuItem:AddPanel(Panel)
-	if Panel() == "UIMenuPanel" then
-		table.insert(self.Panels, Panel)
+function MenuItem:AddPanel(Panel)
+	if Panel() == "MenuPanel" then
+		table.insert(self.panels, Panel)
 		Panel:SetParentItem(self)
 	end
 end
 
-function UIMenuItem:RemovePanelAt(Index)
+function MenuItem:RemovePanelAt(Index)
 	if tonumber(Index) then
-		if self.Panels[Index] then
-			table.remove(self.Panels, tonumber(Index))
+		if self.panels[Index] then
+			table.remove(self.panels, tonumber(Index))
 		end
 	end
 end
 
-function UIMenuItem:FindPanelIndex(Panel)
-	if Panel() == "UIMenuPanel" then
-		for Index = 1, #self.Panels do
-			if self.Panels[Index] == Panel then
+function MenuItem:FindPanelIndex(Panel)
+	if Panel() == "MenuPanel" then
+		for Index = 1, #self.panels do
+			if self.panels[Index] == Panel then
 				return Index
 			end
 		end
@@ -151,62 +151,62 @@ function UIMenuItem:FindPanelIndex(Panel)
 	return nil
 end
 
-function UIMenuItem:FindPanelItem()
-	for Index = #self.Items, 1, -1 do
-		if self.Items[Index].Panel then
+function MenuItem:FindPanelItem()
+	for Index = #self.items, 1, -1 do
+		if self.items[Index].Panel then
 			return Index
 		end
 	end
 	return nil
 end
 
-function UIMenuItem:Draw()
-	self.Rectangle:Size(431 + self.ParentMenu.WidthOffset, self.Rectangle.Height)
-	self.SelectedSprite:Size(431 + self.ParentMenu.WidthOffset, self.SelectedSprite.Height)
+function MenuItem:draw()
+	self.rectangle:Size(431 + self.parentMenu.WidthOffset, self.rectangle.height)
+	self.selectedSprite:Size(431 + self.parentMenu.WidthOffset, self.selectedSprite.height)
 
 	if self._Hovered and not self._Selected then
-		self.Rectangle:Draw()
+		self.rectangle:draw()
 	end
 
 	if self._Selected then
-		self.SelectedSprite:Draw()
+		self.selectedSprite:draw()
 	end
 
 	if self._Enabled then
 		if self._Selected then
-			self.Text:Colour(0, 0, 0, 255)
-			self.Label.Text:Colour(self.Label.HighlightColour.R, self.Label.HighlightColour.G, self.Label.HighlightColour.B, self.Label.HighlightColour.A)
+			self.text:color(0, 0, 0, 255)
+			self.label.text:color(self.label.HighlightColor.R, self.label.HighlightColor.G, self.label.HighlightColor.B, self.label.HighlightColor.A)
 		else
-			self.Text:Colour(245, 245, 245, 255)
-			self.Label.Text:Colour(self.Label.MainColour.R, self.Label.MainColour.G, self.Label.MainColour.B, self.Label.MainColour.A)
+			self.text:color(245, 245, 245, 255)
+			self.label.text:color(self.label.MainColor.R, self.label.MainColor.G, self.label.MainColor.B, self.label.MainColor.A)
 		end
 	else
-		self.Text:Colour(163, 159, 148, 255)
-        self.Label.Text:Colour(163, 159, 148, 255)
+		self.text:color(163, 159, 148, 255)
+        self.label.text:color(163, 159, 148, 255)
 	end
 
-	if self.LeftBadge.Badge == BadgeStyle.None then
-		self.Text:Position(8 + self._Offset.X, self.Text.Y)
+	if self.leftBadge.Badge == BadgeStyle.None then
+		self.text:position(8 + self._Offset.X, self.text.Y)
 	else
-		self.Text:Position(35 + self._Offset.X, self.Text.Y)
-		self.LeftBadge.Sprite.TxtDictionary = GetBadgeDictionary(self.LeftBadge.Badge, self._Selected)
-		self.LeftBadge.Sprite.TxtName = GetBadgeTexture(self.LeftBadge.Badge, self._Selected)
-		self.LeftBadge.Sprite:Colour(GetBadgeColour(self.LeftBadge.Badge, self._Selected))
-		self.LeftBadge.Sprite:Draw()
+		self.text:position(35 + self._Offset.X, self.text.Y)
+		self.leftBadge.Sprite.TxtDictionary = GetBadgeDictionary(self.leftBadge.Badge, self._Selected)
+		self.leftBadge.Sprite.TxtName = GetBadgeTexture(self.leftBadge.Badge, self._Selected)
+		self.leftBadge.Sprite:color(GetBadgeColor(self.leftBadge.Badge, self._Selected))
+		self.leftBadge.Sprite:draw()
 	end
 
-	if self.RightBadge.Badge ~= BadgeStyle.None then
-		self.RightBadge.Sprite:Position(385 + self._Offset.X + self.ParentMenu.WidthOffset, self.RightBadge.Sprite.Y)
-		self.RightBadge.Sprite.TxtDictionary = GetBadgeDictionary(self.RightBadge.Badge, self._Selected)
-		self.RightBadge.Sprite.TxtName = GetBadgeTexture(self.RightBadge.Badge, self._Selected)
-		self.RightBadge.Sprite:Colour(GetBadgeColour(self.RightBadge.Badge, self._Selected))
-		self.RightBadge.Sprite:Draw()
+	if self.rightBadge.Badge ~= BadgeStyle.None then
+		self.rightBadge.Sprite:position(385 + self._Offset.X + self.parentMenu.WidthOffset, self.rightBadge.Sprite.Y)
+		self.rightBadge.Sprite.TxtDictionary = GetBadgeDictionary(self.rightBadge.Badge, self._Selected)
+		self.rightBadge.Sprite.TxtName = GetBadgeTexture(self.rightBadge.Badge, self._Selected)
+		self.rightBadge.Sprite:color(GetBadgeColor(self.rightBadge.Badge, self._Selected))
+		self.rightBadge.Sprite:draw()
 	end
 
-	if self.Label.Text:Text() ~= "" and string.len(self.Label.Text:Text()) > 0 then
-		self.Label.Text:Position(420 + self._Offset.X + self.ParentMenu.WidthOffset, self.Label.Text.Y)
-		self.Label.Text:Draw()
+	if self.label.text:Text() ~= "" and string.len(self.label.text:Text()) > 0 then
+		self.label.text:position(420 + self._Offset.X + self.parentMenu.WidthOffset, self.label.text.Y)
+		self.label.text:draw()
 	end
 
-	self.Text:Draw()
+	self.text:draw()
 end

@@ -162,7 +162,7 @@ module.BadgeDictionary = {
 	end,
 }
 
-module.BadgeColour = {
+module.BadgeColor = {
 	[5] = function(Selected)
 		if Selected then
 			return 0, 0, 0, 255
@@ -202,9 +202,9 @@ function module.GetBadgeDictionary(Badge, Selected)
 	end
 end
 
-function module.GetBadgeColour(Badge, Selected)
-	if BadgeColour[Badge] then
-		return BadgeColour[Badge](Selected)
+function module.GetBadgeColor(Badge, Selected)
+	if BadgeColor[Badge] then
+		return BadgeColor[Badge](Selected)
 	else
 		return 255, 255, 255, 255
 	end

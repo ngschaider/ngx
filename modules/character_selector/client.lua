@@ -49,7 +49,7 @@ module.StartSelection = function(cb)
 	local menu = NativeUI.CreateMenu("Charakterauswahl");
 	pool:Add(menu);
 
-	menu.Controls.Back.Enabled = false;
+	menu.Controls.Back.enabled = false;
 
 	for _,character in pairs(characters) do
 		local characterName = character:getName();
@@ -104,7 +104,7 @@ end;
 Citizen.CreateThread(function()
 	while true do
 		if pool then
-        	pool:ProcessMenus();
+        	pool:processMenus();
 		end
 		Citizen.Wait(0);
 	end

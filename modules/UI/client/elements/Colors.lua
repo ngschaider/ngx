@@ -1,4 +1,4 @@
-module.Colors = {
+module.colors = {
     PureWhite = {255, 255, 255, 255},
     White = {240, 240, 240, 255},
     Black = {0, 0, 0, 255},

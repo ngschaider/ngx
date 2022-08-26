@@ -21,7 +21,7 @@ local data = {};
 
 Citizen.CreateThread(function()
     while true do
-        pool:ProcessMenus();
+        pool:processMenus();
         Citizen.Wait(0);
     end
 end);
@@ -57,7 +57,7 @@ module.CreateNewCharacter = function(cb)
     pool:Clear();
     pool:Add(menu);
 	
-	menu.Controls.Back.Enabled = false;
+	menu.Controls.Back.enabled = false;
 	
 	local firstnameItem = NativeUI.CreateItem("Vorname", "");
 	menu:AddItem(firstnameItem);
@@ -165,8 +165,8 @@ module.CreateNewCharacter = function(cb)
     local ageingIntensityItem = NativeUI.CreateListItem("Alterungsstärke", intensityOptions, 1);
     menu:AddItem(ageingIntensityItem);
 
-    local eyeColourItem = NativeUI.CreateListItem("Augenfarbe", Config.eyeColors, 1);
-    menu:AddItem(eyeColourItem);
+    local eyeColorItem = NativeUI.CreateListItem("Augenfarbe", Config.eyeColors, 1);
+    menu:AddItem(eyeColorItem);
 
     local eyebrowsItem = NativeUI.CreateListItem("Augenbrauen", Config.eyebrows, 1);
     menu:AddItem(eyebrowsItem);
@@ -211,7 +211,7 @@ module.CreateNewCharacter = function(cb)
         if item == genderItem then
             skin.setValue("sex", index - 1)
 			SetCamValues(nil, 0.2, 1.5);
-        elseif item == eyeColourItem then
+        elseif item == eyeColorItem then
             skin.setValue("eye_color", index - 1)
 			SetCamValues(nil, 0.7, 0.6);
         elseif item == ageingItem then

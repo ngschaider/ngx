@@ -4,7 +4,7 @@ local pool = NativeUI.CreatePool();
 
 Citizen.CreateThread(function()
     while true do
-        pool:ProcessMenus();
+        pool:processMenus();
         
         Citizen.Wait(0);
     end

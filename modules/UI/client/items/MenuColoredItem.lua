@@ -1,117 +1,117 @@
-UIMenuColouredItem = setmetatable({}, UIMenuColouredItem)
-UIMenuColouredItem.__index = UIMenuColouredItem
-UIMenuColouredItem.__call = function() return "UIMenuItem", "UIMenuColouredItem" end
+MenuColoredItem = setmetatable({}, MenuColoredItem)
+MenuColoredItem.__index = MenuColoredItem
+MenuColoredItem.__call = function() return "MenuItem", "MenuColoredItem" end
 
-function UIMenuColouredItem.New(Text, Description, MainColour, HighlightColour)
-	if type(Colour) ~= "table" then Colour = {R = 0, G = 0, B = 0, A = 255} end
-	if type(HighlightColour) ~= "table" then Colour = {R = 255, G = 255, B = 255, A = 255} end
-	local _UIMenuColouredItem = {
-		Base = UIMenuItem.New(Text or "", Description or ""),
-		Rectangle = UIResRectangle.New(0, 0, 431, 38, MainColour.R, MainColour.G, MainColour.B, MainColour.A),
-		MainColour = MainColour,
-		HighlightColour = HighlightColour,
+function MenuColoredItem.New(Text, Description, MainColor, HighlightColor)
+	if type(Color) ~= "table" then Color = {R = 0, G = 0, B = 0, A = 255} end
+	if type(HighlightColor) ~= "table" then Color = {R = 255, G = 255, B = 255, A = 255} end
+	local _MenuColoredItem = {
+		Base = MenuItem.New(Text or "", Description or ""),
+		Rectangle = ResRectangle:new(0, 0, 431, 38, MainColor.R, MainColor.G, MainColor.B, MainColor.A),
+		MainColor = MainColor,
+		HighlightColor = HighlightColor,
 		Activated = function(menu, item) end,
 	}
-	_UIMenuColouredItem.Base.SelectedSprite:Colour(HighlightColour.R, HighlightColour.G, HighlightColour.B, HighlightColour.A)
-	return setmetatable(_UIMenuColouredItem, UIMenuColouredItem)
+	_MenuColoredItem.Base.SelectedSprite:color(HighlightColor.R, HighlightColor.G, HighlightColor.B, HighlightColor.A)
+	return setmetatable(_MenuColoredItem, MenuColoredItem)
 end
 
-function UIMenuColouredItem:SetParentMenu(Menu)
-	if Menu() == "UIMenu" then
-		self.Base.ParentMenu = Menu
+function MenuColoredItem:SetParentMenu(Menu)
+	if Menu() == "Menu" then
+		self.base.ParentMenu = Menu
 	else
-		return self.Base.ParentMenu
+		return self.base.ParentMenu
 	end
 end
 
-function UIMenuColouredItem:Position(Y)
+function MenuColoredItem:position(Y)
 	if tonumber(Y) then
-		self.Base:Position(Y)
-		self.Rectangle:Position(self.Base._Offset.X, Y + 144 + self.Base._Offset.Y)
+		self.base:position(Y)
+		self.rectangle:position(self.base._Offset.X, Y + 144 + self.base._Offset.Y)
 	end
 end
 
-function UIMenuColouredItem:Selected(bool)
+function MenuColoredItem:selected(bool)
 	if bool ~= nil then
-		self.Base._Selected = tobool(bool)
+		self.base._Selected = tobool(bool)
 	else
-		return self.Base._Selected
+		return self.base._Selected
 	end
 end
 
-function UIMenuColouredItem:Hovered(bool)
+function MenuColoredItem:hovered(bool)
 	if bool ~= nil then
-		self.Base._Hovered = tobool(bool)
+		self.base._Hovered = tobool(bool)
 	else
-		return self.Base._Hovered
+		return self.base._Hovered
 	end
 end
 
-function UIMenuColouredItem:Enabled(bool)
+function MenuColoredItem:enabled(bool)
 	if bool ~= nil then
-		self.Base._Enabled = tobool(bool)
+		self.base._Enabled = tobool(bool)
 	else
-		return self.Base._Enabled
+		return self.base._Enabled
 	end
 end
 
-function UIMenuColouredItem:Description(str)
+function MenuColoredItem:description(str)
 	if tostring(str) and str ~= nil then
-		self.Base._Description = tostring(str)
+		self.base._Description = tostring(str)
 	else
-		return self.Base._Description
+		return self.base._Description
 	end
 end
 
-function UIMenuColouredItem:Offset(X, Y)
+function MenuColoredItem:Offset(X, Y)
 	if tonumber(X) or tonumber(Y) then
 		if tonumber(X) then
-			self.Base._Offset.X = tonumber(X)
+			self.base._Offset.X = tonumber(X)
 		end
 		if tonumber(Y) then
-			self.Base._Offset.Y = tonumber(Y)
+			self.base._Offset.Y = tonumber(Y)
 		end
 	else
-		return self.Base._Offset
+		return self.base._Offset
 	end
 end
 
-function UIMenuColouredItem:Text(Text)
+function MenuColoredItem:Text(Text)
 	if tostring(Text) and Text ~= nil then
-		self.Base.Text:Text(tostring(Text))
+		self.base.text:Text(tostring(Text))
 	else
-		return self.Base.Text:Text()
+		return self.base.text:Text()
 	end
 end
 
-function UIMenuColouredItem:RightLabel(Text, MainColour, HighlightColour)
+function MenuColoredItem:RightLabel(Text, MainColor, HighlightColor)
     if tostring(Text) and Text ~= nil then
-        if type(MainColour) == "table" then
-            self.Base.Label.MainColour = MainColour
+        if type(MainColor) == "table" then
+            self.base.Label.MainColor = MainColor
         end
-        if type(HighlightColour) == "table" then
-            self.Base.Label.HighlightColour = HighlightColour
+        if type(HighlightColor) == "table" then
+            self.base.Label.HighlightColor = HighlightColor
         end
-        self.Base.Label.Text:Text(tostring(Text))
+        self.base.Label.text:Text(tostring(Text))
     else
-        return self.Base.Label.Text:Text()
+        return self.base.Label.text:Text()
     end
 end
 
-function UIMenuColouredItem:SetLeftBadge(Badge)
+function MenuColoredItem:SetLeftBadge(Badge)
 	if tonumber(Badge) then
-		self.Base.LeftBadge.Badge = tonumber(Badge)
+		self.base.leftBadge.Badge = tonumber(Badge)
 	end
 end
 
-function UIMenuColouredItem:SetRightBadge(Badge)
+function MenuColoredItem:SetRightBadge(Badge)
 	if tonumber(Badge) then
-		self.Base.RightBadge.Badge = tonumber(Badge)
+		self.base.rightBadge.Badge = tonumber(Badge)
 	end
 end
 
-function UIMenuColouredItem:Draw()
-	self.Rectangle:Size(431 + self.ParentMenu.WidthOffset, self.Rectangle.Height)
-	self.Rectangle:Draw()
-	self.Base:Draw()
+function MenuColoredItem:draw()
+	self.rectangle:Size(431 + self.parentMenu.WidthOffset, self.rectangle.height)
+	self.rectangle:draw()
+	self.base:draw()
 end

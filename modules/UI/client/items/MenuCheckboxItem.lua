@@ -1,112 +1,112 @@
-UIMenuCheckboxItem = setmetatable({}, UIMenuCheckboxItem)
-UIMenuCheckboxItem.__index = UIMenuCheckboxItem
-UIMenuCheckboxItem.__call = function() return "UIMenuItem", "UIMenuCheckboxItem" end
+MenuCheckboxItem = setmetatable({}, MenuCheckboxItem)
+MenuCheckboxItem.__index = MenuCheckboxItem
+MenuCheckboxItem.__call = function() return "MenuItem", "MenuCheckboxItem" end
 
-function UIMenuCheckboxItem.New(Text, Check, Description)
-	local _UIMenuCheckboxItem = {
-		Base = UIMenuItem.New(Text or "", Description or ""),
-		CheckedSprite = Sprite.New("commonmenu", "shop_box_blank", 410, 95, 50, 50),
+function MenuCheckboxItem.New(Text, Check, Description)
+	local _MenuCheckboxItem = {
+		Base = MenuItem.New(Text or "", Description or ""),
+		CheckedSprite = Sprite:new("commonmenu", "shop_box_blank", 410, 95, 50, 50),
 		Checked = tobool(Check),
 		CheckboxEvent = function(menu, item, checked) end,
 	}
-	return setmetatable(_UIMenuCheckboxItem, UIMenuCheckboxItem)
+	return setmetatable(_MenuCheckboxItem, MenuCheckboxItem)
 end
 
-function UIMenuCheckboxItem:SetParentMenu(Menu)
-	if Menu() == "UIMenu" then
-		self.Base.ParentMenu = Menu
+function MenuCheckboxItem:SetParentMenu(Menu)
+	if Menu() == "Menu" then
+		self.base.ParentMenu = Menu
 	else
-		return self.Base.ParentMenu
+		return self.base.ParentMenu
 	end
 end
 
-function UIMenuCheckboxItem:Position(Y)
+function MenuCheckboxItem:position(Y)
 	if tonumber(Y) then
-		self.Base:Position(Y)
-		self.CheckedSprite:Position(380 + self.Base._Offset.X + self.Base.ParentMenu.WidthOffset, Y + 138 + self.Base._Offset.Y)
+		self.base:position(Y)
+		self.checkedSprite:position(380 + self.base._Offset.X + self.base.ParentMenu.WidthOffset, Y + 138 + self.base._Offset.Y)
 	end
 end
 
-function UIMenuCheckboxItem:Selected(bool)
+function MenuCheckboxItem:selected(bool)
 	if bool ~= nil then
-		self.Base._Selected = tobool(bool)
+		self.base._Selected = tobool(bool)
 	else
-		return self.Base._Selected
+		return self.base._Selected
 	end
 end
 
-function UIMenuCheckboxItem:Hovered(bool)
+function MenuCheckboxItem:hovered(bool)
 	if bool ~= nil then
-		self.Base._Hovered = tobool(bool)
+		self.base._Hovered = tobool(bool)
 	else
-		return self.Base._Hovered
+		return self.base._Hovered
 	end
 end
 
-function UIMenuCheckboxItem:Enabled(bool)
+function MenuCheckboxItem:enabled(bool)
 	if bool ~= nil then
-		self.Base._Enabled = tobool(bool)
+		self.base._Enabled = tobool(bool)
 	else
-		return self.Base._Enabled
+		return self.base._Enabled
 	end
 end
 
-function UIMenuCheckboxItem:Description(str)
+function MenuCheckboxItem:description(str)
 	if tostring(str) and str ~= nil then
-		self.Base._Description = tostring(str)
+		self.base._Description = tostring(str)
 	else
-		return self.Base._Description
+		return self.base._Description
 	end
 end
 
-function UIMenuCheckboxItem:Offset(X, Y)
+function MenuCheckboxItem:Offset(X, Y)
 	if tonumber(X) or tonumber(Y) then
 		if tonumber(X) then
-			self.Base._Offset.X = tonumber(X)
+			self.base._Offset.X = tonumber(X)
 		end
 		if tonumber(Y) then
-			self.Base._Offset.Y = tonumber(Y)
+			self.base._Offset.Y = tonumber(Y)
 		end
 	else
-		return self.Base._Offset
+		return self.base._Offset
 	end
 end
 
-function UIMenuCheckboxItem:Text(Text)
+function MenuCheckboxItem:Text(Text)
 	if tostring(Text) and Text ~= nil then
-		self.Base.Text:Text(tostring(Text))
+		self.base.text:Text(tostring(Text))
 	else
-		return self.Base.Text:Text()
+		return self.base.text:Text()
 	end
 end
 
-function UIMenuCheckboxItem:SetLeftBadge()
+function MenuCheckboxItem:SetLeftBadge()
 	error("This item does not support badges")
 end
 
-function UIMenuCheckboxItem:SetRightBadge()
+function MenuCheckboxItem:SetRightBadge()
 	error("This item does not support badges")
 end
 
-function UIMenuCheckboxItem:RightLabel()
+function MenuCheckboxItem:RightLabel()
 	error("This item does not support a right label")
 end
 
-function UIMenuCheckboxItem:Draw()
-	self.Base:Draw()
-	self.CheckedSprite:Position(380 + self.Base._Offset.X + self.Base.ParentMenu.WidthOffset, self.CheckedSprite.Y)
-	if self.Base:Selected() then
-		if self.Checked then
-			self.CheckedSprite.TxtName = "shop_box_tickb"
+function MenuCheckboxItem:draw()
+	self.base:draw()
+	self.checkedSprite:position(380 + self.base._Offset.X + self.base.ParentMenu.WidthOffset, self.checkedSprite.Y)
+	if self.base:selected() then
+		if self.checked then
+			self.checkedSprite.TxtName = "shop_box_tickb"
 		else
-			self.CheckedSprite.TxtName = "shop_box_blankb"
+			self.checkedSprite.TxtName = "shop_box_blankb"
 		end
 	else
-		if self.Checked then
-			self.CheckedSprite.TxtName = "shop_box_tick"
+		if self.checked then
+			self.checkedSprite.TxtName = "shop_box_tick"
 		else
-			self.CheckedSprite.TxtName = "shop_box_blank"
+			self.checkedSprite.TxtName = "shop_box_blank"
 		end
 	end
-	self.CheckedSprite:Draw()
+	self.checkedSprite:draw()
 end

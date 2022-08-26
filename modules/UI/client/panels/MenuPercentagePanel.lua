@@ -1,125 +1,125 @@
-UIMenuPercentagePanel = setmetatable({}, UIMenuPercentagePanel)
-UIMenuPercentagePanel.__index = UIMenuPercentagePanel
-UIMenuPercentagePanel.__call = function() return "UIMenuPanel", "UIMenuPercentagePanel" end
+MenuPercentagePanel = setmetatable({}, MenuPercentagePanel)
+MenuPercentagePanel.__index = MenuPercentagePanel
+MenuPercentagePanel.__call = function() return "MenuPanel", "MenuPercentagePanel" end
 
-function UIMenuPercentagePanel.New(MinText, MaxText)
-	_UIMenuPercentagePanel = {
+function MenuPercentagePanel.New(MinText, MaxText)
+	_MenuPercentagePanel = {
 		Data = {
 			Enabled = true,
 		},
-		Background = Sprite.New("commonmenu", "gradient_bgd", 0, 0, 431, 76),
-		ActiveBar = UIResRectangle.New(0, 0, 413, 10, 245, 245, 245, 255),
-		BackgroundBar = UIResRectangle.New(0, 0, 413, 10, 87, 87, 87, 255),
+		Background = Sprite:new("commonmenu", "gradient_bgd", 0, 0, 431, 76),
+		ActiveBar = ResRectangle:new(0, 0, 413, 10, 245, 245, 245, 255),
+		BackgroundBar = ResRectangle:new(0, 0, 413, 10, 87, 87, 87, 255),
 		Text = {
-			Min = UIResText.New(MinText or "0%", 0, 0, 0.35, 255, 255, 255, 255, 0, "Centre"),
-			Max = UIResText.New("100%", 0, 0, 0.35, 255, 255, 255, 255, 0, "Centre"),
-			Title = UIResText.New(MaxText or "Opacity", 0, 0, 0.35, 255, 255, 255, 255, 0, "Centre"),
+			Min = ResText:new(MinText or "0%", 0, 0, 0.35, 255, 255, 255, 255, 0, "Centre"),
+			Max = ResText:new("100%", 0, 0, 0.35, 255, 255, 255, 255, 0, "Centre"),
+			Title = ResText:new(MaxText or "Opacity", 0, 0, 0.35, 255, 255, 255, 255, 0, "Centre"),
 		},
 		Audio = {Slider = "CONTINUOUS_SLIDER", Library = "HUD_FRONTEND_DEFAULT_SOUNDSET", Id = nil},
 		ParentItem = nil,
 	}
 
-	return setmetatable(_UIMenuPercentagePanel, UIMenuPercentagePanel)
+	return setmetatable(_MenuPercentagePanel, MenuPercentagePanel)
 end
 
-function UIMenuPercentagePanel:SetParentItem(Item) -- required
-	if Item() == "UIMenuItem" then
-		self.ParentItem = Item
+function MenuPercentagePanel:SetParentItem(Item) -- required
+	if Item() == "MenuItem" then
+		self.parentItem = Item
 	else
-		return self.ParentItem
+		return self.parentItem
 	end
 end
 
-function UIMenuPercentagePanel:Enabled(Enabled)
+function MenuPercentagePanel:enabled(Enabled)
 	if type(Enabled) == "boolean" then
-		self.Data.Enabled = Enabled
+		self.data.enabled = Enabled
 	else
-		return self.Data.Enabled
+		return self.data.enabled
 	end
 end
 
-function UIMenuPercentagePanel:Position(Y) -- required
+function MenuPercentagePanel:position(Y) -- required
     if tonumber(Y) then
-        local ParentOffsetX, ParentOffsetWidth = self.ParentItem:Offset().X, self.ParentItem:SetParentMenu().WidthOffset
-        self.Background:Position(ParentOffsetX, Y)
-        self.ActiveBar:Position(ParentOffsetX + (ParentOffsetWidth/2) + 9, 50 + Y)
-        self.BackgroundBar:Position(ParentOffsetX + (ParentOffsetWidth/2) + 9, 50 + Y)
-        self.Text.Min:Position(ParentOffsetX + (ParentOffsetWidth/2) + 25, 15 + Y)
-        self.Text.Max:Position(ParentOffsetX + (ParentOffsetWidth/2) + 398, 15 + Y)
-        self.Text.Title:Position(ParentOffsetX + (ParentOffsetWidth/2) + 215.5, 15 + Y)
+        local ParentOffsetX, ParentOffsetWidth = self.parentItem:Offset().X, self.parentItem:SetParentMenu().WidthOffset
+        self.background:position(ParentOffsetX, Y)
+        self.activeBar:position(ParentOffsetX + (ParentOffsetWidth/2) + 9, 50 + Y)
+        self.backgroundBar:position(ParentOffsetX + (ParentOffsetWidth/2) + 9, 50 + Y)
+        self.text.min:position(ParentOffsetX + (ParentOffsetWidth/2) + 25, 15 + Y)
+        self.text.max:position(ParentOffsetX + (ParentOffsetWidth/2) + 398, 15 + Y)
+        self.text.Title:position(ParentOffsetX + (ParentOffsetWidth/2) + 215.5, 15 + Y)
     end
 end
 
-function UIMenuPercentagePanel:Percentage(Value)
+function MenuPercentagePanel:Percentage(Value)
 	if tonumber(Value) then
 		local Percent = ((Value < 0.0) and 0.0) or ((Value > 1.0) and 1.0 or Value)
-		self.ActiveBar:Size(self.BackgroundBar.Width * Percent, self.ActiveBar.Height)
+		self.activeBar:Size(self.backgroundBar.Width * Percent, self.activeBar.height)
 	else
 	    local SafeZone = {X = 0, Y = 0}
-	    if self.ParentItem:SetParentMenu().Settings.ScaleWithSafezone then
+	    if self.parentItem:SetParentMenu().Settings.ScaleWithSafezone then
 	       SafeZone = GetSafeZoneBounds()
 	    end
 	    
-		local Progress = (math.round(GetControlNormal(0, 239) * 1920) - SafeZone.X) - self.ActiveBar.X
-		return math.round(((Progress >= 0 and Progress <= 413) and Progress or ((Progress < 0) and 0 or 413))/self.BackgroundBar.Width, 2)
+		local Progress = (math.round(GetControlNormal(0, 239) * 1920) - SafeZone.X) - self.activeBar.X
+		return math.round(((Progress >= 0 and Progress <= 413) and Progress or ((Progress < 0) and 0 or 413))/self.backgroundBar.Width, 2)
 	end
 end
 
-function UIMenuPercentagePanel:UpdateParent(Percentage)
-	local _, ParentType = self.ParentItem()
-	if ParentType == "UIMenuListItem" then
-		local PanelItemIndex = self.ParentItem:FindPanelItem()
+function MenuPercentagePanel:UpdateParent(Percentage)
+	local _, ParentType = self.parentItem()
+	if ParentType == "MenuListItem" then
+		local PanelItemIndex = self.parentItem:FindPanelItem()
 		if PanelItemIndex then
-			self.ParentItem.Items[PanelItemIndex].Value[self.ParentItem:FindPanelIndex(self)] = Percentage
-			self.ParentItem:Index(PanelItemIndex)
-			self.ParentItem.Base.ParentMenu.OnListChange(self.ParentItem.Base.ParentMenu, self.ParentItem, self.ParentItem._Index)
-			self.ParentItem.OnListChanged(self.ParentItem.Base.ParentMenu, self.ParentItem, self.ParentItem._Index)
+			self.parentItem.Items[PanelItemIndex].Value[self.parentItem:FindPanelIndex(self)] = Percentage
+			self.parentItem:Index(PanelItemIndex)
+			self.parentItem.Base.ParentMenu.OnListChange(self.parentItem.Base.ParentMenu, self.parentItem, self.parentItem._Index)
+			self.parentItem.OnListChanged(self.parentItem.Base.ParentMenu, self.parentItem, self.parentItem._Index)
 		else
-			local PanelIndex = self.ParentItem:FindPanelIndex(self)
-			for Index = 1, #self.ParentItem.Items do
-				if type(self.ParentItem.Items[Index]) == "table" then
-					if not self.ParentItem.Items[Index].Panels then self.ParentItem.Items[Index].Panels = {} end
-					self.ParentItem.Items[Index].Panels[PanelIndex] = Percentage
+			local PanelIndex = self.parentItem:FindPanelIndex(self)
+			for Index = 1, #self.parentItem.Items do
+				if type(self.parentItem.Items[Index]) == "table" then
+					if not self.parentItem.Items[Index].panels then self.parentItem.Items[Index].panels = {} end
+					self.parentItem.Items[Index].panels[PanelIndex] = Percentage
 				else
-					self.ParentItem.Items[Index] = {Name = tostring(self.ParentItem.Items[Index]), Value = self.ParentItem.Items[Index], Panels = {[PanelIndex] = Percentage}}
+					self.parentItem.Items[Index] = {Name = tostring(self.parentItem.Items[Index]), Value = self.parentItem.Items[Index], Panels = {[PanelIndex] = Percentage}}
 				end
 			end
-			self.ParentItem.Base.ParentMenu.OnListChange(self.ParentItem.Base.ParentMenu, self.ParentItem, self.ParentItem._Index)
-			self.ParentItem.OnListChanged(self.ParentItem.Base.ParentMenu, self.ParentItem, self.ParentItem._Index)		
+			self.parentItem.Base.ParentMenu.OnListChange(self.parentItem.Base.ParentMenu, self.parentItem, self.parentItem._Index)
+			self.parentItem.OnListChanged(self.parentItem.Base.ParentMenu, self.parentItem, self.parentItem._Index)		
 		end
-    elseif ParentType == "UIMenuItem" then
-        self.ParentItem.ActivatedPanel(self.ParentItem.ParentMenu, self.ParentItem, self, Percentage)
+    elseif ParentType == "MenuItem" then
+        self.parentItem.ActivatedPanel(self.parentItem.ParentMenu, self.parentItem, self, Percentage)
 	end
 end
 
-function UIMenuPercentagePanel:Functions()
+function MenuPercentagePanel:Functions()
 
     local SafeZone = {X = 0, Y = 0}
-    if self.ParentItem:SetParentMenu().Settings.ScaleWithSafezone then
+    if self.parentItem:SetParentMenu().Settings.ScaleWithSafezone then
        SafeZone = GetSafeZoneBounds()
     end
 
-    if IsMouseInBounds(self.BackgroundBar.X + SafeZone.X, self.BackgroundBar.Y - 4 + SafeZone.Y, self.BackgroundBar.Width, self.BackgroundBar.Height + 8) then
+    if IsMouseInBounds(self.backgroundBar.X + SafeZone.X, self.backgroundBar.Y - 4 + SafeZone.Y, self.backgroundBar.Width, self.backgroundBar.height + 8) then
         if IsDisabledControlJustPressed(0, 24) then
-            if not self.Pressed then
-                self.Pressed = true
+            if not self.pressed then
+                self.pressed = true
                 Citizen.CreateThread(function()
-                    self.Audio.Id = GetSoundId()
-                    PlaySoundFrontend(self.Audio.Id, self.Audio.Slider, self.Audio.Library, 1)
-                    while IsDisabledControlPressed(0, 24) and IsMouseInBounds(self.BackgroundBar.X + SafeZone.X, self.BackgroundBar.Y - 4 + SafeZone.Y, self.BackgroundBar.Width, self.BackgroundBar.Height + 8) do
+                    self.audio.Id = GetSoundId()
+                    PlaySoundFrontend(self.audio.Id, self.audio.Slider, self.audio.Library, 1)
+                    while IsDisabledControlPressed(0, 24) and IsMouseInBounds(self.backgroundBar.X + SafeZone.X, self.backgroundBar.Y - 4 + SafeZone.Y, self.backgroundBar.Width, self.backgroundBar.height + 8) do
                         Citizen.Wait(0)
-                        local Progress = (math.round(GetControlNormal(0, 239) * 1920) - SafeZone.X) - self.ActiveBar.X
-                        self.ActiveBar:Size(((Progress >= 0 and Progress <= 413) and Progress or ((Progress < 0) and 0 or 413)), self.ActiveBar.Height)
+                        local Progress = (math.round(GetControlNormal(0, 239) * 1920) - SafeZone.X) - self.activeBar.X
+                        self.activeBar:Size(((Progress >= 0 and Progress <= 413) and Progress or ((Progress < 0) and 0 or 413)), self.activeBar.height)
                     end
-                    StopSound(self.Audio.Id)
-                    ReleaseSoundId(self.Audio.Id)
-                    self.Pressed = false
+                    StopSound(self.audio.Id)
+                    ReleaseSoundId(self.audio.Id)
+                    self.pressed = false
                 end)
                 Citizen.CreateThread(function()
-                    while IsDisabledControlPressed(0, 24) and IsMouseInBounds(self.BackgroundBar.X + SafeZone.X, self.BackgroundBar.Y - 4 + SafeZone.Y, self.BackgroundBar.Width, self.BackgroundBar.Height + 8) do
+                    while IsDisabledControlPressed(0, 24) and IsMouseInBounds(self.backgroundBar.X + SafeZone.X, self.backgroundBar.Y - 4 + SafeZone.Y, self.backgroundBar.Width, self.backgroundBar.height + 8) do
                         Citizen.Wait(75)
-                        local Progress = (math.round(GetControlNormal(0, 239) * 1920) - SafeZone.X) - self.ActiveBar.X
-                        self:UpdateParent(math.round(((Progress >= 0 and Progress <= 413) and Progress or ((Progress < 0) and 0 or 413))/self.BackgroundBar.Width, 2))
+                        local Progress = (math.round(GetControlNormal(0, 239) * 1920) - SafeZone.X) - self.activeBar.X
+                        self:UpdateParent(math.round(((Progress >= 0 and Progress <= 413) and Progress or ((Progress < 0) and 0 or 413))/self.backgroundBar.Width, 2))
                     end
                 end)
             end
@@ -127,15 +127,15 @@ function UIMenuPercentagePanel:Functions()
     end
 end
 
-function UIMenuPercentagePanel:Draw() -- required
-    if self.Data.Enabled then
-        self.Background:Size(431 + self.ParentItem:SetParentMenu().WidthOffset, 76)
-        self.Background:Draw()
-        self.BackgroundBar:Draw()
-        self.ActiveBar:Draw()
-        self.Text.Min:Draw()
-        self.Text.Max:Draw()
-        self.Text.Title:Draw()
+function MenuPercentagePanel:draw() -- required
+    if self.data.enabled then
+        self.background:Size(431 + self.parentItem:SetParentMenu().WidthOffset, 76)
+        self.background:draw()
+        self.backgroundBar:draw()
+        self.activeBar:draw()
+        self.text.min:draw()
+        self.text.max:draw()
+        self.text.Title:draw()
         self:Functions()
     end
 end

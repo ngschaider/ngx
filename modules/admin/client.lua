@@ -78,7 +78,7 @@ end);
 
 Citizen.CreateThread(function()
     while true do
-        pool:ProcessMenus();
+        pool:processMenus();
         Citizen.Wait(0);
     end
 end);

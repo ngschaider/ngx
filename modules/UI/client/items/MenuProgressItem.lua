@@ -1,176 +1,176 @@
-UIMenuProgressItem = setmetatable({}, UIMenuProgressItem)
-UIMenuProgressItem.__index = UIMenuProgressItem
-UIMenuProgressItem.__call = function() return "UIMenuItem", "UIMenuProgressItem" end
+MenuProgressItem = setmetatable({}, MenuProgressItem)
+MenuProgressItem.__index = MenuProgressItem
+MenuProgressItem.__call = function() return "MenuItem", "MenuProgressItem" end
 
-function UIMenuProgressItem.New(Text, Items, Index, Description, Counter)
+function MenuProgressItem.New(Text, Items, Index, Description, Counter)
 	if type(Items) ~= "table" then Items = {} end
 	if Index == 0 then Index = 1 end
-	local _UIMenuProgressItem = {
-		Base = UIMenuItem.New(Text or "", Description or ""),
+	local _MenuProgressItem = {
+		Base = MenuItem.New(Text or "", Description or ""),
 		Data = {
 			Items = Items,
 			Counter = tobool(Counter),
 			Max = 407.5,
 			Index = tonumber(Index) or 1,
 		},
-		Background = UIResRectangle.New(0, 0, 415, 20),
-		Bar = UIResRectangle.New(0, 0, 407.5, 12.5),
-		OnProgressChanged = function(menu, item, newindex) end,
+		Background = ResRectangle:new(0, 0, 415, 20),
+		Bar = ResRectangle:new(0, 0, 407.5, 12.5),
+		onProgressChanged = function(menu, item, newindex) end,
 		OnProgressSelected = function(menu, item, newindex) end,
 	}
 
-	_UIMenuProgressItem.Base.Rectangle.Height = 60
-	_UIMenuProgressItem.Base.SelectedSprite.Height = 60
+	_MenuProgressItem.Base.rectangle.height = 60
+	_MenuProgressItem.Base.SelectedSprite.height = 60
 
-	if _UIMenuProgressItem.Data.Counter then
-		_UIMenuProgressItem.Base:RightLabel(_UIMenuProgressItem.Data.Index.."/"..#_UIMenuProgressItem.Data.Items)
+	if _MenuProgressItem.Data.Counter then
+		_MenuProgressItem.Base:RightLabel(_MenuProgressItem.Data.Index.."/"..#_MenuProgressItem.Data.Items)
 	else
-		_UIMenuProgressItem.Base:RightLabel((type(_UIMenuProgressItem.Data.Items[_UIMenuProgressItem.Data.Index]) == "table") and tostring(_UIMenuProgressItem.Data.Items[_UIMenuProgressItem.Data.Index].Name) or tostring(_UIMenuProgressItem.Data.Items[_UIMenuProgressItem.Data.Index]))
+		_MenuProgressItem.Base:RightLabel((type(_MenuProgressItem.Data.Items[_MenuProgressItem.Data.Index]) == "table") and tostring(_MenuProgressItem.Data.Items[_MenuProgressItem.Data.Index].Name) or tostring(_MenuProgressItem.Data.Items[_MenuProgressItem.Data.Index]))
 	end
 
-	_UIMenuProgressItem.Bar.Width = _UIMenuProgressItem.Data.Index/#_UIMenuProgressItem.Data.Items * _UIMenuProgressItem.Data.Max
+	_MenuProgressItem.bar.Width = _MenuProgressItem.Data.Index/#_MenuProgressItem.Data.Items * _MenuProgressItem.Data.max
 
-	return setmetatable(_UIMenuProgressItem, UIMenuProgressItem)
+	return setmetatable(_MenuProgressItem, MenuProgressItem)
 end
 
-function UIMenuProgressItem:SetParentMenu(Menu)
-	if Menu() == "UIMenu" then
-		self.Base.ParentMenu = Menu
+function MenuProgressItem:SetParentMenu(Menu)
+	if Menu() == "Menu" then
+		self.base.ParentMenu = Menu
 	else
-		return self.Base.ParentMenu
+		return self.base.ParentMenu
 	end
 end
 
-function UIMenuProgressItem:Position(Y)
+function MenuProgressItem:position(Y)
 	if tonumber(Y) then
-		self.Base:Position(Y)
-		self.Background:Position(8 + self.Base._Offset.X + self.Base.ParentMenu.WidthOffset, 177 + Y + self.Base._Offset.Y)
-		self.Bar:Position(11.75 + self.Base._Offset.X + self.Base.ParentMenu.WidthOffset, 180.75 + Y + self.Base._Offset.Y)
+		self.base:position(Y)
+		self.background:position(8 + self.base._Offset.X + self.base.ParentMenu.WidthOffset, 177 + Y + self.base._Offset.Y)
+		self.bar:position(11.75 + self.base._Offset.X + self.base.ParentMenu.WidthOffset, 180.75 + Y + self.base._Offset.Y)
 	end
 end
 
-function UIMenuProgressItem:Selected(bool)
+function MenuProgressItem:selected(bool)
 	if bool ~= nil then
-		self.Base._Selected = tobool(bool)
+		self.base._Selected = tobool(bool)
 	else
-		return self.Base._Selected
+		return self.base._Selected
 	end
 end
 
-function UIMenuProgressItem:Hovered(bool)
+function MenuProgressItem:hovered(bool)
 	if bool ~= nil then
-		self.Base._Hovered = tobool(bool)
+		self.base._Hovered = tobool(bool)
 	else
-		return self.Base._Hovered
+		return self.base._Hovered
 	end
 end
 
-function UIMenuProgressItem:Enabled(bool)
+function MenuProgressItem:enabled(bool)
 	if bool ~= nil then
-		self.Base._Enabled = tobool(bool)
+		self.base._Enabled = tobool(bool)
 	else
-		return self.Base._Enabled
+		return self.base._Enabled
 	end
 end
 
-function UIMenuProgressItem:Description(str)
+function MenuProgressItem:description(str)
 	if tostring(str) and str ~= nil then
-		self.Base._Description = tostring(str)
+		self.base._Description = tostring(str)
 	else
-		return self.Base._Description
+		return self.base._Description
 	end
 end
 
-function UIMenuProgressItem:Offset(X, Y)
+function MenuProgressItem:Offset(X, Y)
 	if tonumber(X) or tonumber(Y) then
 		if tonumber(X) then
-			self.Base._Offset.X = tonumber(X)
+			self.base._Offset.X = tonumber(X)
 		end
 		if tonumber(Y) then
-			self.Base._Offset.Y = tonumber(Y)
+			self.base._Offset.Y = tonumber(Y)
 		end
 	else
-		return self.Base._Offset
+		return self.base._Offset
 	end
 end
 
-function UIMenuProgressItem:Text(Text)
+function MenuProgressItem:Text(Text)
 	if tostring(Text) and Text ~= nil then
-		self.Base.Text:Text(tostring(Text))
+		self.base.text:Text(tostring(Text))
 	else
-		return self.Base.Text:Text()
+		return self.base.text:Text()
 	end
 end
 
-function UIMenuProgressItem:Index(Index)
+function MenuProgressItem:Index(Index)
 	if tonumber(Index) then
-		if tonumber(Index) > #self.Data.Items then
-			self.Data.Index = 1
+		if tonumber(Index) > #self.data.Items then
+			self.data.Index = 1
 		elseif tonumber(Index) < 1 then
-			self.Data.Index = #self.Data.Items
+			self.data.Index = #self.data.Items
 		else
-			self.Data.Index = tonumber(Index)
+			self.data.Index = tonumber(Index)
 		end
 
-		if self.Data.Counter then
-			self.Base:RightLabel(self.Data.Index.."/"..#self.Data.Items)
+		if self.data.Counter then
+			self.base:RightLabel(self.data.Index.."/"..#self.data.Items)
 		else
-			self.Base:RightLabel((type(self.Data.Items[self.Data.Index]) == "table") and tostring(self.Data.Items[self.Data.Index].Name) or tostring(self.Data.Items[self.Data.Index]))
+			self.base:RightLabel((type(self.data.Items[self.data.Index]) == "table") and tostring(self.data.Items[self.data.Index].Name) or tostring(self.data.Items[self.data.Index]))
 		end
 
-		self.Bar.Width = self.Data.Index/#self.Data.Items * self.Data.Max
+		self.bar.Width = self.data.Index/#self.data.Items * self.data.max
 	else
-		return self.Data.Index
+		return self.data.Index
 	end
 end
 
-function UIMenuProgressItem:ItemToIndex(Item)
-	for i = 1, #self.Data.Items do
-		if type(Item) == type(self.Data.Items[i]) and Item == self.Data.Items[i] then
+function MenuProgressItem:ItemToIndex(Item)
+	for i = 1, #self.data.Items do
+		if type(Item) == type(self.data.Items[i]) and Item == self.data.Items[i] then
 			return i
-		elseif type(self.Data.Items[i]) == "table" and (type(Item) == type(self.Data.Items[i].Name) or type(Item) == type(self.Data.Items[i].Value)) and (Item == self.Data.Items[i].Name or Item == self.Data.Items[i].Value) then
+		elseif type(self.data.Items[i]) == "table" and (type(Item) == type(self.data.Items[i].Name) or type(Item) == type(self.data.Items[i].Value)) and (Item == self.data.Items[i].Name or Item == self.data.Items[i].Value) then
 			return i
 		end
 	end
 end
 
-function UIMenuProgressItem:IndexToItem(Index)
+function MenuProgressItem:IndexToItem(Index)
 	if tonumber(Index) then
 		if tonumber(Index) == 0 then Index = 1 end
-		if self.Data.Items[tonumber(Index)] then
-			return self.Data.Items[tonumber(Index)]
+		if self.data.Items[tonumber(Index)] then
+			return self.data.Items[tonumber(Index)]
 		end
 	end
 end
 
-function UIMenuProgressItem:SetLeftBadge()
+function MenuProgressItem:SetLeftBadge()
 	error("This item does not support badges")
 end
 
-function UIMenuProgressItem:SetRightBadge()
+function MenuProgressItem:SetRightBadge()
 	error("This item does not support badges")
 end
 
-function UIMenuProgressItem:RightLabel()
+function MenuProgressItem:RightLabel()
 	error("This item does not support a right label")
 end
 
-function UIMenuProgressItem:CalculateProgress(CursorX)
-	local Progress = CursorX - self.Bar.X
-	self:Index(math.round(#self.Data.Items * (((Progress >= 0 and Progress <= self.Data.Max) and Progress or ((Progress < 0) and 0 or self.Data.Max))/self.Data.Max)))
+function MenuProgressItem:CalculateProgress(CursorX)
+	local Progress = CursorX - self.bar.X
+	self:Index(math.round(#self.data.Items * (((Progress >= 0 and Progress <= self.data.max) and Progress or ((Progress < 0) and 0 or self.data.max))/self.data.max)))
 end
 
-function UIMenuProgressItem:Draw()
-	self.Base:Draw()
+function MenuProgressItem:draw()
+	self.base:draw()
 
-	if self.Base._Selected then
-		self.Background:Colour(table.unpack(Colours.Black))
-		self.Bar:Colour(table.unpack(Colours.White))
+	if self.base._Selected then
+		self.background:color(table.unpack(Colors.Black))
+		self.bar:color(table.unpack(Colors.White))
 	else
-		self.Background:Colour(table.unpack(Colours.White))
-		self.Bar:Colour(table.unpack(Colours.Black))
+		self.background:color(table.unpack(Colors.White))
+		self.bar:color(table.unpack(Colors.Black))
 	end
 
-	self.Background:Draw()
-	self.Bar:Draw()
+	self.background:draw()
+	self.bar:draw()
 end

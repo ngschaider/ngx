@@ -1,169 +1,170 @@
 local class = M("class");
 
-function Menu:initialize(Title, Subtitle, X, Y, TxtDictionary, TxtName)
-	local X, Y = tonumber(X) or 0, tonumber(Y) or 0
-	if Title ~= nil then Title = tostring(Title) or "" else Title = "" end
-	if Subtitle ~= nil then Subtitle = tostring(Subtitle) or "" else Subtitle = "" end
-	if TxtDictionary ~= nil then TxtDictionary = tostring(TxtDictionary) or "commonmenu" else TxtDictionary = "commonmenu" end
-	if TxtName ~= nil then TxtName = tostring(TxtName) or "interaction_bgd" else TxtName = "interaction_bgd" end
-	local _UIMenu = {
-		Logo = Sprite.New(TxtDictionary, TxtName, 0 + X, 0 + Y, 431, 107),
-		Banner = nil,
-		Title = UIResText.New(Title, 215 + X, 20 + Y, 1.15, 255, 255, 255, 255, 1, 1),
-		Subtitle = {ExtraY = 0},
-		WidthOffset = 0,
-		Position = {X = X, Y = Y},
-		Pagination = {Min = 0, Max = 9, Total = 9},
-		PageCounter = {PreText = ""},
-		Extra = {},
-		Description = {},
-		Items = {},
-		Windows = {},
-		Children = {},
-		Controls = {
-			Back = {
-				Enabled = true,
-			},
-			Select = {
-				Enabled = true,
-			},
-			Left = {
-				Enabled = true,
-			},
-			Right = {
-				Enabled = true,
-			},
-			Up = {
-				Enabled = true,
-			},
-			Down = {
-				Enabled = true,
-			},
+function Menu:initialize(title, subtitle, x, y)
+	self.logo = Sprite:new(TxtDictionary, TxtName, 0 + X, 0 + Y, 431, 107);
+	self.banner = nil;
+	self.title = ResText:new(title, 215 + X, 20 + Y, 1.15, 255, 255, 255, 255, 1, 1);
+	self.subtitle = {
+		extraY = 0
+	};
+	self.widthOffset = 0;
+	self.position = {
+		x = x, 
+		y = y,
+	};
+	self.pagination = {
+		min = 0, 
+		max = 9, 
+		total = 9
+	};
+	self.pageCounter = {
+		preText = ""
+	};
+	self.extra = {};
+	self.description = {};
+	self.items = {};
+	self.windows = {};
+	self.children = {};
+	self.controls = {
+		Back = {
+			Enabled = true,
 		},
-		ParentMenu = nil,
-		ParentItem = nil,
-		_Visible = false,
-		ActiveItem = 1000,
-		Dirty = false;
-		ReDraw = true,
-		InstructionalScaleform = RequestScaleformMovie("INSTRUCTIONAL_BUTTONS"),
-		InstructionalButtons = {},
-		OnIndexChange = function(menu, newindex) end,
-		OnListChange = function(menu, list, newindex) end,
-		OnSliderChange = function(menu, slider, newindex) end,
-		OnProgressChange = function(menu, progress, newindex) end,
-		OnCheckboxChange = function(menu, item, checked) end,
-		OnListSelect = function(menu, list, index) end,
-		OnSliderSelect = function(menu, slider, index) end,
-		OnProgressSelect = function(menu, progress, index) end,
-		OnItemSelect = function(menu, item, index) end,
-		OnMenuChanged = function(menu, newmenu, forward) end,
-		OnMenuClosed = function(menu) end,
-		Settings = {
-			InstructionalButtons = true,
-			MultilineFormats = true,
-			ScaleWithSafezone = true,
-			ResetCursorOnOpen = true,
-			MouseControlsEnabled = true,
-			MouseEdgeEnabled = true,
-			ControlDisablingEnabled = true,
-			Audio = {
-				Library = "HUD_FRONTEND_DEFAULT_SOUNDSET",
-				UpDown = "NAV_UP_DOWN",
-				LeftRight = "NAV_LEFT_RIGHT",
-				Select = "SELECT",
-				Back = "BACK",
-				Error = "ERROR",
+		Select = {
+			Enabled = true,
+		},
+		Left = {
+			Enabled = true,
+		},
+		Right = {
+			Enabled = true,
+		},
+		Up = {
+			Enabled = true,
+		},
+		Down = {
+			Enabled = true,
+		},
+	};
+	self.parentMenu = nil;
+	self.parentItem = nil;
+	self._visible = false;
+	self.activeItem = 1000;
+	self.dirty = false;
+	self.reDraw = true;
+	self.instructionalScaleform = RequestScaleformMovie("INSTRUCTIONAL_BUTTONS");
+	self.instructionalButtons = {};
+	self.onIndexChange = function(menu, newindex) end;
+	self.onListChange = function(menu, list, newindex) end;
+	self.onSliderChange = function(menu, slider, newindex) end;
+	self.onProgressChange = function(menu, progress, newindex) end;
+	self.onCheckboxChange = function(menu, item, checked) end;
+	self.onListSelect = function(menu, list, index) end;
+	self.onSliderSelect = function(menu, slider, index) end;
+	self.onProgressSelect = function(menu, progress, index) end;
+	self.onItemSelect = function(menu, item, index) end;
+	self.onMenuChanged = function(menu, newmenu, forward) end;
+	self.onMenuClosed = function(menu) end;
+	self.settings = {
+		instructionalButtons = true,
+		multilineFormats = true,
+		scaleWithSafezone = true,
+		ResetCursorOnOpen = true,
+		MouseControlsEnabled = false,
+		MouseEdgeEnabled = false,
+		controlDisablingEnabled = true,
+		audio = {
+			library = "HUD_FRONTEND_DEFAULT_SOUNDSET",
+			UpDown = "NAV_UP_DOWN",
+			leftRight = "NAV_LEFT_RIGHT",
+			Select = "SELECT",
+			Back = "BACK",
+			error = "ERROR",
+		},
+		EnabledControls = {
+			Controller = {
+				{0, 2}, -- Look Up and Down
+				{0, 1}, -- Look Left and Right
+				{0, 25}, -- Aim
+				{0, 24}, -- Attack
 			},
-            EnabledControls = {
-                Controller = {
-                    {0, 2}, -- Look Up and Down
-                    {0, 1}, -- Look Left and Right
-                    {0, 25}, -- Aim
-                    {0, 24}, -- Attack
-                },
-                Keyboard = {
-                    {0, 201}, -- Select
-                    {0, 195}, -- X axis
-                    {0, 196}, -- Y axis
-                    {0, 187}, -- Down
-                    {0, 188}, -- Up
-                    {0, 189}, -- Left
-                    {0, 190}, -- Right
-                    {0, 202}, -- Back
-                    {0, 217}, -- Select
-                    {0, 242}, -- Scroll down
-                    {0, 241}, -- Scroll up
-                    {0, 239}, -- Cursor X
-                    {0, 240}, -- Cursor Y
-                    {0, 31}, -- Move Up and Down
-                    {0, 30}, -- Move Left and Right
-                    {0, 21}, -- Sprint
-                    {0, 22}, -- Jump
-                    {0, 23}, -- Enter
-                    {0, 75}, -- Exit Vehicle
-                    {0, 71}, -- Accelerate Vehicle
-                    {0, 72}, -- Vehicle Brake
-                    {0, 59}, -- Move Vehicle Left and Right
-                    {0, 89}, -- Fly Yaw Left
-                    {0, 9}, -- Fly Left and Right
-                    {0, 8}, -- Fly Up and Down
-                    {0, 90}, -- Fly Yaw Right
-                    {0, 76}, -- Vehicle Handbrake
-                },
-            },
-		}
+			Keyboard = {
+				{0, 201}, -- Select
+				{0, 195}, -- X axis
+				{0, 196}, -- Y axis
+				{0, 187}, -- Down
+				{0, 188}, -- Up
+				{0, 189}, -- Left
+				{0, 190}, -- Right
+				{0, 202}, -- Back
+				{0, 217}, -- Select
+				{0, 242}, -- Scroll down
+				{0, 241}, -- Scroll up
+				{0, 239}, -- Cursor X
+				{0, 240}, -- Cursor Y
+				{0, 31}, -- Move Up and Down
+				{0, 30}, -- Move Left and Right
+				{0, 21}, -- Sprint
+				{0, 22}, -- Jump
+				{0, 23}, -- Enter
+				{0, 75}, -- Exit Vehicle
+				{0, 71}, -- Accelerate Vehicle
+				{0, 72}, -- Vehicle Brake
+				{0, 59}, -- Move Vehicle Left and Right
+				{0, 89}, -- Fly Yaw Left
+				{0, 9}, -- Fly Left and Right
+				{0, 8}, -- Fly Up and Down
+				{0, 90}, -- Fly Yaw Right
+				{0, 76}, -- Vehicle Handbrake
+			},
+		};
 	}
 
-	if Subtitle ~= "" and Subtitle ~= nil then
-		_UIMenu.Subtitle.Rectangle = UIResRectangle.New(0 + _UIMenu.Position.X, 107 + _UIMenu.Position.Y, 431, 37, 0, 0, 0, 255)
-		_UIMenu.Subtitle.Text = UIResText.New(Subtitle, 8 + _UIMenu.Position.X, 110 + _UIMenu.Position.Y, 0.35, 245, 245, 245, 255, 0)
-		_UIMenu.Subtitle.BackupText = Subtitle
-		_UIMenu.Subtitle.Formatted = false
-		if string.starts(Subtitle, "~") then
-			_UIMenu.PageCounter.PreText = string.sub(Subtitle, 1, 3)
+	if subtitle then
+		self.subtitle.rectangle = ResRectangle:new(self.position.x, self.position.y + 107, 431, 37, 0, 0, 0, 255);
+		self.subtitle.text = ResText:new(subtitle, self.position.x + 8, self.position.y + 110, 0.35, 245, 245, 245, 255, 0);
+		self.subtitle.backupText = subtitle
+		self.subtitle.formatted = false;
+		if string.starts(subtitle, "~") then
+			self.pageCounter.preText = string.sub(subtitle, 1, 3);
 		end
-		_UIMenu.PageCounter.Text = UIResText.New("", 425 + _UIMenu.Position.X, 110 + _UIMenu.Position.Y, 0.35, 245, 245, 245, 255, 0, "Right")
-		_UIMenu.Subtitle.ExtraY = 37
+		self.pageCounter.text = ResText:new("", self.position.x + 425, self.position.y + 110, 0.35, 245, 245, 245, 255, 0, "Right");
+		self.subtitle.extraY = 37;
 	end
 	
-	_UIMenu.ArrowSprite = Sprite.New("commonmenu", "shop_arrows_upanddown", 190 + _UIMenu.Position.X, 147 + 37 * (_UIMenu.Pagination.Total + 1) + _UIMenu.Position.Y - 37 + _UIMenu.Subtitle.ExtraY, 50, 50)
-	_UIMenu.Extra.Up = UIResRectangle.New(0 + _UIMenu.Position.X, 144 + 38 * (_UIMenu.Pagination.Total + 1) + _UIMenu.Position.Y - 37 + _UIMenu.Subtitle.ExtraY, 431, 18, 0, 0, 0, 200)
-	_UIMenu.Extra.Down = UIResRectangle.New(0 + _UIMenu.Position.X, 144 + 18 + 38 * (_UIMenu.Pagination.Total + 1) + _UIMenu.Position.Y - 37 + _UIMenu.Subtitle.ExtraY, 431, 18, 0, 0, 0, 200)
+	self.arrowSprite = Sprite:new("commonmenu", "shop_arrows_upanddown", 190 + self.position.x, 147 + 37 * (self.pagination.total + 1) + self.position.y - 37 + self.subtitle.extraY, 50, 50)
+	self.extra.up = ResRectangle:new(0 + self.position.x, 144 + 38 * (self.pagination.total + 1) + self.position.y - 37 + self.subtitle.extraY, 431, 18, 0, 0, 0, 200)
+	self.extra.down = ResRectangle:new(0 + self.position.x, 144 + 18 + 38 * (self.pagination.total + 1) + self.position.y - 37 + self.subtitle.extraY, 431, 18, 0, 0, 0, 200)
 
-	_UIMenu.Description.Bar = UIResRectangle.New(_UIMenu.Position.X, 123, 431, 4, 0, 0, 0, 255)
-	_UIMenu.Description.Rectangle = Sprite.New("commonmenu", "gradient_bgd", _UIMenu.Position.X, 127, 431, 30)
-	_UIMenu.Description.Text = UIResText.New("Description", _UIMenu.Position.X + 5, 125, 0.35)
+	self.description.bar = ResRectangle:new(self.position.x, 123, 431, 4, 0, 0, 0, 255)
+	self.description.rectangle = Sprite:new("commonmenu", "gradient_bgd", self.position.x, 127, 431, 30)
+	self.description.text = ResText:new("Description", self.position.x + 5, 125, 0.35)
 
-	_UIMenu.Background = Sprite.New("commonmenu", "gradient_bgd", _UIMenu.Position.X, 144 + _UIMenu.Position.Y - 37 + _UIMenu.Subtitle.ExtraY, 290, 25)
+	self.background = Sprite:new("commonmenu", "gradient_bgd", self.position.x, 144 + self.position.y - 37 + self.subtitle.extraY, 290, 25)
 
 	Citizen.CreateThread(function()
-		if not HasScaleformMovieLoaded(_UIMenu.InstructionalScaleform) then
-			_UIMenu.InstructionalScaleform = RequestScaleformMovie("INSTRUCTIONAL_BUTTONS")
-			while not HasScaleformMovieLoaded(_UIMenu.InstructionalScaleform) do
-				Citizen.Wait(0)
+		if not HasScaleformMovieLoaded(self.instructionalScaleform) then
+			self.instructionalScaleform = RequestScaleformMovie("INSTRUCTIONAL_BUTTONS")
+			while not HasScaleformMovieLoaded(self.instructionalScaleform) do
+				Citizen.Wait(0);
 			end
 		end
 	end)
-	return setmetatable(_UIMenu, UIMenu)
 end
 
-function Menu:SetMenuWidthOffset(Offset)
-    if tonumber(Offset) then
-        self.WidthOffset = math.floor(tonumber(Offset))
-        self.Logo:Size(431 + self.WidthOffset, 107)
-        self.Title:Position(((self.WidthOffset + 431)/2) + self.Position.X, 20 + self.Position.Y)
-        if self.Subtitle.Rectangle ~= nil then
-            self.Subtitle.Rectangle:Size(431 + self.WidthOffset + 100, 37)            
-            self.PageCounter.Text:Position(425 + self.Position.X + self.WidthOffset, 110 + self.Position.Y)
-        end
-        if self.Banner ~= nil then
-            self.Banner:Size(431 + self.WidthOffset, 107)
-        end
-    end
+function Menu:SetMenuWidthOffset(offset)
+	self.widthOffset = math.floor(offset);
+	self.logo:Size(431 + self.widthOffset, 107);
+	self.title:position(((self.widthOffset + 431)/2) + self.position.x, 20 + self.position.y);
+	if self.subtitle.rectangle ~= nil then
+		self.subtitle.rectangle:Size(431 + self.widthOffset + 100, 37);
+		self.pageCounter.text:position(425 + self.position.x + self.widthOffset, 110 + self.position.y);
+	end
+	if self.banner ~= nil then
+		self.banner:Size(431 + self.widthOffset, 107);
+	end
 end
 
-function UIMenu:DisEnableControls(bool)
+function Menu:disEnableControls(bool)
 	if bool then
 		EnableAllControlActions(2)
 	else
@@ -174,1006 +175,999 @@ function UIMenu:DisEnableControls(bool)
 		return
 	else
         if Controller() then
-            for Index = 1, #self.Settings.EnabledControls.Controller do
-                EnableControlAction(self.Settings.EnabledControls.Controller[Index][1], self.Settings.EnabledControls.Controller[Index][2], true)
+            for _,v in pairs(self.settings.enabledControls.Controller) do
+                EnableControlAction(v[1], v[Index][2], true);
             end
         else
-            for Index = 1, #self.Settings.EnabledControls.Keyboard do
-                EnableControlAction(self.Settings.EnabledControls.Keyboard[Index][1], self.Settings.EnabledControls.Keyboard[Index][2], true)
+            for _,v in pairs(self.settings.enabledControls.Keyboard) do
+                EnableControlAction(v[1], v[2], true);
             end
         end
     end
 end
 
-function UIMenu:InstructionalButtons(bool)
-	if bool ~= nil then
-		self.Settings.InstrucitonalButtons = tobool(bool)
+function Menu:InstructionalButtons(bool)
+	self.settings.instructionalButtons = bool;
+end
+
+function Menu:SetBannerSprite(Sprite, includeChildren)
+	self.logo = sprite;
+	self.logo:Size(431 + self.widthOffset, 107);
+	self.logo:position(self.position.x, self.position.y);
+	self.banner = nil;
+	if includeChildren then
+		for Item, Menu in pairs(self.children) do
+			Menu.Logo = Sprite
+			Menu.Logo:Size(431 + self.widthOffset, 107)
+			Menu.Logo:position(self.position.x, self.position.y)
+			Menu.Banner = nil
+		end
 	end
 end
 
-function UIMenu:SetBannerSprite(Sprite, IncludeChildren)
-    if Sprite() == "Sprite" then
-        self.Logo = Sprite
-        self.Logo:Size(431 + self.WidthOffset, 107)
-        self.Logo:Position(self.Position.X, self.Position.Y)
-        self.Banner = nil
-        if IncludeChildren then
-            for Item, Menu in pairs(self.Children) do
-                Menu.Logo = Sprite
-                Menu.Logo:Size(431 + self.WidthOffset, 107)
-                Menu.Logo:Position(self.Position.X, self.Position.Y)
-                Menu.Banner = nil
-            end
-        end
-    end
-end
-
-function UIMenu:SetBannerRectangle(Rectangle, IncludeChildren)
-    if Rectangle() == "Rectangle" then
-        self.Banner = Rectangle
-        self.Banner:Size(431 + self.WidthOffset, 107)
-        self.Banner:Position(self.Position.X, self.Position.Y)
-        self.Logo = nil
-        if IncludeChildren then
-            for Item, Menu in pairs(self.Children) do
-                Menu.Banner = Rectangle
-                Menu.Banner:Size(431 + self.WidthOffset, 107)
-                Menu:Position(self.Position.X, self.Position.Y)
+function Menu:SetBannerRectangle(rectangle, includeChildren)
+    if rectangle() == "Rectangle" then
+        self.banner = rectangle
+        self.banner:Size(431 + self.widthOffset, 107)
+        self.banner:position(self.position.x, self.position.y)
+        self.logo = nil
+        if includeChildren then
+            for Item, Menu in pairs(self.children) do
+                Menu.Banner = rectangle
+                Menu.Banner:Size(431 + self.widthOffset, 107)
+                Menu:position(self.position.x, self.position.y)
                 Menu.Logo = nil
             end
         end
     end
 end
 
-function UIMenu:CurrentSelection(value)
+function Menu:currentSelection(value)
 	if tonumber(value) then
-		if #self.Items == 0 then
-			self.ActiveItem = 0
+		if #self.items == 0 then
+			self.activeItem = 0
 		end
 
-		self.Items[self:CurrentSelection()]:Selected(false)
-		self.ActiveItem = 1000000 - (1000000 % #self.Items) + tonumber(value)
+		self.items[self:currentSelection()]:selected(false)
+		self.activeItem = 1000000 - (1000000 % #self.items) + tonumber(value)
 
-		if self:CurrentSelection() > self.Pagination.Max then
-			self.Pagination.Min = self:CurrentSelection() - self.Pagination.Total
-			self.Pagination.Max = self:CurrentSelection()
-		elseif self:CurrentSelection() < self.Pagination.Min then
-			self.Pagination.Min = self:CurrentSelection()
-			self.Pagination.Max = self:CurrentSelection() + self.Pagination.Total
+		if self:currentSelection() > self.pagination.max then
+			self.pagination.min = self:currentSelection() - self.pagination.total
+			self.pagination.max = self:currentSelection()
+		elseif self:currentSelection() < self.pagination.min then
+			self.pagination.min = self:currentSelection()
+			self.pagination.max = self:currentSelection() + self.pagination.total
 		end 
 	else
-		if #self.Items == 0 then
+		if #self.items == 0 then
 			return 1
 		else
-			if self.ActiveItem % #self.Items == 0 then
+			if self.activeItem % #self.items == 0 then
 				return 1
 			else
-				return self.ActiveItem % #self.Items + 1
+				return self.activeItem % #self.items + 1
 			end
 		end
 	end
 end
 
-function UIMenu:CalculateWindowHeight()
-	local Height = 0
-	for i = 1, #self.Windows do
-		Height = Height + self.Windows[i].Background:Size().Height
+function Menu:CalculateWindowHeight()
+	local height = 0
+	for i = 1, #self.windows do
+		height = height + self.windows[i].Background:Size().height
 	end
-	return Height
+	return height
 end
 
-function UIMenu:CalculateItemHeightOffset(Item)
+function Menu:CalculateItemHeightOffset(Item)
 	if Item.Base then
-		return Item.Base.Rectangle.Height
+		return Item.Base.rectangle.height
 	else
-		return Item.Rectangle.Height
+		return Item.rectangle.height
 	end
 end
 
-function UIMenu:CalculateItemHeight()
-	local ItemOffset = 0 + self.Subtitle.ExtraY - 37
-	for i = self.Pagination.Min + 1, self.Pagination.Max do
-		local Item = self.Items[i]
-		if Item ~= nil then
-			ItemOffset = ItemOffset + self:CalculateItemHeightOffset(Item)
+function Menu:CalculateItemHeight()
+	local itemOffset = 0 + self.subtitle.extraY - 37;
+	for i = self.pagination.min + 1, self.pagination.max do
+		local item = self.items[i]
+		if item ~= nil then
+			itemOffset = itemOffset + self:CalculateItemHeightOffset(item)
 		end
 	end
-	return ItemOffset
+	return itemOffset
 end
 
-function UIMenu:RecalculateDescriptionPosition()
-	local WindowHeight = self:CalculateWindowHeight()
-    self.Description.Bar:Position(self.Position.X, 149 + self.Position.Y + WindowHeight)
-    self.Description.Rectangle:Position(self.Position.X, 149 + self.Position.Y + WindowHeight)
-    self.Description.Text:Position(self.Position.X + 8, 155 + self.Position.Y + WindowHeight)
+function Menu:RecalculateDescriptionPosition()
+	local windowHeight = self:CalculateWindowHeight()
+    self.description.bar:position(self.position.x, 149 + self.position.y + WindowHeight)
+    self.description.rectangle:position(self.position.x, 149 + self.position.y + WindowHeight)
+    self.description.text:position(self.position.x + 8, 155 + self.position.y + WindowHeight)
 
-	self.Description.Bar:Size(431 + self.WidthOffset, 4)
-	self.Description.Rectangle:Size(431 + self.WidthOffset, 30)
+	self.description.bar:Size(431 + self.widthOffset, 4)
+	self.description.rectangle:Size(431 + self.widthOffset, 30)
 
-	self.Description.Bar:Position(self.Position.X, self:CalculateItemHeight() + ((#self.Items > (self.Pagination.Total + 1)) and 37 or 0) + self.Description.Bar:Position().Y)
-	self.Description.Rectangle:Position(self.Position.X, self:CalculateItemHeight() + ((#self.Items > (self.Pagination.Total + 1)) and 37 or 0) + self.Description.Rectangle:Position().Y)
-	self.Description.Text:Position(self.Position.X + 8, self:CalculateItemHeight() + ((#self.Items > (self.Pagination.Total + 1)) and 37 or 0) + self.Description.Text:Position().Y)
+	self.description.bar:position(self.position.x, self:CalculateItemHeight() + ((#self.items > (self.pagination.total + 1)) and 37 or 0) + self.description.bar:position().Y)
+	self.description.rectangle:position(self.position.x, self:CalculateItemHeight() + ((#self.items > (self.pagination.total + 1)) and 37 or 0) + self.description.rectangle:position().Y)
+	self.description.text:position(self.position.x + 8, self:CalculateItemHeight() + ((#self.items > (self.pagination.total + 1)) and 37 or 0) + self.description.text:position().Y)
 end
 
-function UIMenu:CaclulatePanelPosition(HasDescription)
-	local Height = self:CalculateWindowHeight() + 149 + self.Position.Y
+function Menu:CaclulatePanelPosition(HasDescription)
+	local height = self:CalculateWindowHeight() + 149 + self.position.y
 
 	if HasDescription then
-		Height = Height + self.Description.Rectangle:Size().Height + 5
+		height = height + self.description.rectangle:Size().height + 5
 	end
 
-	return self:CalculateItemHeight() + ((#self.Items > (self.Pagination.Total + 1)) and 37 or 0) + Height
+	return self:CalculateItemHeight() + ((#self.items > (self.pagination.total + 1)) and 37 or 0) + height
 end
 
-function UIMenu:AddWindow(Window)
-	if Window() == "UIMenuWindow" then
-		Window:SetParentMenu(self)
-		Window:Offset(self.Position.X, self.Position.Y)
-		table.insert(self.Windows, Window)
-		self.ReDraw = true
-		self:RecalculateDescriptionPosition()
-	end
-end
-
-function UIMenu:RemoveWindowAt(Index)
-	if tonumber(Index) then
-		if self.Windows[Index] then
-			table.remove(self.Windows, Index)
-			self.ReDraw = true
-			self:RecalculateDescriptionPosition()
-		end
-	end
-end
-
-function UIMenu:AddItem(Item)
-	if Item() == "UIMenuItem" then
-		local SelectedItem = self:CurrentSelection()
-		Item:SetParentMenu(self)
-		Item:Offset(self.Position.X, self.Position.Y)
-		Item:Position((#self.Items * 25) - 37 + self.Subtitle.ExtraY)
-		table.insert(self.Items, Item)
-		self:RecalculateDescriptionPosition()
-		self:CurrentSelection(SelectedItem)
-	end
-end
-
-function UIMenu:RemoveItemAt(Index)
-	if tonumber(Index) then
-		if self.Items[Index] then
-			local SelectedItem = self:CurrentSelection()
-			if #self.Items > self.Pagination.Total and self.Pagination.Max == #self.Items - 1 then
-				self.Pagination.Min = self.Pagination.Min - 1
-				self.Pagination.Max = self.Pagination.Max + 1
-			end
-			table.remove(self.Items, tonumber(Index))
-			self:RecalculateDescriptionPosition()
-			self:CurrentSelection(SelectedItem)
-		end
-	end
-end
-
-function UIMenu:RefreshIndex()
-	if #self.Items == 0 then
-		self.ActiveItem = 1000
-		self.Pagination.Max = self.Pagination.Total + 1
-		self.Pagination.Min = 0
-		return
-	end
-	self.Items[self:CurrentSelection()]:Selected(false)
-	self.ActiveItem = 1000 - (1000 % #self.Items)
-	self.Pagination.Max = self.Pagination.Total + 1
-	self.Pagination.Min = 0
-	self.ReDraw = true
-end
-
-function UIMenu:Clear()
-	self.Items = {}
-    self.ReDraw = true
+function Menu:AddWindow(window)
+	window:SetParentMenu(self)
+	window:Offset(self.position.x, self.position.y)
+	table.insert(self.windows, window)
+	self.reDraw = true
 	self:RecalculateDescriptionPosition()
 end
 
-function UIMenu:MultilineFormat(str)
-	if tostring(str) then
-
-		local PixelPerLine = 425 + self.WidthOffset
-		local AggregatePixels = 0
-		local output = ""
-		local words = string.split(tostring(str), " ")
-
-		for i = 1, #words do
-			local offset = MeasureStringWidth(words[i], 0, 0.35)
-			AggregatePixels = AggregatePixels + offset
-			if AggregatePixels > PixelPerLine then
-				output = output .. "\n" .. words[i] .. " "
-				AggregatePixels = offset + MeasureString(" ")
-			else
-				output = output .. words[i] .. " "
-				AggregatePixels = AggregatePixels + MeasureString(" ")
-			end
-		end
-		return output
+function Menu:RemoveWindowAt(index)
+	if self.windows[index] then
+		table.remove(self.windows, index);
+		self.reDraw = true;
+		self:RecalculateDescriptionPosition();
 	end
 end
 
-function UIMenu:DrawCalculations()
-	local WindowHeight = self:CalculateWindowHeight()
+function Menu:AddItem(item)
+	if item() == "MenuItem" then
+		local selectedItem = self:currentSelection()
+		item:SetParentMenu(self)
+		item:Offset(self.position.x, self.position.y)
+		item:position((#self.items * 25) - 37 + self.subtitle.extraY)
+		table.insert(self.items, item)
+		self:RecalculateDescriptionPosition()
+		self:currentSelection(selectedItem)
+	end
+end
 
-	if self.Settings.MultilineFormats then
-		if self.Subtitle.Rectangle and not self.Subtitle.Formatted then
-			self.Subtitle.Formatted = true
-			self.Subtitle.Text:Text(self:MultilineFormat(self.Subtitle.Text:Text()))
-
-			local Linecount = #string.split(self.Subtitle.Text:Text(), "\n")
-			self.Subtitle.ExtraY = ((Linecount == 1) and 37 or ((Linecount + 1) * 22))
-			self.Subtitle.Rectangle:Size(431 + self.WidthOffset, self.Subtitle.ExtraY)
+function Menu:RemoveItemAt(index)
+	if self.items[index] then
+		local SelectedItem = self:currentSelection()
+		if #self.items > self.pagination.total and self.pagination.max == #self.items - 1 then
+			self.pagination.min = self.pagination.min - 1;
+			self.pagination.max = self.pagination.max + 1;
 		end
-	elseif self.Subtitle.Formatted then
-		self.Subtitle.Formatted = false
-		self.Subtitle.ExtraY = 37
-		self.Subtitle.Rectangle:Size(431 + self.WidthOffset, self.Subtitle.ExtraY)
-		self.Subtitle.Text:Text(self.Subtitle.BackupText)
+		table.remove(self.items, index)
+		self:RecalculateDescriptionPosition()
+		self:currentSelection(SelectedItem)
+	end
+end
+
+function Menu:RefreshIndex()
+	if #self.items == 0 then
+		self.activeItem = 1000
+		self.pagination.max = self.pagination.total + 1
+		self.pagination.min = 0
+		return
+	end
+	self.items[self:currentSelection()]:selected(false)
+	self.activeItem = 1000 - (1000 % #self.items)
+	self.pagination.max = self.pagination.total + 1
+	self.pagination.min = 0
+	self.reDraw = true
+end
+
+function Menu:Clear()
+	self.items = {}
+    self.reDraw = true
+	self:RecalculateDescriptionPosition()
+end
+
+function Menu:MultilineFormat(str)
+	local pixelsPerLine = 425 + self.widthOffset;
+	local aggregatePixels = 0
+	local output = ""
+	local words = string.split(tostring(str), " ")
+
+	for i = 1, #words do
+		local offset = MeasureStringWidth(words[i], 0, 0.35)
+		aggregatePixels = aggregatePixels + offset
+		if aggregatePixels > pixelsPerLine then
+			output = output .. "\n" .. words[i] .. " "
+			aggregatePixels = offset + MeasureString(" ")
+		else
+			output = output .. words[i] .. " "
+			aggregatePixels = aggregatePixels + MeasureString(" ")
+		end
+	end
+	return output;
+end
+
+function Menu:drawCalculations()
+	local windowHeight = self:CalculateWindowHeight()
+
+	if self.settings.multilineFormats then
+		if self.subtitle.rectangle and not self.subtitle.formatted then
+			self.subtitle.formatted = true
+			self.subtitle.text:Text(self:MultilineFormat(self.subtitle.text:Text()))
+
+			local Linecount = #string.split(self.subtitle.text:Text(), "\n")
+			self.subtitle.extraY = ((Linecount == 1) and 37 or ((Linecount + 1) * 22))
+			self.subtitle.rectangle:Size(431 + self.widthOffset, self.subtitle.extraY)
+		end
+	elseif self.subtitle.formatted then
+		self.subtitle.formatted = false
+		self.subtitle.extraY = 37
+		self.subtitle.rectangle:Size(431 + self.widthOffset, self.subtitle.extraY)
+		self.subtitle.text:Text(self.subtitle.BackupText)
 	end
 
-    self.Background:Size(431 + self.WidthOffset, self:CalculateItemHeight() + WindowHeight + ((self.Subtitle.ExtraY > 0) and 0 or 37))
+    self.background:Size(431 + self.widthOffset, self:CalculateItemHeight() + WindowHeight + ((self.subtitle.extraY > 0) and 0 or 37))
 
-	self.Extra.Up:Size(431 + self.WidthOffset, 18)
-	self.Extra.Down:Size(431 + self.WidthOffset, 18)
+	self.extra.up:Size(431 + self.widthOffset, 18)
+	self.extra.down:Size(431 + self.widthOffset, 18)
 
-    self.Extra.Up:Position(self.Position.X, 144 + self:CalculateItemHeight() + self.Position.Y + WindowHeight)
-    self.Extra.Down:Position(self.Position.X, 144 + 18 + self:CalculateItemHeight() + self.Position.Y + WindowHeight)
+    self.extra.up:position(self.position.x, 144 + self:CalculateItemHeight() + self.position.y + WindowHeight)
+    self.extra.down:position(self.position.x, 144 + 18 + self:CalculateItemHeight() + self.position.y + WindowHeight)
 
-    if self.WidthOffset > 0 then
-        self.ArrowSprite:Position(190 + self.Position.X + (self.WidthOffset / 2), 137 + self:CalculateItemHeight() + self.Position.Y + WindowHeight)
+    if self.widthOffset > 0 then
+        self.arrowSprite:position(190 + self.position.x + (self.widthOffset / 2), 137 + self:CalculateItemHeight() + self.position.y + WindowHeight)
     else
-        self.ArrowSprite:Position(190 + self.Position.X + self.WidthOffset, 137 + self:CalculateItemHeight() + self.Position.Y + WindowHeight)
+        self.arrowSprite:position(190 + self.position.x + self.widthOffset, 137 + self:CalculateItemHeight() + self.position.y + WindowHeight)
     end
 
-	self.ReDraw = false
+	self.reDraw = false
 
-	if #self.Items ~= 0 and self.Items[self:CurrentSelection()]:Description() ~= "" then
+	if #self.items ~= 0 and self.items[self:currentSelection()]:description() ~= "" then
 		self:RecalculateDescriptionPosition()
 
-		local description = self.Items[self:CurrentSelection()]:Description()
-		if self.Settings.MultilineFormats then
-			self.Description.Text:Text(self:MultilineFormat(description))
+		local description = self.items[self:currentSelection()]:description()
+		if self.settings.multilineFormats then
+			self.description.text:Text(self:MultilineFormat(description))
 		else
-			self.Description.Text:Text(description)
+			self.description.text:Text(description)
 		end
 
-		local Linecount = #string.split(self.Description.Text:Text(), "\n")
-		self.Description.Rectangle:Size(431 + self.WidthOffset, ((Linecount == 1) and 37 or ((Linecount + 1) * 22)))
+		local Linecount = #string.split(self.description.text:Text(), "\n")
+		self.description.rectangle:Size(431 + self.widthOffset, ((Linecount == 1) and 37 or ((Linecount + 1) * 22)))
 	end
 end
 
-function UIMenu:Visible(bool)
+function Menu:visible(bool)
 	if bool ~= nil then
-		self._Visible = tobool(bool)
-		self.JustOpened = tobool(bool)
-		self.Dirty = tobool(bool)
-		self:UpdateScaleform()
-		if self.ParentMenu ~= nil or tobool(bool) == false then
+		self._visible = tobool(bool)
+		self.justOpened = tobool(bool)
+		self.dirty = tobool(bool)
+		self:updateScaleform()
+		if self.parentMenu ~= nil or tobool(bool) == false then
 			return
 		end
-		if self.Settings.ResetCursorOnOpen then
-			local W, H = GetScreenResolution()
+		if self.settings.ResetCursorOnOpen then
+			local w, h = GetScreenResolution()
 			SetCursorLocation(W / 2, H / 2)
 			SetCursorSprite(1)
 		end
 	else
-		return self._Visible
+		return self._visible
 	end
 end
 
-function UIMenu:ProcessControl()
-	if not self._Visible then
+function Menu:ProcessControl()
+	if not self._visible then
 		return
 	end
 
-	if self.JustOpened then
-		self.JustOpened = false
+	if self.justOpened then
+		self.justOpened = false
 		return
 	end
 
-	if self.Controls.Back.Enabled and (IsDisabledControlJustReleased(0, 177) or IsDisabledControlJustReleased(1, 177) or IsDisabledControlJustReleased(2, 177) or IsDisabledControlJustReleased(0, 199) or IsDisabledControlJustReleased(1, 199) or IsDisabledControlJustReleased(2, 199)) then
+	if self.controls.Back.enabled and (IsDisabledControlJustReleased(0, 177) or IsDisabledControlJustReleased(1, 177) or IsDisabledControlJustReleased(2, 177) or IsDisabledControlJustReleased(0, 199) or IsDisabledControlJustReleased(1, 199) or IsDisabledControlJustReleased(2, 199)) then
 		self:GoBack()
 	end
 	
-	if #self.Items == 0 then
+	if #self.items == 0 then
 		return
 	end
 
-	if not self.UpPressed then
-		if self.Controls.Up.Enabled and (IsDisabledControlJustPressed(0, 172) or IsDisabledControlJustPressed(1, 172) or IsDisabledControlJustPressed(2, 172) or IsDisabledControlJustPressed(0, 241) or IsDisabledControlJustPressed(1, 241) or IsDisabledControlJustPressed(2, 241) or IsDisabledControlJustPressed(2, 241)) then
+	if not self.upPressed then
+		if self.controls.up.enabled and (IsDisabledControlJustPressed(0, 172) or IsDisabledControlJustPressed(1, 172) or IsDisabledControlJustPressed(2, 172) or IsDisabledControlJustPressed(0, 241) or IsDisabledControlJustPressed(1, 241) or IsDisabledControlJustPressed(2, 241) or IsDisabledControlJustPressed(2, 241)) then
 			Citizen.CreateThread(function()
-				self.UpPressed = true
-				if #self.Items > self.Pagination.Total + 1 then
-					self:GoUpOverflow()
+				self.upPressed = true
+				if #self.items > self.pagination.total + 1 then
+					self:goUpOverflow()
 				else
-					self:GoUp()
+					self:goUp()
 				end
-				self:UpdateScaleform()
+				self:updateScaleform()
 				Citizen.Wait(175)
-				while self.Controls.Up.Enabled and (IsDisabledControlPressed(0, 172) or IsDisabledControlPressed(1, 172) or IsDisabledControlPressed(2, 172) or IsDisabledControlPressed(0, 241) or IsDisabledControlPressed(1, 241) or IsDisabledControlPressed(2, 241) or IsDisabledControlPressed(2, 241)) do
-					if #self.Items > self.Pagination.Total + 1 then
-						self:GoUpOverflow()
+				while self.controls.up.enabled and (IsDisabledControlPressed(0, 172) or IsDisabledControlPressed(1, 172) or IsDisabledControlPressed(2, 172) or IsDisabledControlPressed(0, 241) or IsDisabledControlPressed(1, 241) or IsDisabledControlPressed(2, 241) or IsDisabledControlPressed(2, 241)) do
+					if #self.items > self.pagination.total + 1 then
+						self:goUpOverflow()
 					else
-						self:GoUp()
+						self:goUp()
 					end
-					self:UpdateScaleform()
+					self:updateScaleform()
 					Citizen.Wait(125)
 				end
-				self.UpPressed = false
+				self.upPressed = false
 			end)
 		end
 	end
 
-	if not self.DownPressed then
-		if self.Controls.Down.Enabled and (IsDisabledControlJustPressed(0, 173) or IsDisabledControlJustPressed(1, 173) or IsDisabledControlJustPressed(2, 173) or IsDisabledControlJustPressed(0, 242) or IsDisabledControlJustPressed(1, 242) or IsDisabledControlJustPressed(2, 242)) then
+	if not self.downPressed then
+		if self.controls.down.enabled and (IsDisabledControlJustPressed(0, 173) or IsDisabledControlJustPressed(1, 173) or IsDisabledControlJustPressed(2, 173) or IsDisabledControlJustPressed(0, 242) or IsDisabledControlJustPressed(1, 242) or IsDisabledControlJustPressed(2, 242)) then
 			Citizen.CreateThread(function()
-				self.DownPressed = true
-				if #self.Items > self.Pagination.Total + 1 then
-					self:GoDownOverflow()
+				self.downPressed = true
+				if #self.items > self.pagination.total + 1 then
+					self:goDownOverflow()
 				else
-					self:GoDown()
+					self:goDown()
 				end
-				self:UpdateScaleform()
+				self:updateScaleform()
 				Citizen.Wait(175)
-				while self.Controls.Down.Enabled and (IsDisabledControlPressed(0, 173) or IsDisabledControlPressed(1, 173) or IsDisabledControlPressed(2, 173) or IsDisabledControlPressed(0, 242) or IsDisabledControlPressed(1, 242) or IsDisabledControlPressed(2, 242)) do
-					if #self.Items > self.Pagination.Total + 1 then
-						self:GoDownOverflow()
+				while self.controls.down.enabled and (IsDisabledControlPressed(0, 173) or IsDisabledControlPressed(1, 173) or IsDisabledControlPressed(2, 173) or IsDisabledControlPressed(0, 242) or IsDisabledControlPressed(1, 242) or IsDisabledControlPressed(2, 242)) do
+					if #self.items > self.pagination.total + 1 then
+						self:goDownOverflow()
 					else
-						self:GoDown()
+						self:goDown()
 					end
-					self:UpdateScaleform()
+					self:updateScaleform()
 					Citizen.Wait(125)
 				end
-				self.DownPressed = false
+				self.downPressed = false;
 			end)
 		end
 	end
 
-	if not self.LeftPressed then
-		if self.Controls.Left.Enabled and (IsDisabledControlPressed(0, 174) or IsDisabledControlPressed(1, 174) or IsDisabledControlPressed(2, 174)) then
+	if not self.leftPressed then
+		if self.controls.left.enabled and (IsDisabledControlPressed(0, 174) or IsDisabledControlPressed(1, 174) or IsDisabledControlPressed(2, 174)) then
 			Citizen.CreateThread(function()
-				self.LeftPressed = true
-				self:GoLeft()
+				self.leftPressed = true
+				self:goLeft()
 				Citizen.Wait(175)
-				while self.Controls.Left.Enabled and (IsDisabledControlPressed(0, 174) or IsDisabledControlPressed(1, 174) or IsDisabledControlPressed(2, 174)) do
-					self:GoLeft()
+				while self.controls.left.enabled and (IsDisabledControlPressed(0, 174) or IsDisabledControlPressed(1, 174) or IsDisabledControlPressed(2, 174)) do
+					self:goLeft()
 					Citizen.Wait(125)
 				end
-				self.LeftPressed = false
+				self.leftPressed = false
 			end)
 		end
 	end
 
-	if not self.RightPressed then
-		if self.Controls.Right.Enabled and (IsDisabledControlPressed(0, 175) or IsDisabledControlPressed(1, 175) or IsDisabledControlPressed(2, 175)) then
+	if not self.rightPressed then
+		if self.controls.right.enabled and (IsDisabledControlPressed(0, 175) or IsDisabledControlPressed(1, 175) or IsDisabledControlPressed(2, 175)) then
 			Citizen.CreateThread(function()
-				self.RightPressed = true
-				self:GoRight()
+				self.rightPressed = true
+				self:goRight()
 				Citizen.Wait(175)
-				while self.Controls.Right.Enabled and (IsDisabledControlPressed(0, 175) or IsDisabledControlPressed(1, 175) or IsDisabledControlPressed(2, 175)) do
-					self:GoRight()
+				while self.controls.right.enabled and (IsDisabledControlPressed(0, 175) or IsDisabledControlPressed(1, 175) or IsDisabledControlPressed(2, 175)) do
+					self:goRight()
 					Citizen.Wait(125)
 				end
-				self.RightPressed = false
+				self.rightPressed = false
 			end)
 		end
 	end
 
-	if self.Controls.Select.Enabled and (IsDisabledControlJustPressed(0, 201) or IsDisabledControlJustPressed(1, 201) or IsDisabledControlJustPressed(2, 201)) then
-		self:SelectItem()
+	if self.controls.Select.enabled and (IsDisabledControlJustPressed(0, 201) or IsDisabledControlJustPressed(1, 201) or IsDisabledControlJustPressed(2, 201)) then
+		self:selectItem()
 	end
 end
 
-function UIMenu:GoUpOverflow()
-	if #self.Items <= self.Pagination.Total + 1 then
+function Menu:goUpOverflow()
+	if #self.items <= self.pagination.total + 1 then
 		return
 	end
 
-	if self:CurrentSelection() <= self.Pagination.Min + 1 then
-		if self:CurrentSelection() == 1 then
-			self.Pagination.Min = #self.Items - (self.Pagination.Total + 1)
-			self.Pagination.Max = #self.Items
-			self.Items[self:CurrentSelection()]:Selected(false)
-			self.ActiveItem = 1000 - (1000 % #self.Items)
-			self.ActiveItem = self.ActiveItem + (#self.Items - 1)
-			self.Items[self:CurrentSelection()]:Selected(true)
+	if self:currentSelection() <= self.pagination.min + 1 then
+		if self:currentSelection() == 1 then
+			self.pagination.min = #self.items - (self.pagination.total + 1)
+			self.pagination.max = #self.items
+			self.items[self:currentSelection()]:selected(false)
+			self.activeItem = 1000 - (1000 % #self.items)
+			self.activeItem = self.activeItem + (#self.items - 1)
+			self.items[self:currentSelection()]:selected(true)
 		else
-			self.Pagination.Min = self.Pagination.Min - 1
-			self.Pagination.Max = self.Pagination.Max - 1
-			self.Items[self:CurrentSelection()]:Selected(false)
-			self.ActiveItem = self.ActiveItem - 1
-			self.Items[self:CurrentSelection()]:Selected(true)
+			self.pagination.min = self.pagination.min - 1
+			self.pagination.max = self.pagination.max - 1
+			self.items[self:currentSelection()]:selected(false)
+			self.activeItem = self.activeItem - 1
+			self.items[self:currentSelection()]:selected(true)
 		end
 	else
-		self.Items[self:CurrentSelection()]:Selected(false)
-		self.ActiveItem = self.ActiveItem - 1
-		self.Items[self:CurrentSelection()]:Selected(true)
+		self.items[self:currentSelection()]:selected(false)
+		self.activeItem = self.activeItem - 1
+		self.items[self:currentSelection()]:selected(true)
 	end
-	PlaySoundFrontend(-1, self.Settings.Audio.UpDown, self.Settings.Audio.Library, true)
-	self.OnIndexChange(self, self:CurrentSelection())
-	self.ReDraw = true
+	PlaySoundFrontend(-1, self.settings.audio.upDown, self.settings.audio.library, true)
+	self.onIndexChange(self, self:currentSelection())
+	self.reDraw = true
 end
 
-function UIMenu:GoUp()
-	if #self.Items > self.Pagination.Total + 1 then
+function Menu:goUp()
+	if #self.items > self.pagination.total + 1 then
 		return
 	end
-	self.Items[self:CurrentSelection()]:Selected(false)
-	self.ActiveItem = self.ActiveItem - 1
-	self.Items[self:CurrentSelection()]:Selected(true)
-	PlaySoundFrontend(-1, self.Settings.Audio.UpDown, self.Settings.Audio.Library, true)
-	self.OnIndexChange(self, self:CurrentSelection())
-	self.ReDraw = true
+	self.items[self:currentSelection()]:selected(false)
+	self.activeItem = self.activeItem - 1
+	self.items[self:currentSelection()]:selected(true)
+	PlaySoundFrontend(-1, self.settings.audio.upDown, self.settings.audio.library, true)
+	self.onIndexChange(self, self:currentSelection())
+	self.reDraw = true
 end
 
-function UIMenu:GoDownOverflow()
-	if #self.Items <= self.Pagination.Total + 1 then
+function Menu:goDownOverflow()
+	if #self.items <= self.pagination.total + 1 then
 		return
 	end
 
-	if self:CurrentSelection() >= self.Pagination.Max then
-		if self:CurrentSelection() == #self.Items then
-			self.Pagination.Min = 0
-			self.Pagination.Max = self.Pagination.Total + 1
-			self.Items[self:CurrentSelection()]:Selected(false)
-			self.ActiveItem = 1000 - (1000 % #self.Items)
-			self.Items[self:CurrentSelection()]:Selected(true)
+	if self:currentSelection() >= self.pagination.max then
+		if self:currentSelection() == #self.items then
+			self.pagination.min = 0
+			self.pagination.max = self.pagination.total + 1
+			self.items[self:currentSelection()]:selected(false)
+			self.activeItem = 1000 - (1000 % #self.items)
+			self.items[self:currentSelection()]:selected(true)
 		else
-			self.Pagination.Max = self.Pagination.Max + 1
-			self.Pagination.Min = self.Pagination.Max - (self.Pagination.Total + 1)
-			self.Items[self:CurrentSelection()]:Selected(false)
-			self.ActiveItem = self.ActiveItem + 1
-			self.Items[self:CurrentSelection()]:Selected(true)            
+			self.pagination.max = self.pagination.max + 1
+			self.pagination.min = self.pagination.max - (self.pagination.total + 1)
+			self.items[self:currentSelection()]:selected(false)
+			self.activeItem = self.activeItem + 1
+			self.items[self:currentSelection()]:selected(true)            
 		end
 	else
-		self.Items[self:CurrentSelection()]:Selected(false)
-		self.ActiveItem = self.ActiveItem + 1
-		self.Items[self:CurrentSelection()]:Selected(true)
+		self.items[self:currentSelection()]:selected(false)
+		self.activeItem = self.activeItem + 1
+		self.items[self:currentSelection()]:selected(true)
 	end
-	PlaySoundFrontend(-1, self.Settings.Audio.UpDown, self.Settings.Audio.Library, true)
-	self.OnIndexChange(self, self:CurrentSelection())
-	self.ReDraw = true
+	PlaySoundFrontend(-1, self.settings.audio.upDown, self.settings.audio.library, true)
+	self.onIndexChange(self, self:currentSelection())
+	self.reDraw = true
 end
 
-function UIMenu:GoDown()
-	if #self.Items > self.Pagination.Total + 1 then
+function Menu:goDown()
+	if #self.items > self.pagination.total + 1 then
 		return
 	end
 
-	self.Items[self:CurrentSelection()]:Selected(false)
-	self.ActiveItem = self.ActiveItem + 1
-	self.Items[self:CurrentSelection()]:Selected(true) 
-	PlaySoundFrontend(-1, self.Settings.Audio.UpDown, self.Settings.Audio.Library, true)
-	self.OnIndexChange(self, self:CurrentSelection())
-	self.ReDraw = true
+	self.items[self:currentSelection()]:selected(false)
+	self.activeItem = self.activeItem + 1
+	self.items[self:currentSelection()]:selected(true) 
+	PlaySoundFrontend(-1, self.settings.audio.upDown, self.settings.audio.library, true)
+	self.onIndexChange(self, self:currentSelection())
+	self.reDraw = true
 end
 
-function UIMenu:GoLeft()
-	local type, subtype = self.Items[self:CurrentSelection()]()
-	if subtype ~= "UIMenuListItem" and subtype ~= "UIMenuSliderItem" and subtype ~= "UIMenuProgressItem" then
+function Menu:goLeft()
+	local itemClass = self.items[self:currentSelection()].class;
+
+	if itemClass ~= MenuListItem
+		and itemClass ~= MenuSliderItem
+		and subtype ~= MenuProgressItem then
 		return
 	end
 
-	if not self.Items[self:CurrentSelection()]:Enabled() then
-		PlaySoundFrontend(-1, self.Settings.Audio.Error, self.Settings.Audio.Library, true)
+	if not self.items[self:currentSelection()]:enabled() then
+		PlaySoundFrontend(-1, self.settings.audio.error, self.settings.audio.library, true)
 		return
 	end
 	
-	if subtype == "UIMenuListItem" then
-		local Item = self.Items[self:CurrentSelection()]
-		Item:Index(Item._Index - 1)
-		self.OnListChange(self, Item, Item._Index)
-		Item.OnListChanged(self, Item, Item._Index)
-		PlaySoundFrontend(-1, self.Settings.Audio.LeftRight, self.Settings.Audio.Library, true)
-	elseif subtype == "UIMenuSliderItem" then
-		local Item = self.Items[self:CurrentSelection()]
-		Item:Index(Item._Index - 1)
-		self.OnSliderChange(self, Item, Item:Index())
-		Item.OnSliderChanged(self, Item, Item._Index)
-		PlaySoundFrontend(-1, self.Settings.Audio.LeftRight, self.Settings.Audio.Library, true)
-	elseif subtype == "UIMenuProgressItem" then
-		local Item = self.Items[self:CurrentSelection()]
-		Item:Index(Item.Data.Index - 1)
-		self.OnProgressChange(self, Item, Item.Data.Index)
-		Item.OnProgressChanged(self, Item, Item.Data.Index)
-		PlaySoundFrontend(-1, self.Settings.Audio.LeftRight, self.Settings.Audio.Library, true)
+	if itemClass == MenuListItem then
+		local item = self.items[self:currentSelection()]
+		item:index(item._index - 1)
+		self.onListChange(self, item, item._index)
+		item.OnListChanged(self, item, item._index)
+		PlaySoundFrontend(-1, self.settings.audio.leftRight, self.settings.audio.library, true)
+	elseif itemClass == MenuSliderItem then
+		local item = self.items[self:currentSelection()]
+		item:Index(item._Index - 1)
+		self.onSliderChange(self, item, item:Index())
+		item.OnSliderChanged(self, item, item._Index)
+		PlaySoundFrontend(-1, self.settings.audio.leftRight, self.settings.audio.library, true)
+	elseif itemClass == MenuProgressItem then
+		local item = self.items[self:currentSelection()]
+		item:Index(item.Data.Index - 1)
+		self.onProgressChange(self, item, item.Data.Index)
+		item.onProgressChanged(self, item, item.Data.Index)
+		PlaySoundFrontend(-1, self.settings.audio.leftRight, self.settings.audio.library, true)
 	end
 end
 
-function UIMenu:GoRight()
-	local type, subtype = self.Items[self:CurrentSelection()]()
-	if subtype ~= "UIMenuListItem" and subtype ~= "UIMenuSliderItem" and subtype ~= "UIMenuProgressItem" then
+function Menu:goRight()
+	local itemClass = self.items[self:currentSelection()].class;
+
+	if itemClass ~= MenuListItem 
+		and itemClass ~= MenuSliderItem 
+		and itemClass ~= MenuProgressItem then
 		return
 	end
 
-	if not self.Items[self:CurrentSelection()]:Enabled() then
-		PlaySoundFrontend(-1, self.Settings.Audio.Error, self.Settings.Audio.Library, true)
+	if not self.items[self:currentSelection()]:enabled() then
+		PlaySoundFrontend(-1, self.settings.audio.error, self.settings.audio.library, true)
 		return
 	end
 
-	if subtype == "UIMenuListItem" then
-		local Item = self.Items[self:CurrentSelection()]
+	if itemClass == MenuListItem then
+		local Item = self.items[self:currentSelection()]
 		Item:Index(Item._Index + 1)
-		self.OnListChange(self, Item, Item._Index)
+		self.onListChange(self, Item, Item._Index)
 		Item.OnListChanged(self, Item, Item._Index)
-		PlaySoundFrontend(-1, self.Settings.Audio.LeftRight, self.Settings.Audio.Library, true)
-	elseif subtype == "UIMenuSliderItem" then
-		local Item = self.Items[self:CurrentSelection()]
-		Item:Index(Item._Index + 1)
-		self.OnSliderChange(self, Item, Item:Index())
-		Item.OnSliderChanged(self, Item, Item._Index)
-		PlaySoundFrontend(-1, self.Settings.Audio.LeftRight, self.Settings.Audio.Library, true)
-	elseif subtype == "UIMenuProgressItem" then
-		local Item = self.Items[self:CurrentSelection()]
-		Item:Index(Item.Data.Index + 1)
-		self.OnProgressChange(self, Item, Item.Data.Index)
-		Item.OnProgressChanged(self, Item, Item.Data.Index)
-		PlaySoundFrontend(-1, self.Settings.Audio.LeftRight, self.Settings.Audio.Library, true)
+		PlaySoundFrontend(-1, self.settings.audio.leftRight, self.settings.audio.library, true)
+	elseif itemClass == MenuSliderItem then
+		local item = self.items[self:currentSelection()]
+		item:Index(item._Index + 1)
+		self.onSliderChange(self, item, item:Index())
+		item.OnSliderChanged(self, item, item._Index)
+		PlaySoundFrontend(-1, self.settings.audio.leftRight, self.settings.audio.library, true)
+	elseif itemClass == MenuProgressItem then
+		local item = self.items[self:currentSelection()]
+		item:index(item.Data.Index + 1)
+		self.onProgressChange(self, item, item.Data.Index)
+		item.onProgressChanged(self, item, item.Data.Index)
+		PlaySoundFrontend(-1, self.settings.audio.leftRight, self.settings.audio.library, true)
 	end
 end
 
-function UIMenu:SelectItem()
-	if not self.Items[self:CurrentSelection()]:Enabled() then
-		PlaySoundFrontend(-1, self.Settings.Audio.Error, self.Settings.Audio.Library, true)
+function Menu:selectItem()
+	if not self.items[self:currentSelection()]:enabled() then
+		PlaySoundFrontend(-1, self.settings.audio.error, self.settings.audio.library, true)
 		return
 	end
-	local Item = self.Items[self:CurrentSelection()]
-	local type, subtype = Item()
-	if subtype == "UIMenuCheckboxItem" then
-		Item.Checked = not Item.Checked
-		PlaySoundFrontend(-1, self.Settings.Audio.Select, self.Settings.Audio.Library, true)
-		self.OnCheckboxChange(self, Item, Item.Checked)
-		Item.CheckboxEvent(self, Item, Item.Checked)
-	elseif subtype == "UIMenuListItem" then
-		PlaySoundFrontend(-1, self.Settings.Audio.Select, self.Settings.Audio.Library, true)
-		self.OnListSelect(self, Item, Item._Index)
-		Item.OnListSelected(self, Item, Item._Index)
-	elseif subtype == "UIMenuSliderItem" then
-		PlaySoundFrontend(-1, self.Settings.Audio.Select, self.Settings.Audio.Library, true)
-		self.OnSliderSelect(self, Item, Item._Index)
-		Item.OnSliderSelected(Item._Index)
-	elseif subtype == "UIMenuProgressItem" then
-		PlaySoundFrontend(-1, self.Settings.Audio.Select, self.Settings.Audio.Library, true)
-		self.OnProgressSelect(self, Item, Item.Data.Index)
-		Item.OnProgressSelected(Item.Data.Index)		
+	local item = self.items[self:currentSelection()]
+	local itemClass = item.class;
+	if itemClass == MenuCheckboxItem then
+		item.checked = not item.checked
+		PlaySoundFrontend(-1, self.settings.audio.Select, self.settings.audio.library, true)
+		self.onCheckboxChange(self, item, item.checked)
+		item.CheckboxEvent(self, item, item.checked)
+	elseif itemClass == MenuListItem then
+		PlaySoundFrontend(-1, self.settings.audio.Select, self.settings.audio.library, true)
+		self.onListSelect(self, item, item._Index)
+		item.OnListSelected(self, item, item._Index)
+	elseif itemClass == MenuSliderItem then
+		PlaySoundFrontend(-1, self.settings.audio.Select, self.settings.audio.library, true)
+		self.onSliderSelect(self, item, item._Index)
+		item.OnSliderSelected(item._Index)
+	elseif itemClass == MenuProgressItem then
+		PlaySoundFrontend(-1, self.settings.audio.Select, self.settings.audio.library, true)
+		self.onProgressSelect(self, item, item.Data.Index)
+		item.OnProgressSelected(item.Data.Index)		
 	else
-		PlaySoundFrontend(-1, self.Settings.Audio.Select, self.Settings.Audio.Library, true)
-		self.OnItemSelect(self, Item, self:CurrentSelection())
-		Item.Activated(self, Item)
-		if not self.Children[Item] then
+		PlaySoundFrontend(-1, self.settings.audio.Select, self.settings.audio.library, true)
+		self.onItemSelect(self, item, self:currentSelection())
+		item.Activated(self, item)
+		if not self.children[item] then
 			return
 		end
-		self:Visible(false)
-		self.Children[Item]:Visible(true)
-		self.OnMenuChanged(self, self.Children[self.Items[self:CurrentSelection()]], true)
+		self:visible(false)
+		self.children[item]:visible(true)
+		self.onMenuChanged(self, self.children[self.items[self:currentSelection()]], true)
 	end
 end
 
-function UIMenu:GoBack()
-	PlaySoundFrontend(-1, self.Settings.Audio.Back, self.Settings.Audio.Library, true)
-	self:Visible(false)
-	if self.ParentMenu ~= nil then
-		self.ParentMenu:Visible(true)
-		self.OnMenuChanged(self, self.ParentMenu, false)
-		if self.Settings.ResetCursorOnOpen then
-			local W, H = GetActiveScreenResolution()
+function Menu:GoBack()
+	PlaySoundFrontend(-1, self.settings.audio.Back, self.settings.audio.library, true)
+	self:visible(false)
+	if self.parentMenu ~= nil then
+		self.parentMenu:visible(true)
+		self.onMenuChanged(self, self.parentMenu, false)
+		if self.settings.ResetCursorOnOpen then
+			local w, h = GetActiveScreenResolution()
 			SetCursorLocation(W / 2, H / 2)
 		end
 	end
-	self.OnMenuClosed(self)
+	self.onMenuClosed(self)
 end
 
-function UIMenu:BindMenuToItem(Menu, Item)
-	if Menu() == "UIMenu" and Item() == "UIMenuItem" then
-		Menu.ParentMenu = self
-		Menu.ParentItem = Item
-		self.Children[Item] = Menu
+function Menu:bindMenuToItem(menu, item)
+	if menu.class == Menu and item.class == MenuItem then
+		menu.parentMenu = self;
+		menu.parentItem = item;
+		self.children[item] = menu;
 	end
 end
 
-function UIMenu:ReleaseMenuFromItem(Item)
-	if Item() == "UIMenuItem" then
-		if not self.Children[Item] then
+function Menu:releaseMenuFromItem(item)
+	if item.class == MenuItem then
+		if not self.children[item] then
 			return false
 		end
-		self.Children[Item].ParentMenu = nil
-		self.Children[Item].ParentItem = nil
-		self.Children[Item] = nil
-		return true
+		self.children[item].parentMenu = nil;
+		self.children[item].parentItem = nil;
+		self.children[item] = nil;
+		return true;
 	end
 end
 
-function UIMenu:Draw()
-	if not self._Visible then
-		return
+function Menu:draw()
+	if not self._visible then
+		return;
 	end
 
 	HideHudComponentThisFrame(19)
 
-	if self.Settings.ControlDisablingEnabled then
-		self:DisEnableControls(false)
+	if self.settings.controlDisablingEnabled then
+		self:disEnableControls(false)
 	end
 
-	if self.Settings.InstructionalButtons then
-		DrawScaleformMovieFullscreen(self.InstructionalScaleform, 255, 255, 255, 255, 0)
+	if self.settings.instructionalButtons then
+		DrawScaleformMovieFullscreen(self.instructionalScaleform, 255, 255, 255, 255, 0)
 	end
 
-	if self.Settings.ScaleWithSafezone then
+	if self.settings.scaleWithSafezone then
 		ScreenDrawPositionBegin(76, 84)
 		ScreenDrawPositionRatio(0, 0, 0, 0)
 	end
 
-	if self.ReDraw then
-		self:DrawCalculations()
+	if self.reDraw then
+		self:drawCalculations()
 	end
 
-	if self.Logo then
-		self.Logo:Draw()
-	elseif self.Banner then
-		self.Banner:Draw()
+	if self.logo then
+		self.logo:draw()
+	elseif self.banner then
+		self.banner:draw()
 	end
 
-	self.Title:Draw()
+	self.title:draw()
 
-	if self.Subtitle.Rectangle then
-		self.Subtitle.Rectangle:Draw()
-		self.Subtitle.Text:Draw()
+	if self.subtitle.rectangle then
+		self.subtitle.rectangle:draw()
+		self.subtitle.text:draw()
 	end
 
-	if #self.Items ~= 0 or #self.Windows ~= 0 then
-		self.Background:Draw()
+	if #self.items ~= 0 or #self.windows ~= 0 then
+		self.background:draw()
 	end
 
-	if #self.Windows ~= 0 then
-		local WindowOffset = 0
-		for index = 1, #self.Windows do
-			if self.Windows[index - 1] then 
-				WindowOffset = WindowOffset + self.Windows[index - 1].Background:Size().Height 
+	if #self.windows ~= 0 then
+		local windowOffset = 0
+		for index = 1, #self.windows do
+			if self.windows[index - 1] then 
+				windowOffset = windowOffset + self.windows[index - 1].Background:Size().height 
 			end
-			local Window = self.Windows[index]
-			Window:Position(WindowOffset + self.Subtitle.ExtraY - 37)
-			Window:Draw()
+			local window = self.windows[index]
+			Window:position(windowOffset + self.subtitle.extraY - 37)
+			Window:draw()
 		end
 	end
 
-	if #self.Items == 0 then
-		if self.Settings.ScaleWithSafezone then
+	if #self.items == 0 then
+		if self.settings.scaleWithSafezone then
 			ScreenDrawPositionEnd()
 		end
-		return
+		return;
 	end
 
-	local CurrentSelection = self:CurrentSelection()
-	self.Items[CurrentSelection]:Selected(true)
+	local currentSelection = self:currentSelection()
+	self.items[currentSelection]:selected(true)
 
-	if self.Items[CurrentSelection]:Description() ~= "" then
-		self.Description.Bar:Draw()
-		self.Description.Rectangle:Draw()
-		self.Description.Text:Draw()
+	if self.items[currentSelection]:description() ~= "" then
+		self.description.bar:draw()
+		self.description.rectangle:draw()
+		self.description.text:draw()
 	end
 
-	if self.Items[CurrentSelection].Panels ~= nil then
-		if #self.Items[CurrentSelection].Panels ~= 0 then
-			local PanelOffset = self:CaclulatePanelPosition(self.Items[CurrentSelection]:Description() ~= "")
-			for index = 1, #self.Items[CurrentSelection].Panels do
-				if self.Items[CurrentSelection].Panels[index - 1] then 
-					PanelOffset = PanelOffset + self.Items[CurrentSelection].Panels[index - 1].Background:Size().Height + 5
+	if self.items[currentSelection].panels ~= nil then
+		if #self.items[currentSelection].panels ~= 0 then
+			local panelOffset = self:CaclulatePanelPosition(self.items[currentSelection]:description() ~= "")
+			for index = 1, #self.items[currentSelection].panels do
+				if self.items[currentSelection].panels[index - 1] then 
+					panelOffset = panelOffset + self.items[currentSelection].panels[index - 1].background:Size().height + 5
 				end
-				self.Items[CurrentSelection].Panels[index]:Position(PanelOffset)
-				self.Items[CurrentSelection].Panels[index]:Draw()
+				self.items[currentSelection].panels[index]:position(panelOffset)
+				self.items[currentSelection].panels[index]:draw()
 			end
 		end
 	end
 
-	local WindowHeight = self:CalculateWindowHeight()
+	local windowHeight = self:CalculateWindowHeight()
 
-	if #self.Items <= self.Pagination.Total + 1 then
-		local ItemOffset = self.Subtitle.ExtraY - 37 + WindowHeight
-		for index = 1, #self.Items do
-			Item = self.Items[index]
-			Item:Position(ItemOffset)
-			Item:Draw()
+	if #self.items <= self.pagination.total + 1 then
+		local ItemOffset = self.subtitle.extraY - 37 + WindowHeight
+		for index = 1, #self.items do
+			Item = self.items[index]
+			Item:position(ItemOffset)
+			Item:draw()
 			ItemOffset = ItemOffset + self:CalculateItemHeightOffset(Item)
 		end
 	else
-		local ItemOffset = self.Subtitle.ExtraY - 37 + WindowHeight
-		for index = self.Pagination.Min + 1, self.Pagination.Max, 1 do
-			if self.Items[index] then
-				Item = self.Items[index]
-				Item:Position(ItemOffset)
-				Item:Draw()
-				ItemOffset = ItemOffset + self:CalculateItemHeightOffset(Item)
+		local itemOffset = self.subtitle.extraY - 37 + WindowHeight
+		for index = self.pagination.min + 1, self.pagination.max, 1 do
+			if self.items[index] then
+				Item = self.items[index]
+				Item:position(itemOffset)
+				Item:draw()
+				itemOffset = itemOffset + self:CalculateItemHeightOffset(Item)
 			end
 		end
 
-		self.Extra.Up:Draw()
-		self.Extra.Down:Draw()
-		self.ArrowSprite:Draw()
+		self.extra.up:draw()
+		self.extra.down:draw()
+		self.arrowSprite:draw()
 
-		if self.PageCounter.Text ~= nil then
-			local Caption = self.PageCounter.PreText .. CurrentSelection .. " / " .. #self.Items
-			self.PageCounter.Text:Text(Caption)
-			self.PageCounter.Text:Draw()
+		if self.pageCounter.text ~= nil then
+			local Caption = self.pageCounter.PreText .. currentSelection .. " / " .. #self.items
+			self.pageCounter.text:Text(Caption)
+			self.pageCounter.text:draw()
 		end
 	end
 
-	if self.Settings.ScaleWithSafezone then
+	if self.settings.scaleWithSafezone then
 		ScreenDrawPositionEnd()
 	end
 end
 
-function UIMenu:ProcessMouse()
-	if not self._Visible or self.JustOpened or #self.Items == 0 or tobool(Controller()) or not self.Settings.MouseControlsEnabled then
+function Menu:processMouse()
+	if not self._visible or self.justOpened or #self.items == 0 or tobool(Controller()) or not self.settings.MouseControlsEnabled then
 		EnableControlAction(0, 2, true)
 		EnableControlAction(0, 1, true)
 		EnableControlAction(0, 25, true)
 		EnableControlAction(0, 24, true)
-		if self.Dirty then
-			for _, Item in pairs(self.Items) do
-				if Item:Hovered() then
-					Item:Hovered(false)
+		if self.dirty then
+			for _, item in pairs(self.items) do
+				if item:hovered() then
+					item:hovered(false)
 				end
 			end
 		end
 		return
 	end
 
-    local SafeZone = {X = 0, Y = 0}
-    local WindowHeight = self:CalculateWindowHeight()
-    if self.Settings.ScaleWithSafezone then
-	   SafeZone = GetSafeZoneBounds()
+    local safeZone = {X = 0, Y = 0}
+    local windowHeight = self:CalculateWindowHeight()
+    if self.settings.scaleWithSafezone then
+	   safeZone = GetSafeZoneBounds()
     end
 
-	local Limit = #self.Items
-	local ItemOffset = 0
+	local Limit = #self.items
+	local itemOffset = 0
 
 	ShowCursorThisFrame()
 
-	if #self.Items > self.Pagination.Total + 1 then
-		Limit = self.Pagination.Max
+	if #self.items > self.pagination.total + 1 then
+		Limit = self.pagination.max
 	end
 
-	if IsMouseInBounds(0, 0, 30, 1080) and self.Settings.MouseEdgeEnabled then
+	if IsMouseInBounds(0, 0, 30, 1080) and self.settings.MouseEdgeEnabled then
 		SetGameplayCamRelativeHeading(GetGameplayCamRelativeHeading() + 5)
 		SetCursorSprite(6)
-	elseif IsMouseInBounds(1920 - 30, 0, 30, 1080) and self.Settings.MouseEdgeEnabled then
+	elseif IsMouseInBounds(1920 - 30, 0, 30, 1080) and self.settings.MouseEdgeEnabled then
 		SetGameplayCamRelativeHeading(GetGameplayCamRelativeHeading() - 5)
 		SetCursorSprite(7)	
-	elseif self.Settings.MouseEdgeEnabled then
+	elseif self.settings.MouseEdgeEnabled then
 		SetCursorSprite(1)
 	end
 
-	for i = self.Pagination.Min + 1, Limit, 1 do
-		local X, Y = self.Position.X + SafeZone.X, self.Position.Y + 144 - 37 + self.Subtitle.ExtraY + ItemOffset + SafeZone.Y + WindowHeight
-		local Item = self.Items[i]
-		local Type, SubType = Item()
-		local Width, Height = 431 + self.WidthOffset, self:CalculateItemHeightOffset(Item)
+	for i = self.pagination.min + 1, Limit, 1 do
+		local X, Y = self.position.x + safeZone.X, self.position.y + 144 - 37 + self.subtitle.extraY + itemOffset + safeZone.Y + WindowHeight
+		local item = self.items[i]
+		local itemClass = item.class;
+		local width, height = 431 + self.widthOffset, self:CalculateItemHeightOffset(item)
 
-		if IsMouseInBounds(X, Y, Width, Height) then
-			Item:Hovered(true)
-			if not self.Controls.MousePressed then
+		if IsMouseInBounds(X, Y, Width, height) then
+			item:hovered(true)
+			if not self.controls.mousePressed then
 				if IsDisabledControlJustPressed(0, 24) then
 					Citizen.CreateThread(function()
-						local _X, _Y, _Width, _Height = X, Y, Width, Height
-						self.Controls.MousePressed = true
-						if Item:Selected() and Item:Enabled() then
-							if SubType == "UIMenuListItem" then
-								if IsMouseInBounds(Item.LeftArrow.X + SafeZone.X, Item.LeftArrow.Y + SafeZone.Y, Item.LeftArrow.Width, Item.LeftArrow.Height) then
-									self:GoLeft()
-								elseif not IsMouseInBounds(Item.RightArrow.X + SafeZone.X, Item.RightArrow.Y + SafeZone.Y, Item.RightArrow.Width, Item.RightArrow.Height) then
-									self:SelectItem()
+						local _x, _y, _width, _height = X, Y, Width, height
+						self.controls.mousePressed = true
+						if item:selected() and item:enabled() then
+							if itemClass == MenuListItem then
+								if IsMouseInBounds(item.leftArrow.X + safeZone.X, item.leftArrow.Y + safeZone.Y, item.leftArrow.Width, item.leftArrow.height) then
+									self:goLeft()
+								elseif not IsMouseInBounds(item.rightArrow.X + safeZone.X, item.rightArrow.Y + safeZone.Y, item.rightArrow.Width, item.rightArrow.height) then
+									self:selectItem()
 								end
-								if IsMouseInBounds(Item.RightArrow.X + SafeZone.X, Item.RightArrow.Y + SafeZone.Y, Item.RightArrow.Width, Item.RightArrow.Height) then
-									self:GoRight()
-								elseif not IsMouseInBounds(Item.LeftArrow.X + SafeZone.X, Item.LeftArrow.Y + SafeZone.Y, Item.LeftArrow.Width, Item.LeftArrow.Height) then
-									self:SelectItem()
+								if IsMouseInBounds(item.rightArrow.X + safeZone.X, item.rightArrow.Y + safeZone.Y, item.rightArrow.Width, item.rightArrow.height) then
+									self:goRight()
+								elseif not IsMouseInBounds(item.leftArrow.X + safeZone.X, item.leftArrow.Y + safeZone.Y, item.leftArrow.Width, item.leftArrow.height) then
+									self:selectItem()
 								end
-							elseif SubType == "UIMenuSliderItem" then
-								if IsMouseInBounds(Item.LeftArrow.X + SafeZone.X, Item.LeftArrow.Y + SafeZone.Y, Item.LeftArrow.Width, Item.LeftArrow.Height) then
-									self:GoLeft()
-								elseif not IsMouseInBounds(Item.RightArrow.X + SafeZone.X, Item.RightArrow.Y + SafeZone.Y, Item.RightArrow.Width, Item.RightArrow.Height) then
-									self:SelectItem()
+							elseif itemClass == MenuSliderItem then
+								if IsMouseInBounds(item.leftArrow.X + safeZone.X, item.leftArrow.Y + safeZone.Y, item.leftArrow.Width, item.leftArrow.height) then
+									self:goLeft()
+								elseif not IsMouseInBounds(item.rightArrow.X + safeZone.X, item.rightArrow.Y + safeZone.Y, item.rightArrow.Width, item.rightArrow.height) then
+									self:selectItem()
 								end
-								if IsMouseInBounds(Item.RightArrow.X + SafeZone.X, Item.RightArrow.Y + SafeZone.Y, Item.RightArrow.Width, Item.RightArrow.Height) then
-									self:GoRight()
-								elseif not IsMouseInBounds(Item.LeftArrow.X + SafeZone.X, Item.LeftArrow.Y + SafeZone.Y, Item.LeftArrow.Width, Item.LeftArrow.Height) then
-									self:SelectItem()
+								if IsMouseInBounds(item.rightArrow.X + safeZone.X, item.rightArrow.Y + safeZone.Y, item.rightArrow.Width, item.rightArrow.height) then
+									self:goRight()
+								elseif not IsMouseInBounds(item.leftArrow.X + safeZone.X, item.leftArrow.Y + safeZone.Y, item.leftArrow.Width, item.leftArrow.height) then
+									self:selectItem()
 								end
-							elseif SubType == "UIMenuProgressItem" then
-								if IsMouseInBounds(Item.Bar.X + SafeZone.X, Item.Bar.Y + SafeZone.Y - 12, Item.Data.Max, Item.Bar.Height + 24) then
-									Item:CalculateProgress(math.round(GetControlNormal(0, 239) * 1920) - SafeZone.X)
-                                    self.OnProgressChange(self, Item, Item.Data.Index)
-                                    Item.OnProgressChanged(self, Item, Item.Data.Index)
+							elseif itemClass == MenuProgressItem then
+								if IsMouseInBounds(item.bar.X + safeZone.X, item.bar.Y + safeZone.Y - 12, item.data.max, item.bar.height + 24) then
+									item:CalculateProgress(math.round(GetControlNormal(0, 239) * 1920) - safeZone.X)
+                                    self.onProgressChange(self, item, item.data.index);
+                                    item.onProgressChanged(self, item, item.data.index);
 								else
-									self:SelectItem()
+									self:selectItem()
 								end
 							else
-								self:SelectItem()
+								self:selectItem()
 							end
-						elseif not Item:Selected() then
-							self:CurrentSelection(i-1)
-							PlaySoundFrontend(-1, self.Settings.Audio.Error, self.Settings.Audio.Library, true)
-							self.OnIndexChange(self, self:CurrentSelection())
-							self.ReDraw = true
-							self:UpdateScaleform()
-						elseif not Item:Enabled() and Item:Selected() then
-							PlaySoundFrontend(-1, self.Settings.Audio.Error, self.Settings.Audio.Library, true)
+						elseif not item:selected() then
+							self:currentSelection(i-1)
+							PlaySoundFrontend(-1, self.settings.audio.error, self.settings.audio.library, true)
+							self.onIndexChange(self, self:currentSelection())
+							self.reDraw = true
+							self:updateScaleform()
+						elseif not item:enabled() and item:selected() then
+							PlaySoundFrontend(-1, self.settings.audio.error, self.settings.audio.library, true)
 						end
 						Citizen.Wait(175)
-						while IsDisabledControlPressed(0, 24) and IsMouseInBounds(_X, _Y, _Width, _Height) do
-							if Item:Selected() and Item:Enabled() then
-								if SubType == "UIMenuListItem" then
-									if IsMouseInBounds(Item.LeftArrow.X + SafeZone.X, Item.LeftArrow.Y + SafeZone.Y, Item.LeftArrow.Width, Item.LeftArrow.Height) then
-										self:GoLeft()
+						while IsDisabledControlPressed(0, 24) and IsMouseInBounds(_x, _y, _width, _height) do
+							if item:selected() and item:enabled() then
+								if itemClass == MenuListItem then
+									if IsMouseInBounds(item.leftArrow.X + safeZone.X, item.leftArrow.Y + safeZone.Y, item.leftArrow.Width, item.leftArrow.height) then
+										self:goLeft()
 									end
-									if IsMouseInBounds(Item.RightArrow.X + SafeZone.X, Item.RightArrow.Y + SafeZone.Y, Item.RightArrow.Width, Item.RightArrow.Height) then
-										self:GoRight()
+									if IsMouseInBounds(item.rightArrow.X + safeZone.X, item.rightArrow.Y + safeZone.Y, item.rightArrow.Width, item.rightArrow.height) then
+										self:goRight()
 									end
-								elseif SubType == "UIMenuSliderItem" then
-									if IsMouseInBounds(Item.LeftArrow.X + SafeZone.X, Item.LeftArrow.Y + SafeZone.Y, Item.LeftArrow.Width, Item.LeftArrow.Height) then
-										self:GoLeft()
+								elseif itemClass == MenuSliderItem then
+									if IsMouseInBounds(item.leftArrow.X + safeZone.X, item.leftArrow.Y + safeZone.Y, item.leftArrow.Width, item.leftArrow.height) then
+										self:goLeft()
 									end
-									if IsMouseInBounds(Item.RightArrow.X + SafeZone.X, Item.RightArrow.Y + SafeZone.Y, Item.RightArrow.Width, Item.RightArrow.Height) then
-										self:GoRight()
+									if IsMouseInBounds(item.rightArrow.X + safeZone.X, item.rightArrow.Y + safeZone.Y, item.rightArrow.Width, item.rightArrow.height) then
+										self:goRight()
 									end
-								elseif SubType == "UIMenuProgressItem" then
-									if IsMouseInBounds(Item.Bar.X + SafeZone.X, Item.Bar.Y + SafeZone.Y - 12, Item.Data.Max, Item.Bar.Height + 24) then
-										Item:CalculateProgress(math.round(GetControlNormal(0, 239) * 1920) - SafeZone.X)
-                                        self.OnProgressChange(self, Item, Item.Data.Index)
-                                        Item.OnProgressChanged(self, Item, Item.Data.Index)
+								elseif itemClass == MenuProgressItem then
+									if IsMouseInBounds(item.bar.X + safeZone.X, item.bar.Y + safeZone.Y - 12, item.data.max, item.bar.height + 24) then
+										item:CalculateProgress(math.round(GetControlNormal(0, 239) * 1920) - safeZone.X)
+                                        self.onProgressChange(self, item, item.data.index)
+                                        item.onProgressChanged(self, item, item.data.index)
 									else
-										self:SelectItem()
+										self:selectItem()
 									end
 								end
-							elseif not Item:Selected() then
-								self:CurrentSelection(i-1)
-								PlaySoundFrontend(-1, self.Settings.Audio.Error, self.Settings.Audio.Library, true)
-								self.OnIndexChange(self, self:CurrentSelection())
-								self.ReDraw = true
-								self:UpdateScaleform()
-							elseif not Item:Enabled() and Item:Selected() then
-								PlaySoundFrontend(-1, self.Settings.Audio.Error, self.Settings.Audio.Library, true)
+							elseif not item:selected() then
+								self:currentSelection(i-1)
+								PlaySoundFrontend(-1, self.settings.audio.error, self.settings.audio.library, true)
+								self.onIndexChange(self, self:currentSelection())
+								self.reDraw = true
+								self:updateScaleform()
+							elseif not item:enabled() and item:selected() then
+								PlaySoundFrontend(-1, self.settings.audio.error, self.settings.audio.library, true)
 							end
 							Citizen.Wait(125)						
 						end
-						self.Controls.MousePressed = false
+						self.controls.mousePressed = false
 					end)
 				end
 			end
 		else
-			Item:Hovered(false)
+			item:hovered(false)
 		end
-		ItemOffset = ItemOffset + self:CalculateItemHeightOffset(Item)
+		itemOffset = itemOffset + self:CalculateItemHeightOffset(item)
 	end
 
-	local ExtraX, ExtraY = self.Position.X + SafeZone.X, 144 + self:CalculateItemHeight() + self.Position.Y + SafeZone.Y + WindowHeight
+	local extraX, extraY = self.position.x + safeZone.X, 144 + self:CalculateItemHeight() + self.position.y + safeZone.Y + WindowHeight
 
-	if #self.Items <= self.Pagination.Total + 1 then return end
+	if #self.items <= self.pagination.total + 1 then return end
 
-	if IsMouseInBounds(ExtraX, ExtraY, 431 + self.WidthOffset, 18) then
-		self.Extra.Up:Colour(30, 30, 30, 255)
-		if not self.Controls.MousePressed then
+	if IsMouseInBounds(extraX, extraY, 431 + self.widthOffset, 18) then
+		self.extra.up:color(30, 30, 30, 255)
+		if not self.controls.mousePressed then
 			if IsDisabledControlJustPressed(0, 24) then
 				Citizen.CreateThread(function()
-					local _ExtraX, _ExtraY = ExtraX, ExtraY
-					self.Controls.MousePressed = true
-					if #self.Items > self.Pagination.Total + 1 then
-						self:GoUpOverflow()
+					local _extraX, _extraY = extraX, extraY
+					self.controls.mousePressed = true
+					if #self.items > self.pagination.total + 1 then
+						self:goUpOverflow()
 					else
-						self:GoUp()
+						self:goUp()
 					end
 					Citizen.Wait(175)
-					while IsDisabledControlPressed(0, 24) and IsMouseInBounds(_ExtraX, _ExtraY, 431 + self.WidthOffset, 18) do
-						if #self.Items > self.Pagination.Total + 1 then
-							self:GoUpOverflow()
+					while IsDisabledControlPressed(0, 24) and IsMouseInBounds(_extraX, _extraY, 431 + self.widthOffset, 18) do
+						if #self.items > self.pagination.total + 1 then
+							self:goUpOverflow()
 						else
-							self:GoUp()
+							self:goUp()
 						end
 						Citizen.Wait(125)
 					end
-					self.Controls.MousePressed = false				
+					self.controls.mousePressed = false;			
 				end)
 			end
 		end
 	else
-		self.Extra.Up:Colour(0, 0, 0, 200)
+		self.extra.up:color(0, 0, 0, 200)
 	end
 
-	if IsMouseInBounds(ExtraX, ExtraY + 18, 431 + self.WidthOffset, 18) then
-		self.Extra.Down:Colour(30, 30, 30, 255)
-		if not self.Controls.MousePressed then
+	if IsMouseInBounds(extraX, extraY + 18, 431 + self.widthOffset, 18) then
+		self.extra.down:color(30, 30, 30, 255)
+		if not self.controls.mousePressed then
 			if IsDisabledControlJustPressed(0, 24) then
 				Citizen.CreateThread(function()
-					local _ExtraX, _ExtraY = ExtraX, ExtraY
-					self.Controls.MousePressed = true
-					if #self.Items > self.Pagination.Total + 1 then
-						self:GoDownOverflow()
+					local _extraX, _extraY = extraX, extraY
+					self.controls.mousePressed = true
+					if #self.items > self.pagination.total + 1 then
+						self:goDownOverflow()
 					else
-						self:GoDown()
+						self:goDown()
 					end
 					Citizen.Wait(175)
-					while IsDisabledControlPressed(0, 24) and IsMouseInBounds(_ExtraX, _ExtraY + 18, 431 + self.WidthOffset, 18) do
-						if #self.Items > self.Pagination.Total + 1 then
-							self:GoDownOverflow()
+					while IsDisabledControlPressed(0, 24) and IsMouseInBounds(_extraX, _extraY + 18, 431 + self.widthOffset, 18) do
+						if #self.items > self.pagination.total + 1 then
+							self:goDownOverflow()
 						else
-							self:GoDown()
+							self:goDown()
 						end
 						Citizen.Wait(125)
 					end
-					self.Controls.MousePressed = false				
+					self.controls.mousePressed = false			
 				end)
 			end
 		end
 	else
-		self.Extra.Down:Colour(0, 0, 0, 200)
+		self.extra.down:color(0, 0, 0, 200)
 	end
 end
 
-function UIMenu:AddInstructionButton(button)
+function Menu:AddInstructionButton(button)
 	if type(button) == "table" and #button == 2 then
-		table.insert(self.InstructionalButtons, button)
+		table.insert(self.instructionalButtons, button)
 	end
 end
 
-function UIMenu:RemoveInstructionButton(button)
+function Menu:RemoveInstructionButton(button)
 	if type(button) == "table" then
-		for i = 1, #self.InstructionalButtons do
-			if button == self.InstructionalButtons[i] then
-				table.remove(self.InstructionalButtons, i)
+		for i = 1, #self.instructionalButtons do
+			if button == self.instructionalButtons[i] then
+				table.remove(self.instructionalButtons, i)
 				break
 			end
 		end
 	else
 		if tonumber(button) then
-			if self.InstructionalButtons[tonumber(button)] then
-				table.remove(self.InstructionalButtons, tonumber(button))
+			if self.instructionalButtons[tonumber(button)] then
+				table.remove(self.instructionalButtons, tonumber(button))
 			end
 		end
 	end
 end
 
-function UIMenu:AddEnabledControl(Inputgroup, Control, Controller)
+function Menu:addEnabledControl(Inputgroup, Control, Controller)
     if tonumber(Inputgroup) and tonumber(Control) then
-        table.insert(self.Settings.EnabledControls[(Controller and "Controller" or "Keyboard")], {Inputgroup, Control})
+        table.insert(self.settings.enabledControls[(Controller and "Controller" or "Keyboard")], {Inputgroup, Control})
     end
 end
 
-function UIMenu:RemoveEnabledControl(Inputgroup, Control, Controller)
-    local Type = (Controller and "Controller" or "Keyboard")
-    for Index = 1, #self.Settings.EnabledControls[Type] do
-        if Inputgroup == self.Settings.EnabledControls[Type][Index][1] and Control == self.Settings.EnabledControls[Type][Index][2] then
-            table.remove(self.Settings.EnabledControls[Type], Index)
+function Menu:removeEnabledControl(inputgroup, control, controller)
+    local Type = (controller and "Controller" or "Keyboard")
+    for index = 1, #self.settings.enabledControls[Type] do
+        if inputgroup == self.settings.enabledControls[Type][index][1] and control == self.settings.enabledControls[Type][index][2] then
+            table.remove(self.settings.enabledControls[Type], index)
             break
         end
     end
 end
 
-function UIMenu:UpdateScaleform()
-	if not self._Visible or not self.Settings.InstructionalButtons then
+function Menu:updateScaleform()
+	if not self._visible or not self.settings.instructionalButtons then
 		return
 	end
 	
-	PushScaleformMovieFunction(self.InstructionalScaleform, "CLEAR_ALL")
+	PushScaleformMovieFunction(self.instructionalScaleform, "CLEAR_ALL")
 	PopScaleformMovieFunction()
 
-	PushScaleformMovieFunction(self.InstructionalScaleform, "TOGGLE_MOUSE_BUTTONS")
+	PushScaleformMovieFunction(self.instructionalScaleform, "TOGGLE_MOUSE_BUTTONS")
 	PushScaleformMovieFunctionParameterInt(0)
 	PopScaleformMovieFunction()
 
-	PushScaleformMovieFunction(self.InstructionalScaleform, "CREATE_CONTAINER")
+	PushScaleformMovieFunction(self.instructionalScaleform, "CREATE_CONTAINER")
 	PopScaleformMovieFunction()
 
-	PushScaleformMovieFunction(self.InstructionalScaleform, "SET_DATA_SLOT")
+	PushScaleformMovieFunction(self.instructionalScaleform, "SET_DATA_SLOT")
 	PushScaleformMovieFunctionParameterInt(0)
 	PushScaleformMovieFunctionParameterString(GetControlInstructionalButton(2, 176, 0))
 	PushScaleformMovieFunctionParameterString("Select")
 	PopScaleformMovieFunction()
 
-	if self.Controls.Back.Enabled then
-		PushScaleformMovieFunction(self.InstructionalScaleform, "SET_DATA_SLOT")
+	if self.controls.Back.enabled then
+		PushScaleformMovieFunction(self.instructionalScaleform, "SET_DATA_SLOT")
 		PushScaleformMovieFunctionParameterInt(1)
 		PushScaleformMovieFunctionParameterString(GetControlInstructionalButton(2, 177, 0))
 		PushScaleformMovieFunctionParameterString("Back")
@@ -1182,20 +1176,20 @@ function UIMenu:UpdateScaleform()
 
 	local count = 2
 
-	for i = 1, #self.InstructionalButtons do
-		if self.InstructionalButtons[i] then
-			if #self.InstructionalButtons[i] == 2 then
-				PushScaleformMovieFunction(self.InstructionalScaleform, "SET_DATA_SLOT")
+	for i = 1, #self.instructionalButtons do
+		if self.instructionalButtons[i] then
+			if #self.instructionalButtons[i] == 2 then
+				PushScaleformMovieFunction(self.instructionalScaleform, "SET_DATA_SLOT")
 				PushScaleformMovieFunctionParameterInt(count)
-				PushScaleformMovieFunctionParameterString(self.InstructionalButtons[i][1])
-				PushScaleformMovieFunctionParameterString(self.InstructionalButtons[i][2])
+				PushScaleformMovieFunctionParameterString(self.instructionalButtons[i][1])
+				PushScaleformMovieFunctionParameterString(self.instructionalButtons[i][2])
 				PopScaleformMovieFunction()
 				count = count + 1
 			end
 		end
 	end
 
-	PushScaleformMovieFunction(self.InstructionalScaleform, "DRAW_INSTRUCTIONAL_BUTTONS")
+	PushScaleformMovieFunction(self.instructionalScaleform, "DRAW_INSTRUCTIONAL_BUTTONS")
 	PushScaleformMovieFunctionParameterInt(-1)
 	PopScaleformMovieFunction()
 end

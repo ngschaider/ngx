@@ -1,6 +1,6 @@
 --[[
 
 Renames: 
-  - Colours -> Colors
+  - Colors -> Colors
 
 ]]

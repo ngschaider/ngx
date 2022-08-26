@@ -1,6 +1,6 @@
-ResText = setmetatable({}, ResText)
-ResText.__index = ResText
-ResText.__call = function() return "Text" end
+UIResText = setmetatable({}, UIResText)
+UIResText.__index = UIResText
+UIResText.__call = function() return "Text" end
 
 function GetCharacterCount(str)
     local characters = 0
@@ -84,43 +84,43 @@ function MeasureStringWidth(str, font, scale)
     return MeasureStringWidthNoConvert(str, font, scale) * 1920
 end
 
-function ResText:new(Text, X, Y, Scale, R, G, B, A, Font, Alignment, DropShadow, Outline, WordWrap)
-	local _ResText = {
+function UIResText.New(Text, X, Y, Scale, R, G, B, A, Font, Alignment, DropShadow, Outline, WordWrap)
+	local _UIResText = {
         _Text = tostring(Text) or "",
         X = tonumber(X) or 0,
         Y = tonumber(Y) or 0,
         Scale = tonumber(Scale) or 0,
-        _Color = {R = tonumber(R) or 255, G = tonumber(G) or 255, B = tonumber(B) or 255, A = tonumber(A) or 255},
+        _Colour = {R = tonumber(R) or 255, G = tonumber(G) or 255, B = tonumber(B) or 255, A = tonumber(A) or 255},
         Font = tonumber(Font) or 0,
         Alignment = Alignment or nil,
         DropShadow = Dropshadow or nil,
         Outline = Outline or nil,
         WordWrap = tonumber(WordWrap) or 0,
     }
-	return setmetatable(_ResText, ResText)
+	return setmetatable(_UIResText, UIResText)
 end
 
-function ResText:position(X, Y)
+function UIResText:Position(X, Y)
     if tonumber(X) and tonumber(Y) then
-        self.x = tonumber(X)
-        self.y = tonumber(Y)
+        self.X = tonumber(X)
+        self.Y = tonumber(Y)
     else
-        return {X = self.x, Y = self.y}
+        return {X = self.X, Y = self.Y}
     end
 end
 
-function ResText:color(R, G, B, A)
+function UIResText:Colour(R, G, B, A)
     if tonumber(R) and tonumber(G) and tonumber(B) and tonumber(A) then
-        self._Color.R = tonumber(R)
-        self._Color.B = tonumber(B)
-        self._Color.G = tonumber(G)
-        self._Color.A = tonumber(A)
+        self._Colour.R = tonumber(R)
+        self._Colour.B = tonumber(B)
+        self._Colour.G = tonumber(G)
+        self._Colour.A = tonumber(A)
     else
-        return self._Color
+        return self._Colour
     end
 end
 
-function ResText:Text(Text)
+function UIResText:Text(Text)
     if tostring(Text) and Text ~= nil then
         self._Text = tostring(Text)
     else
@@ -128,33 +128,33 @@ function ResText:Text(Text)
     end
 end
 
-function ResText:draw()
-    local Position = self:position()
+function UIResText:Draw()
+    local Position = self:Position()
     Position.X, Position.Y = FormatXWYH(Position.X, Position.Y)
 
-    SetTextFont(self.font)
-    SetTextScale(1.0, self.scale)
-    SetTextColor(self._Color.R, self._Color.G, self._Color.B, self._Color.A)
+    SetTextFont(self.Font)
+    SetTextScale(1.0, self.Scale)
+    SetTextColour(self._Colour.R, self._Colour.G, self._Colour.B, self._Colour.A)
 
-    if self.dropShadow then
+    if self.DropShadow then
         SetTextDropShadow()
     end
-    if self.outline then
+    if self.Outline then
         SetTextOutline()
     end
 
-    if self.alignment ~= nil then
-        if self.alignment == 1 or self.alignment == "Center" or self.alignment == "Centre" then
+    if self.Alignment ~= nil then
+        if self.Alignment == 1 or self.Alignment == "Center" or self.Alignment == "Centre" then
             SetTextCentre(true)
-        elseif self.alignment == 2 or self.alignment == "Right" then
+        elseif self.Alignment == 2 or self.Alignment == "Right" then
             SetTextRightJustify(true)
             SetTextWrap(0, Position.X)
         end
     end
 
-    if tonumber(self.wordWrap) then
-        if tonumber(self.wordWrap) ~= 0 then
-            SetTextWrap(Position.X, Position.X + (tonumber(self.wordWrap) / Resolution.Width))
+    if tonumber(self.WordWrap) then
+        if tonumber(self.WordWrap) ~= 0 then
+            SetTextWrap(Position.X, Position.X + (tonumber(self.WordWrap) / Resolution.Width))
         end
     end
 
@@ -168,7 +168,7 @@ function RenderText(Text, X, Y, Font, Scale, R, G, B, A, Alignment, DropShadow, 
     X, Y = FormatXWYH(X, Y)
     SetTextFont(Font or 0)
     SetTextScale(1.0, Scale or 0)
-    SetTextColor(R or 255, G or 255, B or 255, A or 255)
+    SetTextColour(R or 255, G or 255, B or 255, A or 255)
 
     if DropShadow then
         SetTextDropShadow()

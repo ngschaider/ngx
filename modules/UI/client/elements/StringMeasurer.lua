@@ -1,4 +1,4 @@
-module.CharacterMap = {
+CharacterMap = {
 	[' '] = 6,
 	['!'] = 6,
 	['"'] = 6,
@@ -94,7 +94,7 @@ module.CharacterMap = {
 	['}'] = 6,
 }
 
-function module.MeasureString(str)
+function MeasureString(str)
 	local output = 0
 	for i = 1, GetCharacterCount(str), 1 do
 		if CharacterMap[string.sub(str, i, i)] then

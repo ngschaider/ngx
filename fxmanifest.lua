@@ -18,8 +18,6 @@ server_scripts {
 }
 
 client_scripts {
-	"@NativeUI/NativeUI.lua",
-
 	"boot/sh_modules.lua",
 	"boot/sh_main.lua",
 }

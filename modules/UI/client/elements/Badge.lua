@@ -1,4 +1,4 @@
-module.BadgeStyle = {
+BadgeStyle = {
 	None = 0,
 	BronzeMedal = 1,
 	GoldMedal = 2,
@@ -22,9 +22,9 @@ module.BadgeStyle = {
 	Trevor = 20, 
 	Lock = 21,
 	Tick = 22
-};
+}
 
-module.BadgeTexture = {
+BadgeTexture = {
 	[0] = function()
 		return ""
 	end,
@@ -152,7 +152,7 @@ module.BadgeTexture = {
 	end,
 }
 
-module.BadgeDictionary = {
+BadgeDictionary = {
 	[0] = function(Selected)
 		if Selected then
 			return "commonmenu"
@@ -162,7 +162,7 @@ module.BadgeDictionary = {
 	end,
 }
 
-module.BadgeColor = {
+BadgeColour = {
 	[5] = function(Selected)
 		if Selected then
 			return 0, 0, 0, 255
@@ -186,7 +186,7 @@ module.BadgeColor = {
 	end,
 }
 
-function module.GetBadgeTexture(Badge, Selected)
+function GetBadgeTexture(Badge, Selected)
 	if BadgeTexture[Badge] then
 		return BadgeTexture[Badge](Selected)
 	else
@@ -194,7 +194,7 @@ function module.GetBadgeTexture(Badge, Selected)
 	end
 end
 
-function module.GetBadgeDictionary(Badge, Selected)
+function GetBadgeDictionary(Badge, Selected)
 	if BadgeDictionary[Badge] then
 		return BadgeDictionary[Badge](Selected)
 	else
@@ -202,9 +202,9 @@ function module.GetBadgeDictionary(Badge, Selected)
 	end
 end
 
-function module.GetBadgeColor(Badge, Selected)
-	if BadgeColor[Badge] then
-		return BadgeColor[Badge](Selected)
+function GetBadgeColour(Badge, Selected)
+	if BadgeColour[Badge] then
+		return BadgeColour[Badge](Selected)
 	else
 		return 255, 255, 255, 255
 	end

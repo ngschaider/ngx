@@ -41,4 +41,11 @@ function Character:getInventory()
 	return Inventory:new(inventoryId);
 end;
 
-module = Character;
+local cache = {};
+module.GetById = function(id)
+	if not cache[id] then
+		cache[id] = Character:new(id);
+	end
+
+	return cache[id];
+end

@@ -10,26 +10,20 @@ Inventory.static.rpcWhitelist = {};
 
 function Inventory:initialize(id)
 	self.id = id;
-end
-
-function Inventory.static:Create(maxWeight)
-	local id = MySQL.insert.await("INSERT INTO inventories (max_weight) VALUES (?)", {
-		maxWeight,
-	});
-
-	return id;
+	self._data = MySQL.query.await("SELECT * FROM inventories WHERE id=?", {self.id});
 end
 
 function Inventory:getMaxWeight()
-	return MySQL.scalar.await("SELECT max_weight FROM inventories WHERE id=?", {self.id});
+	return self._data.max_weight;
 end;
 table.insert(Inventory.static.rpcWhitelist, "getMaxWeight");
 
 function Inventory:setMaxWeight(newMaxWeight)
 	MySQL.update.await("UPDATE inventories SET max_weight=? WHERE id=?", {
-		newMaxWeight, 
+		newMaxWeight,
 		self.id,
 	});
+	self._data.max_weight = newMaxWeight;
 end;
 
 function Inventory:getItemIds()
@@ -49,7 +43,7 @@ function Inventory:getItems()
 
 	local items = {};
 	for _,id in pairs(ids) do
-		local item = Item:new(id);
+		local item = Item.GetById(id);
 		table.insert(items, item);
 	end
 
@@ -57,7 +51,7 @@ function Inventory:getItems()
 end;
 
 callback.register("inventory:rpc", function(playerId, cb, id, name, ...)
-	local inventory = Inventory:new(id);
+	local inventory = module.GetById(id);
 
 	if not inventory then
 		logger.warn("Inventory not found - rpc failed");
@@ -74,4 +68,19 @@ callback.register("inventory:rpc", function(playerId, cb, id, name, ...)
 end);
 
 
-module = Inventory;
+module.Create = function(maxWeight)
+	local id = MySQL.insert.await("INSERT INTO inventories (max_weight) VALUES (?)", {
+		maxWeight,
+	});
+
+	return id;
+end
+
+local cache = {};
+module.GetById = function(id)
+	if not cache[id] then
+		cache[id] = Inventory:new(id);
+	end
+	
+	return cache[id];
+end;

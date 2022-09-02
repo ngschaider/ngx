@@ -48,4 +48,11 @@ function Item:use()
     self:_rpc("use");
 end
 
-module = Item;
+local cache = {};
+module.GetById = function(id)
+    if not cache[id] then
+        cache[id] = Item:new(id);
+    end
+
+    return cache[id];
+end

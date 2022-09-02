@@ -82,5 +82,11 @@ function User:createCharacter(firstname, lastname, dateofbirth, skin)
 	return User:new(id);
 end;
 
+local usersCache = {};
+module.GetById = function(id)
+	if not usersCache[id] then
+		usersChache[id] = User:new(id);
+	end
 
-module = User;
+	return usersCache[id];
+end;

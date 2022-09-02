@@ -1,3 +1,4 @@
+---@diagnostic disable: deprecated
 local logger = M("logger");
 local utils = M("utils");
 local callback = M("callback");
@@ -108,21 +109,25 @@ end);
 
 
 
-
 local registeredItems = {};
-local function registerItem(item)
-    registeredItems[item.name] = item;
+function RegisterItem(itemClass)
+    registeredItems[itemClass.name] = itemClass;
 end;
 
 module.GetItemClass = function(name)
     return registeredItems[name];
 end
 
-module.GetSpecific = function(id)
-    local name = MySQL.scalar.await("SELECT name FROM items WHERE id=?", {id});
-    local specificItemClass = module.GetItemClass(name);
-    return specificItemClass:new(id);
-end;
+local cache = {};
+module.GetById = function(id)
+    if not cache[id] then
+        local name = MySQL.scalar.await("SELECT name FROM items WHERE id=?", {id});
+        local specificItemClass = module.GetItemClass(name);
+        cache[id] = specificItemClass:new(id);
+    end
+
+    return cache[id];
+end
 
 -- Exports
 run("server/beer.lua");

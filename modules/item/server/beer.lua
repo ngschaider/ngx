@@ -10,17 +10,13 @@ function Beer:use()
     self:destroy();
 end
 
-
-
-
-
 RegisterCommand("beer", function(playerId, args, rawCommand)
     print("giving player a beer");
     local beer = Beer:Create();
     print("beer");
 
     print("getting character");
-    local character = M("character"):GetByPlayerId(playerId);
+    local character = M("character").GetByPlayerId(playerId);
     if not character then
         logger.debug("failed to get current character");
         return;
@@ -32,5 +28,4 @@ RegisterCommand("beer", function(playerId, args, rawCommand)
     beer:setInventoryId(inventory.id)
 end, true);
 
-
-module.Beer = Beer;
+RegisterItem(Beer);

@@ -18,11 +18,11 @@ end
 
 function Inventory:getMaxWeight()
 	return self:_rpc("getMaxWeight");
-end;
+end
 
 function Inventory:getItemIds()
 	return self:_rpc("getItemIds");
-end;
+end
 
 function Inventory:getItems()
 	local ids = self:getItemIds();
@@ -33,6 +33,13 @@ function Inventory:getItems()
 	end
 
 	return items;
-end;
+end
 
-module = Inventory;
+local cache = {};
+module.GetById = function(id)
+	if not cache[id] then
+		cache[id] = Inventory:new(id);
+	end
+	
+	return cache[id];
+end;

@@ -8,51 +8,9 @@ local Character = class("Character");
 
 Character.static.rpcWhitelist = {};
 
-function Character.static:Create(userId, firstname, lastname, dateOfBirth, skin)
-	local inventoryId = Inventory.Create(20);
-
-	local skinStr = json.encode(skin);
-	local id = MySQL.insert.await("INSERT INTO characters (user_id, firstname, lastname, date_of_birth, skin, position_x, position_y, position_z, inventory_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", {
-		userId, 
-		firstname, 
-		lastname, 
-		dateOfBirth,
-		skinStr, 
-		213.78, 
-		-900.12, 
-		29.69,
-		inventoryId,
-	});
-
-	return Character:new(id);
-end;
-
-function Character.static:GetByPlayerId(playerId)
-	local user = M("user"):GetByPlayerId(playerId);
-
-	if not user then
-		logger.error("User with player id " .. playerId .. " not found - returning nil");
-		return nil;
-	end
-
-	print("Character.static:GetByPlayerId", "user.id", user.id)
-	return user:getCurrentCharacter();
-end
-
-function Character.static:GetAll()
-	local characters = {};
-
-	local data = MySQL.query.await("SELECT id FROM characters");
-	for _,v in pairs(data) do
-		local character = Character:new(v.id);
-		table.insert(characters, character);
-	end
-
-	return characters;
-end
-
 function Character:initialize(id)
 	self.id = id;
+	self._data = MySQL.query.await("SELECT * FROM characters WHERE id=?", {self.id});
 end
 
 function Character:getId()
@@ -61,8 +19,7 @@ end
 table.insert(Character.static.rpcWhitelist, "getId");
 
 function Character:getUserId()
-	local userId = MySQL.scalar.await("SELECT user_id FROM characters WHERE id=?", {self.id});
-	return tonumber(userId);
+	return self._data.user_id;
 end
 table.insert(Character.static.rpcWhitelist, "getUserId");
 
@@ -82,43 +39,39 @@ function Character:getPosition()
 end
 
 function Character:getLastPosition()
-	local results = MySQL.single.await("SELECT position_x, position_y, position_z FROM characters WHERE id=?", {self.id});
 	return {
-		x = tonumber(results.position_x), 
-		y = tonumber(results.position_y), 
-		z = tonumber(results.position_z),
+		x = tonumber(self._data.position_x),
+		y = tonumber(self._data.position_y),
+		z = tonumber(self._data.position_z),
 	};
 end
 table.insert(Character.static.rpcWhitelist, "getLastPosition");
 
 function Character:getName()
-	local result = MySQL.single.await("SELECT firstname, lastname FROM characters WHERE id=?", {self.id});
-	return result.firstname .. " " .. result.lastname;
+	return self._data.firstname .. " " .. self._data.lastname;
 end
 table.insert(Character.static.rpcWhitelist, "getName");
 
 function Character:getDateOfBirth()
-	local dateOfBirth = MySQL.scalar.await("SELECT date_of_birth FROM characters WHERE id=?", {self.id});
-	return dateOfBirth;
+	return self._data.dateOfBirth;
 end
 table.insert(Character.static.rpcWhitelist, "getDateOfBirth");
 
 function Character:getSkin()
-	local skinStr = MySQL.scalar.await("SELECT skin FROM characters WHERE id=?", {self.id});
-	print(skinStr);
-	return json.decode(skinStr);
+	return json.decode(self._data.skin);
 end
 table.insert(Character.static.rpcWhitelist, "getSkin");
 
 function Character:setSkin(skin)
 	local skinStr = json.encode(skin);
 	MySQL.update.await("UPDATE characters SET skin=? WHERE id=?", {skinStr, self.id});
+	self._data.skin = skinStr;
 end
 table.insert(Character.static.rpcWhitelist, "setSkin");
 
 function Character:getInventoryId()
 	logger.debug("Character:getInventory", "self.id", self.id);
-	local inventoryId = MySQL.scalar.await("SELECT inventory_id FROM characters WHERE id=?", {self.id});
+	local inventoryId = self._data.inventory_id;
 	logger.debug("Character:getInventory", "inventoryId", inventoryId);
 	return inventoryId;
 end
@@ -152,4 +105,54 @@ callback.register("character:rpc", function(playerId, cb, id, name, ...)
 end);
 
 
-module = Character;
+local charactersCache = {};
+module.GetById = function(id)
+	if charactersCache[id] then
+		charactersCache[id] = module.GetById(id);
+	end
+
+	return charactersCache[id];
+end
+
+module.Create = function(userId, firstname, lastname, dateOfBirth, skin)
+	local inventoryId = Inventory.Create(20);
+
+	local skinStr = json.encode(skin);
+	local id = MySQL.insert.await("INSERT INTO characters (user_id, firstname, lastname, date_of_birth, skin, position_x, position_y, position_z, inventory_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", {
+		userId, 
+		firstname, 
+		lastname, 
+		dateOfBirth,
+		skinStr, 
+		213.78, 
+		-900.12, 
+		29.69,
+		inventoryId,
+	});
+
+	return Character:new(id);
+end;
+
+module.GetByPlayerId = function(playerId)
+	local user = M("user").GetByPlayerId(playerId);
+
+	if not user then
+		logger.error("User with player id " .. playerId .. " not found - returning nil");
+		return nil;
+	end
+
+	print("Character.static:GetByPlayerId", "user.id", user.id)
+	return user:getCurrentCharacter();
+end
+
+module.GetAll = function()
+	local characters = {};
+
+	local data = MySQL.query.await("SELECT id FROM characters");
+	for _,v in pairs(data) do
+		local character = module.GetById(v.id);
+		table.insert(characters, character);
+	end
+
+	return characters;
+end

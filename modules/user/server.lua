@@ -13,55 +13,6 @@ local User = class("User");
 
 User.static.rpcWhitelist = {};
 
-function User.static:Create(identifier)
-    local id = MySQL.insert.await("INSERT INTO users (identifier) VALUES (?)", {identifier});
-	local user = User:new(id);
-
-	return user;
-end;
-
-function User.static:GetByIdentifier(identifier)
-	logger.debug("User:GetByIdentifier", "identifier", identifier);
-	local id = MySQL.scalar.await("SELECT id FROM users WHERE identifier=?", {identifier});
-	logger.debug("User:GetByIdentifier", "id", id);
-
-	if id then
-		return User:new(id);
-	else
-		local user = User:Create(identifier);
-		return user;
-	end
-end;
-
-function User.static:GetByPlayerId(playerId)
-	logger.debug("User:GetByPlayerId", "playerId", playerId);
-	local identifier = utils.getIdentifier(playerId);
-	logger.debug("User:GetByPlayerId", "identifier", identifier);
-	local user = User:GetByIdentifier(identifier);
-	logger.debug("User:GetByPlayerId", "user.id", user.id);
-	return user;
-end;
-
-function User.static:GetAllOnlineIds()
-	local users = User:GetAllOnline();
-	local ids = {};
-	for _,user in pairs(users) do
-		table.insert(ids, user.id);
-	end
-	return ids;
-end;
-
-function User.static:GetAllOnline()
-	local playerIds = GetPlayers();
-	local users = {};
-	for _,playerId in pairs(playerIds) do
-		local user = User:GetByPlayerId(playerId);
-		table.insert(users, user);
-	end
-
-	return users;
-end;
-
 function User:initialize(id)
 	self.id = id;
 	self.identifier = MySQL.scalar.await("SELECT identifier FROM users WHERE id=?", {self.id});
@@ -164,15 +115,78 @@ function User:getCharacters()
 	return characters;
 end;
 
+local usersChace = {};
+module.GetById = function(id)
+	if not usersCache[id] then
+		usersCache[id] = User:new(id);
+	end
+
+	return usersCache[id];
+end
+
+module.Create = function(identifier)
+    local id = MySQL.insert.await("INSERT INTO users (identifier) VALUES (?)", {identifier});
+
+	return module.GetById(id);
+end;
+
+module.GetByIdentifier = function(identifier)
+	logger.debug("User:GetByIdentifier", "identifier", identifier);
+	local id = MySQL.scalar.await("SELECT id FROM users WHERE identifier=?", {identifier});
+	logger.debug("User:GetByIdentifier", "id", id);
+
+	if id then
+		return module.GetById(id);
+	else
+		local user = User:Create(identifier);
+		return user;
+	end
+end;
+
+module.GetByPlayerId = function(playerId)
+	logger.debug("User:GetByPlayerId", "playerId", playerId);
+	local identifier = utils.getIdentifier(playerId);
+	logger.debug("User:GetByPlayerId", "identifier", identifier);
+	local user = User:GetByIdentifier(identifier);
+	logger.debug("User:GetByPlayerId", "user.id", user.id);
+	return user;
+end;
+
+module.GetAllOnline = function()
+	local playerIds = GetPlayers();
+	local users = {};
+	for _,playerId in pairs(playerIds) do
+		local user = User:GetByPlayerId(playerId);
+		table.insert(users, user);
+	end
+
+	return users;
+end;
+
+module.GetAllOnlineIds = function()
+	local users = module.GetAllOnline();
+	local ids = {};
+	for _,user in pairs(users) do
+		table.insert(ids, user.id);
+	end
+	return ids;
+end;
+
+callback.register("user:getSelfId", function(playerId, cb)
+	print("callback called", playerId, cb);
+	local user = module.GetByPlayerId(playerId);
+	print("calling cb");
+	cb(user.id);
+end);
 
 callback.register("user:getAllOnlineIds", function(playerId, cb)
-	local ids = User:GetAllOnlineIds();
+	local ids = module.GetAllOnlineIds();
 	cb(ids);
 end);
 
 callback.register("user:rpc", function(playerId, cb, userId, name, ...)
 	print(userId);
-	local user = User:new(userId);
+	local user = module.GetById(userId);
 
 	if not utils.table.contains(User.rpcWhitelist, name) then
 		logger.warn("function name " .. name .. " not in whitelist - user rpc failed.");
@@ -182,13 +196,3 @@ callback.register("user:rpc", function(playerId, cb, userId, name, ...)
 	-- we have to pass the user object because we are not using the colon syntax like user:getCharacterIds(...)
 	cb(user[name](user, ...));
 end);
-
-callback.register("user:getSelfId", function(playerId, cb)
-	print("callback called", playerId, cb);
-	local user = User:GetByPlayerId(playerId);
-	print("calling cb");
-	cb(user.id);
-end);
-
-
-module = User;

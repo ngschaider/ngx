@@ -4,8 +4,9 @@ local User = M("user");
 local charcreator = M("charcreator");
 local utils = M("utils");
 local skin = M("skin");
+local UI = M("UI");
 
-local pool = NativeUI.CreatePool();
+local pool = UI.CreatePool();
 
 local cam = nil;
 
@@ -46,14 +47,14 @@ module.StartSelection = function(cb)
 	
 	local selfUser = User:GetSelf();
 	local characters = selfUser:getCharacters();
-	local menu = NativeUI.CreateMenu("Charakterauswahl");
+	local menu = UI.CreateMenu("Charakterauswahl");
 	pool:Add(menu);
 
 	menu.Controls.Back.enabled = false;
 
 	for _,character in pairs(characters) do
 		local characterName = character:getName();
-		local item = NativeUI.CreateItem(characterName, "Mit " .. characterName .. " einreisen");
+		local item = UI.CreateItem(characterName, "Mit " .. characterName .. " einreisen");
 		menu:AddItem(item);
 
 		item.Activated = function()
@@ -77,7 +78,7 @@ module.StartSelection = function(cb)
 		end;
 	end
 	
-	local createCharacterItem = NativeUI.CreateItem("~b~Charakter erstellen", "");
+	local createCharacterItem = UI.CreateItem("~b~Charakter erstellen", "");
 	menu:AddItem(createCharacterItem);
 
 	createCharacterItem.Activated = function()
@@ -104,7 +105,7 @@ end;
 Citizen.CreateThread(function()
 	while true do
 		if pool then
-        	pool:processMenus();
+        	pool:ProcessMenus();
 		end
 		Citizen.Wait(0);
 	end

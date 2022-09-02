@@ -29,13 +29,12 @@ ui_page {
 files {
 	"modules.json",
 	"modules/**/shared.lua",
-	"modules/**/shared/*.lua",
+	"modules/**/shared/**/*.lua",
 	"modules/**/client.lua",
-	"modules/**/client/*.lua",
+	"modules/**/client/**/*.lua",
 }
 
 dependencies {
 	'oxmysql',
-	"NativeUI",
 	"hbw",
 }

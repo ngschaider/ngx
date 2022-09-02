@@ -1,10 +1,11 @@
 local User = M("user");
+local UI = M("UI");
 
-local pool = NativeUI.CreatePool();
+local pool = UI.CreatePool();
 
 Citizen.CreateThread(function()
     while true do
-        pool:processMenus();
+        pool:ProcessMenus();
         
         Citizen.Wait(0);
     end
@@ -32,7 +33,7 @@ end;
 
 function OpenInventory(inventory)
     print("creating menu");
-    local menu = NativeUI.CreateMenu("Inventar", "");
+    local menu = UI.CreateMenu("Inventar", "");
     print("clearing pool");
     pool:Clear();
     print("adding menu");
@@ -43,7 +44,7 @@ function OpenInventory(inventory)
     print("got items");
     for _,item in pairs(items) do
         local name = item:getName();
-        local itemEntry = NativeUI.CreateItem(name, "");
+        local itemEntry = UI.CreateItem(name, "");
         menu:AddItem(itemEntry);
 
         local itemMenu = GetItemMenu(item);
@@ -60,12 +61,12 @@ end
 
 function GetItemMenu(item)
     local name = item:getName();
-    local menu = NativeUI.CreateMenu(name, "");
+    local menu = UI.CreateMenu(name, "");
     print(name);
     
     if item:getIsUsable() then
         print("adding use item");
-        local useItem = NativeUI.CreateItem("Benutzen", "");
+        local useItem = UI.CreateItem("Benutzen", "");
         menu:AddItem(useItem);
 
         useItem.Activated = function()
@@ -74,7 +75,7 @@ function GetItemMenu(item)
     end
 
     print("adding drop item");
-    local dropItem = NativeUI.CreateItem("Fallen lassen", "");
+    local dropItem = UI.CreateItem("Fallen lassen", "");
     menu:AddItem(dropItem);
 
     return menu;

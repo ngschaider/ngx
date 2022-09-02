@@ -13,7 +13,6 @@
         "IsScreenFadedOut",
         "RenderScriptCams",
         "DestroyCam",
-        "NativeUI",
         "SetCamFov",
         "SetCamCoord",
         "PointCamAtCoord",

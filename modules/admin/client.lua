@@ -1,11 +1,12 @@
 local event = M("event");
 local logger = M("logger");
 local User = M("user");
+local UI = M("UI");
 
-local pool = NativeUI.CreatePool();
+local pool = UI.CreatePool();
 
 local GetPlayerListMenu = function()
-    local menu = NativeUI.CreateMenu("Spielerliste", "Spielerliste");
+    local menu = UI.CreateMenu("Spielerliste", "Spielerliste");
     menu.Settings.MouseEdgeEnabled = false;
 
     local users = User:GetAllOnline();
@@ -20,7 +21,7 @@ local GetPlayerListMenu = function()
             text = text .. " (" .. character:getName() .. ")";
         end
 
-        local userItem = NativeUI.CreateItem(text, "");
+        local userItem = UI.CreateItem(text, "");
         menu:AddItem(userItem);
         local userMenu = GetUserMenu(user);
         pool:Add(userMenu);
@@ -34,7 +35,7 @@ local GetUserMenu = function(user)
     local character = user:getCurrentCharacter();
 
     if character then
-        local reviveItem = NativeUI.CreateItem("Wiederbeleben", "");
+        local reviveItem = UI.CreateItem("Wiederbeleben", "");
         reviveItem.Activated = function()
             callback.trigger("admin:reviveCharacter", function(success)
                 if success then
@@ -55,12 +56,12 @@ local OpenMenu = function()
         return;
     end
 
-    local menu = NativeUI.CreateMenu("Administration");
+    local menu = UI.CreateMenu("Administration");
     menu.Settings.MouseEdgeEnabled = false;
     pool:Clear();
     pool:Add(menu);
     
-    local playerListItem = NativeUI.CreateItem("Spielerliste", "");
+    local playerListItem = UI.CreateItem("Spielerliste", "");
     menu:AddItem(playerListItem);
     local playerListMenu = GetPlayerListMenu();
     pool:Add(playerListMenu);
@@ -78,7 +79,7 @@ end);
 
 Citizen.CreateThread(function()
     while true do
-        pool:processMenus();
+        pool:ProcessMenus();
         Citizen.Wait(0);
     end
 end);

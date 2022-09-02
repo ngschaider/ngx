@@ -5,8 +5,9 @@ local utils = M("utils");
 local skin = M("skin");
 local User = M("user");
 local streaming = M("streaming")
+local UI = M("UI");
 
-local pool = NativeUI.CreatePool();
+local pool = UI.CreatePool();
 
 local cam = nil
 
@@ -21,7 +22,7 @@ local data = {};
 
 Citizen.CreateThread(function()
     while true do
-        pool:processMenus();
+        pool:ProcessMenus();
         Citizen.Wait(0);
     end
 end);
@@ -53,13 +54,13 @@ module.CreateNewCharacter = function(cb)
 
     DoScreenFadeIn(650);
 
-    local menu = NativeUI.CreateMenu("Dein Charakter");
+    local menu = UI.CreateMenu("Dein Charakter");
     pool:Clear();
     pool:Add(menu);
 	
 	menu.Controls.Back.enabled = false;
 	
-	local firstnameItem = NativeUI.CreateItem("Vorname", "");
+	local firstnameItem = UI.CreateItem("Vorname", "");
 	menu:AddItem(firstnameItem);
 
     firstnameItem.Activated = function()
@@ -70,7 +71,7 @@ module.CreateNewCharacter = function(cb)
         end
     end;
 	
-	local lastnameItem = NativeUI.CreateItem("Nachname", "");
+	local lastnameItem = UI.CreateItem("Nachname", "");
 	menu:AddItem(lastnameItem);
 
     lastnameItem.Activated = function()
@@ -81,7 +82,7 @@ module.CreateNewCharacter = function(cb)
         end
     end;
 
-    local dateofbirthItem = NativeUI.CreateItem("Geburtstag", "");
+    local dateofbirthItem = UI.CreateItem("Geburtstag", "");
     menu:AddItem(dateofbirthItem);
 
     dateofbirthItem.Activated = function()
@@ -93,7 +94,7 @@ module.CreateNewCharacter = function(cb)
     end;
 
     local genderOptions = {"Männlich", "Weiblich"};
-    local genderItem = NativeUI.CreateListItem("Geschlecht", genderOptions, 1);
+    local genderItem = UI.CreateListItem("Geschlecht", genderOptions, 1);
     menu:AddItem(genderItem);
 
 	-- START SUBMENU parents
@@ -101,19 +102,19 @@ module.CreateNewCharacter = function(cb)
     menu.Items[#menu.Items]:SetLeftBadge(BadgeStyle.Heart)
     menu.Items[#menu.Items]:RightLabel("~b~→→→")
 	
-    local heritageWindow = NativeUI.CreateHeritageWindow()
+    local heritageWindow = UI.CreateHeritageWindow()
     parentsMenu:AddWindow(heritageWindow)
 
-    local motherItem = NativeUI.CreateListItem("Mutter", Config.motherNames, 1);
+    local motherItem = UI.CreateListItem("Mutter", Config.motherNames, 1);
     parentsMenu:AddItem(motherItem);
 
-    local fatherItem = NativeUI.CreateListItem("Vater", Config.fatherNames, 1);
+    local fatherItem = UI.CreateListItem("Vater", Config.fatherNames, 1);
     parentsMenu:AddItem(fatherItem);
 
-    local similarityItem = NativeUI.CreateSliderItem("Gesichtstyp", intensityOptions, math.ceil(#intensityOptions * 0.5));
+    local similarityItem = UI.CreateSliderItem("Gesichtstyp", intensityOptions, math.ceil(#intensityOptions * 0.5));
     parentsMenu:AddItem(similarityItem)
 
-    local complexionItem = NativeUI.CreateSliderItem("Hauttyp", intensityOptions, math.ceil(#intensityOptions * 0.5));
+    local complexionItem = UI.CreateSliderItem("Hauttyp", intensityOptions, math.ceil(#intensityOptions * 0.5));
     parentsMenu:AddItem(complexionItem)
 
     parentsMenu.OnListChange = function(sender, item, index)
@@ -148,7 +149,7 @@ module.CreateNewCharacter = function(cb)
     menu.Items[#menu.Items]:RightLabel("~b~→→→")
 
     for k, v in pairs(Config.AdvancedFaceParts) do
-        local advancedFaceItem = NativeUI.CreateListItem(v.label, intensityOptions, math.ceil(#intensityOptions * 0.5))
+        local advancedFaceItem = UI.CreateListItem(v.label, intensityOptions, math.ceil(#intensityOptions * 0.5))
         advancedFaceMenu:AddItem(advancedFaceItem);
 
         advancedFaceItem.OnListChanged = function(menu, item, index)
@@ -159,34 +160,34 @@ module.CreateNewCharacter = function(cb)
     end
 	-- END SUBMENU advanced_face
 
-    local ageingItem = NativeUI.CreateListItem("Alterung", Config.ageing, 1);
+    local ageingItem = UI.CreateListItem("Alterung", Config.ageing, 1);
     menu:AddItem(ageingItem);
 
-    local ageingIntensityItem = NativeUI.CreateListItem("Alterungsstärke", intensityOptions, 1);
+    local ageingIntensityItem = UI.CreateListItem("Alterungsstärke", intensityOptions, 1);
     menu:AddItem(ageingIntensityItem);
 
-    local eyeColorItem = NativeUI.CreateListItem("Augenfarbe", Config.eyeColors, 1);
+    local eyeColorItem = UI.CreateListItem("Augenfarbe", Config.eyeColors, 1);
     menu:AddItem(eyeColorItem);
 
-    local eyebrowsItem = NativeUI.CreateListItem("Augenbrauen", Config.eyebrows, 1);
+    local eyebrowsItem = UI.CreateListItem("Augenbrauen", Config.eyebrows, 1);
     menu:AddItem(eyebrowsItem);
 
-    local eyebrowsIntensityItem = NativeUI.CreateListItem("Augenbrauenstärke", intensityOptions, 1);
+    local eyebrowsIntensityItem = UI.CreateListItem("Augenbrauenstärke", intensityOptions, 1);
     menu:AddItem(eyebrowsIntensityItem);
 
-    local complexionItem = NativeUI.CreateListItem("Schönheitsfehler", Config.complexion, 1);
+    local complexionItem = UI.CreateListItem("Schönheitsfehler", Config.complexion, 1);
     menu:AddItem(complexionItem);
 
-    local complexionIntensityItem = NativeUI.CreateListItem("Schönheitsfehler Intensität", intensityOptions, 1);
+    local complexionIntensityItem = UI.CreateListItem("Schönheitsfehler Intensität", intensityOptions, 1);
     menu:AddItem(complexionIntensityItem);
 
-    local sunDamageItem = NativeUI.CreateListItem("Sommersprossen", Config.sundamage, 1);
+    local sunDamageItem = UI.CreateListItem("Sommersprossen", Config.sundamage, 1);
     menu:AddItem(sunDamageItem);
 
-    local sunDamageIntensityItem = NativeUI.CreateListItem("Sommersprossen Intensität", intensityOptions, 1)
+    local sunDamageIntensityItem = UI.CreateListItem("Sommersprossen Intensität", intensityOptions, 1)
     menu:AddItem(sunDamageIntensityItem)
 
-	local saveItem = NativeUI.CreateItem("~b~Speichern", "");
+	local saveItem = UI.CreateItem("~b~Speichern", "");
 	menu:AddItem(saveItem);
 	
 	saveItem.Activated = function(sender, item)

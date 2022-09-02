@@ -10,7 +10,7 @@ Inventory.static.rpcWhitelist = {};
 
 function Inventory:initialize(id)
 	self.id = id;
-	self._data = MySQL.query.await("SELECT * FROM inventories WHERE id=?", {self.id});
+	self._data = MySQL.single.await("SELECT * FROM inventories WHERE id=?", {self.id});
 end
 
 function Inventory:getMaxWeight()
@@ -29,11 +29,10 @@ end;
 function Inventory:getItemIds()
 	local results = MySQL.query.await("SELECT id FROM items WHERE inventory_id=?", {self.id});
 	
-	local ids = {};
-	for k,v in pairs(results) do
-		table.insert(ids, v.id);
-	end
-	print(json.encode(ids));
+	local ids = utils.table.map(results, function(v)
+		return v.id;
+	end);
+	print("Inventory.getItemIds", "ids", json.encode(ids));
 	return ids;
 end;
 table.insert(Inventory.static.rpcWhitelist, "getItemIds");
@@ -41,12 +40,10 @@ table.insert(Inventory.static.rpcWhitelist, "getItemIds");
 function Inventory:getItems()
 	local ids = self:getItemIds();
 
-	local items = {};
-	for _,id in pairs(ids) do
-		local item = Item.GetById(id);
-		table.insert(items, item);
-	end
-
+	local items = utils.table.map(ids, function(id)
+		return Item.GetById(id);
+	end);
+	
 	return items;
 end;
 

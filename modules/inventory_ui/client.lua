@@ -18,16 +18,16 @@ RegisterKeyMapping("inventory", "Inventar öffnen", "keyboard", "F2");
 
 function OpenOwnCharacterInventory()
     local user = User:GetSelf();
-    print("got user", user);
+    print("OpenOwnCharacterInventory", "user", user);
     local character = user:getCurrentCharacter();
-    print("got char", character);
+    print("OpenOwnCharacterInventory", "character", character);
     if not character then
         print("returning");
         return
     end
     print("getting inv");
     local inventory = character:getInventory();
-    print("got inv");
+    print("OpenOwnCharacterInventory", "inventory", inventory);
     OpenInventory(inventory);
 end;
 
@@ -38,9 +38,10 @@ function OpenInventory(inventory)
     pool:Clear();
     print("adding menu");
     pool:Add(menu);
+    print("menu added");
 
-    print("getting items");
-    local items = inventory:getItems();    
+    print("OpenInventory", "inventory.id", inventory.id);
+    local items = inventory:getItems();
     print("got items");
     for _,item in pairs(items) do
         local name = item:getName();

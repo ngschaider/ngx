@@ -81,7 +81,7 @@ Citizen.CreateThread(function()
 
 			return;
 		end
-		Citizen.Wait(100);
+		Citizen.Wait(0);
     end
 end);
 

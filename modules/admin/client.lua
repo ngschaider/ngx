@@ -5,6 +5,23 @@ local UI = M("UI");
 
 local pool = UI.CreatePool();
 
+local GetUserMenu = function(user)
+    local character = user:getCurrentCharacter();
+
+    if character then
+        local reviveItem = UI.CreateItem("Wiederbeleben", "");
+        reviveItem.Activated = function()
+            callback.trigger("admin:reviveCharacter", function(success)
+                if success then
+                    User:GetSelf().showNotification("Charakter " .. character:getName() .. " wurde wiederbelebt");
+                else
+                    User:GetSelf().showNotification("Charakter " .. character:getName() .. " konnte nicht wiederbelebt werden");
+                end
+            end, character.id);
+        end;
+    end
+end;
+
 local GetPlayerListMenu = function()
     local menu = UI.CreateMenu("Spielerliste", "Spielerliste");
     menu.Settings.MouseEdgeEnabled = false;
@@ -29,23 +46,6 @@ local GetPlayerListMenu = function()
     end
 
     return menu;
-end;
-
-local GetUserMenu = function(user)
-    local character = user:getCurrentCharacter();
-
-    if character then
-        local reviveItem = UI.CreateItem("Wiederbeleben", "");
-        reviveItem.Activated = function()
-            callback.trigger("admin:reviveCharacter", function(success)
-                if success then
-                    User:GetSelf().showNotification("Charakter " .. character:getName() .. " wurde wiederbelebt");
-                else
-                    User:GetSelf().showNotification("Charakter " .. character:getName() .. " konnte nicht wiederbelebt werden");
-                end
-            end, character.id);
-        end;
-    end
 end;
 
 local OpenMenu = function()

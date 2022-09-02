@@ -29,7 +29,7 @@ end;
 
 function Item:getInventory()
     local inventoryId = self:getInventoryId();
-    return M("inventory"):new(inventoryId);
+    return M("inventory").GetById(inventoryId);
 end;
 
 function Item:setInventoryId(inventoryId)
@@ -48,11 +48,7 @@ function Item:use()
     self:_rpc("use");
 end
 
-local cache = {};
 module.GetById = function(id)
-    if not cache[id] then
-        cache[id] = Item:new(id);
-    end
-
-    return cache[id];
+    print("Item.GetById", "id", id);
+    return Item:new(id);
 end

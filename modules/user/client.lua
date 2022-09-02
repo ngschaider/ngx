@@ -1,42 +1,19 @@
 local callback = M("callback");
 local Character = M("character");
 local class = M("class");
+local utils = M("utils");
 
 local User = class("User");
 
-function User.static:GetSelf()
-	local p = promise.new();
-	callback.trigger("user:getSelfId", function(id)
-		p:resolve(id);
-	end);
-	local id = Citizen.Await(p);
-	return User:new(id);
-end;
-
-function User.static:GetAllOnline()
-	local p = promise.new();
-	callback.trigger("user:getAllOnlineIds", function(ids)
-		p:resolve(ids);
-	end);
-	local ids = Citizen.Await(p);
-
-	local users = {};
-	for _,id in pairs(ids) do
-		local user = User:new(id);
-		table.insert(users, user);
-	end
-
-	return users;
-end;
-
 function User:initialize(id)
+	print("User.initialize", "id", id);
 	self.id = id;
 end
 
 function User:_rpc(name, ...)
-	print("user:rpc", name, self.id);
+	print("User:rpc", name, self.id);
 	local p = promise.new();
-	callback.trigger("user:rpc", function(...) 
+	callback.trigger("user:rpc", function(...)
 		p:resolve(...);
 	end, self.id, name, ...);
 	return Citizen.Await(p);
@@ -52,11 +29,9 @@ end;
 
 function User:getCharacters()
 	local ids = self:getCharacterIds();
-	local characters = {};
-	for _,id in pairs(ids) do
-		local character = Character:new(id);
-		table.insert(characters, character);
-	end
+	local characters = utils.table.map(ids, function(id)
+		return Character.GetById(id);
+	end);
 	return characters;
 end;
 
@@ -71,7 +46,7 @@ end;
 function User:getCurrentCharacter()
 	local currentCharacterId = self:getCurrentCharacterId();
 	if currentCharacterId then
-		return Character:new(currentCharacterId);
+		return Character.GetById(currentCharacterId);
 	else
 		return nil;
 	end
@@ -79,14 +54,37 @@ end;
 
 function User:createCharacter(firstname, lastname, dateofbirth, skin)
 	local id = self:_rpc("createCharacter", firstname, lastname, dateofbirth, skin);
+	return Character.GetById(id);
+end;
+
+
+
+module.GetById = function(id)
 	return User:new(id);
 end;
 
-local usersCache = {};
-module.GetById = function(id)
-	if not usersCache[id] then
-		usersChache[id] = User:new(id);
+module.GetSelf = function()
+	local p = promise.new();
+	callback.trigger("user:getSelfId", function(id)
+		p:resolve(id);
+	end);
+	local id = Citizen.Await(p);
+	local user = module.GetById(id);
+	return user;
+end;
+
+module.GetOnline = function()
+	local p = promise.new();
+	callback.trigger("user:getOnlineIds", function(ids)
+		p:resolve(ids);
+	end);
+	local ids = Citizen.Await(p);
+
+	local users = {};
+	for _,id in pairs(ids) do
+		local user = module.GetById(id);
+		table.insert(users, user);
 	end
 
-	return usersCache[id];
+	return users;
 end;

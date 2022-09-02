@@ -1,6 +1,8 @@
 local callback = M("callback");
 local Item = M("item");
 local class = M("class");
+local logger = M("logger");
+local utils = M("utils");
 
 local Inventory = class("Inventory");
 
@@ -25,21 +27,18 @@ function Inventory:getItemIds()
 end
 
 function Inventory:getItems()
+	logger.debug("Inventory.getItems", "getting item ids");
 	local ids = self:getItemIds();
-	local items = {};
-	for _,id in pairs(ids) do
-		local item = Item:new(id);
-		table.insert(items, item);
-	end
+	logger.debug("Inventory.getItems", "ids", json.encode(ids));
+	
+	local items = utils.table.map(ids, function(id)
+		logger.debug("Inventory.getItems", "id", id);
+		return Item.GetById(id);
+	end);
 
 	return items;
 end
 
-local cache = {};
 module.GetById = function(id)
-	if not cache[id] then
-		cache[id] = Inventory:new(id);
-	end
-	
-	return cache[id];
+	return Inventory:new(id);
 end;

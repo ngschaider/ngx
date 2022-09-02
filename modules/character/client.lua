@@ -5,10 +5,12 @@ local class = M("class");
 local Character = class("Character");
 
 function Character:initialize(id)
+	print("Character.initialize", "id", id);
 	self.id = id;
 end
 
 function Character:_rpc(name, ...)
+	print("Character.rpc", name, self.id);
 	local p = promise.new();
 	callback.trigger("character:rpc", function(...)
 		p:resolve(...);
@@ -37,15 +39,10 @@ function Character:getInventoryId()
 end;
 
 function Character:getInventory()
-	local inventoryId = self:getInventoryId();
-	return Inventory:new(inventoryId);
+	local id = self:getInventoryId();
+	return Inventory.GetById(id);
 end;
 
-local cache = {};
 module.GetById = function(id)
-	if not cache[id] then
-		cache[id] = Character:new(id);
-	end
-
-	return cache[id];
+	return Character:new(id);
 end

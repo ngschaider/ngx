@@ -2,26 +2,16 @@ local logger = M("logger");
 local utils = M("utils");
 local callback = M("callback");
 local event = M("event");
-local game = M("game");
 local Character = M("character");
 local class = M("class");
 
-local cachedUsers = {};
-
 local User = class("User");
-
 
 User.static.rpcWhitelist = {};
 
 function User:initialize(id)
 	self.id = id;
 	self.identifier = MySQL.scalar.await("SELECT identifier FROM users WHERE id=?", {self.id});
-
-	-- copy over all non-database values from the cached object
-	if cachedUsers[id] then
-		self.currentCharacterId = cachedUsers[id].currentCharacterId;
-	end
-	cachedUsers[id] = self;
 end
 
 function User:emit(name, ...)
@@ -29,7 +19,7 @@ function User:emit(name, ...)
 end;
 
 function User:getPlayerId()
-	for k,v in pairs(GetPlayers()) do
+	for _,v in pairs(GetPlayers()) do
 		if utils.getIdentifier(v) == self.identifier then
 			return tonumber(v);
 		end
@@ -43,19 +33,15 @@ function User:getName()
 end;
 table.insert(User.static.rpcWhitelist, "getName");
 
-function User:getIsAdmin()
-	return self.identifier == "5a66a5adef9f075731fd4306e231aa6d536dc094";
-end;
-
 function User:getIsOnline()
 	return self:getPlayerId() ~= nil;
 end;
 
 function User:kick(reason)
-	if not self:getIsOnline() then 
-		return 
+	if not self:getIsOnline() then
+		return;
 	end
-	DropPlayer(self.playerId, reason);
+	DropPlayer(self:getPlayerId(), reason);
 end;
 
 function User:getIdentifier()
@@ -84,22 +70,20 @@ table.insert(User.static.rpcWhitelist, "setCurrentCharacterId")
 
 function User:getCurrentCharacter()
 	local id = self:getCurrentCharacterId();
-	return Character:new(id);
+	return Character.GetById(id);
 end;
 
 function User:createCharacter(firstname, lastname, dateOfBirth, skin)
-	local characterId = Character:Create(self.id, firstname, lastname, dateOfBirth, skin);
-	return Character:new(characterId);
+	local id = Character.Create(self.id, firstname, lastname, dateOfBirth, skin);
+	return Character.GetById(id);
 end;
 table.insert(User.static.rpcWhitelist, "createCharacter");
 
 function User:getCharacterIds()
 	local results = MySQL.query.await("SELECT id FROM characters WHERE user_id=?", {self.id});
-	
-	local ids = {};
-	for _,v in pairs(results) do
-		table.insert(ids, v.id);
-	end
+	local ids = utils.table.map(results, function(v)
+		return v.id;
+	end);
 	return ids;
 end;
 table.insert(User.static.rpcWhitelist, "getCharacterIds");
@@ -107,21 +91,20 @@ table.insert(User.static.rpcWhitelist, "getCharacterIds");
 function User:getCharacters()
 	local ids = self:getCharacterIds();
 
-	local characters = {};
-	for _,id in pairs(ids) do
-		local character = User:new(id);
-		table.insert(characters, character);
-	end
+	local characters = utils.table.map(ids, function(id)
+		return Character.GetById(id);
+	end);
+	
 	return characters;
 end;
 
-local usersChace = {};
+local cache = {};
 module.GetById = function(id)
-	if not usersCache[id] then
-		usersCache[id] = User:new(id);
+	if not cache[id] then
+		cache[id] = User:new(id);
 	end
 
-	return usersCache[id];
+	return cache[id];
 end
 
 module.Create = function(identifier)
@@ -138,17 +121,18 @@ module.GetByIdentifier = function(identifier)
 	if id then
 		return module.GetById(id);
 	else
-		local user = User:Create(identifier);
+		local user = module.Create(identifier);
 		return user;
 	end
 end;
 
+
 module.GetByPlayerId = function(playerId)
 	logger.debug("User:GetByPlayerId", "playerId", playerId);
 	local identifier = utils.getIdentifier(playerId);
-	logger.debug("User:GetByPlayerId", "identifier", identifier);
-	local user = User:GetByIdentifier(identifier);
-	logger.debug("User:GetByPlayerId", "user.id", user.id);
+	logger.debug("module.GetByPlayerId", "identifier", identifier);
+	local user = module.GetByIdentifier(identifier);
+	logger.debug("module.GetByPlayerId", "user.id", user.id);
 	return user;
 end;
 
@@ -163,7 +147,7 @@ module.GetAllOnline = function()
 	return users;
 end;
 
-module.GetAllOnlineIds = function()
+module.GetOnlineIds = function()
 	local users = module.GetAllOnline();
 	local ids = {};
 	for _,user in pairs(users) do
@@ -179,8 +163,8 @@ callback.register("user:getSelfId", function(playerId, cb)
 	cb(user.id);
 end);
 
-callback.register("user:getAllOnlineIds", function(playerId, cb)
-	local ids = module.GetAllOnlineIds();
+callback.register("user:getOnlineIds", function(playerId, cb)
+	local ids = module.GetOnlineIds();
 	cb(ids);
 end);
 

@@ -11,41 +11,38 @@ Item.static.name = "default";
 Item.static.label = "Default";
 
 function Item.static:Create()
-    print()
     local id = MySQL.insert.await("INSERT INTO items (name, label) VALUES (?, ?)", {
         self.name,
         self.label,
     });
 
-	return Item:new(id);
+	return module.GetById(id);
 end;
-
-print("    Item.static:Create assigned");
 
 function Item:initialize(id)
     self.id = id;
-    self.usable = false;
+    self._data = MySQL.single.await("SELECT * FROM items WHERE id=?", {self.id});
 end
 
 function Item:getInventoryId()
-    local id = MySQL.scalar.await("SELECT inventory_id FROM items WHERE id=?", {self.id});
-    return id;
+    return self._data.inventory_id;
 end;
 table.insert(Item.static.rpcWhitelist, "getInventoryId");
 
 function Item:getInventory()
     local id = self:getInventoryId();
     if id then
-        return M("inventory"):new(id);
+        return M("inventory").GetById(id);
     else
         return nil;
     end
 end;
 
-function Item:setInventoryId(inventoryId)
-    print("Item:setInventoryId", "inventoryId", inventoryId);
+function Item:setInventoryId(newInventoryId)
+    print("Item:setInventoryId", "newInventoryId", newInventoryId);
     print("Item:setInventoryId", "self.id", self.id);
-    MySQL.update.await("UPDATE items SET inventory_id=? WHERE id=?", {inventoryId, self.id});
+    MySQL.update.await("UPDATE items SET inventory_id=? WHERE id=?", {newInventoryId, self.id});
+    self._data.inventory_id = newInventoryId;
 end;
 table.insert(Item.static.rpcWhitelist, "setInventoryId");
 
@@ -54,44 +51,48 @@ function Item:setInventory(inventory)
 end;
 
 function Item:getName()
-    local name = MySQL.scalar.await("SELECT name FROM items WHERE id=?", {self.id});
-    return name;
+    return self._data.name;
 end;
 table.insert(Item.static.rpcWhitelist, "getName");
 
 function Item:getLabel()
-    local label = MySQL.scalar.await("SELECT label FROM items WHERE id=?", {self.id});
-    return label;
+    return self._data.label;
 end;
 table.insert(Item.static.rpcWhitelist, "getLabel");
 
 function Item:getData()
-    local data = MySQL.scalar.await("SELECT data FROM items WHERE id=?", {self.id});
-    return json.decode(data);
+    return json.decode(self._data.data);
 end;
 table.insert(Item.static.rpcWhitelist, "getData");
 
 function Item:setData(data)
     local dataStr = json.encode(data);
     MySQL.update.await("UPDATE items SET data=? WHERE id=?", {dataStr, self.id});
+    self._data.data = dataStr;
 end;
 
 function Item:getIsUsable()
-    return self.isUsable;
+    return self._data.is_usable;
 end
 table.insert(Item.static.rpcWhitelist, "getIsUsable");
 
+function Item:setIsUsable(newIsUsable)
+    MySQL.update.await("UPDATE is_usable SET data=? WHERE id=?", {newIsUsable, self.id});
+    self._data.is_usable = newIsUsable;
+end
+
 function Item:use()
-    logger.warn("Item " .. self:getName() .. " got used but has not usage implemented.");
+    logger.warn("Item " .. self:getName() .. " got used but has no usage implemented.");
 end;
 table.insert(Item.static.rpcWhitelist, "use");
 
 function Item:destroy()
     MySQL.query.await("DELETE FROM items WHERE id=?", {self.id});
+    self = nil;
 end;
 
 callback.register("item:rpc", function(playerId, cb, id, name, ...)
-	local item = Item:new(id);
+	local item = module.GetById(id);
 
 	if not item then
 		logger.warn("Item not found - rpc failed");

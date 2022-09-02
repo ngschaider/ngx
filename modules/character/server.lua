@@ -10,7 +10,7 @@ Character.static.rpcWhitelist = {};
 
 function Character:initialize(id)
 	self.id = id;
-	self._data = MySQL.query.await("SELECT * FROM characters WHERE id=?", {self.id});
+	self._data = MySQL.single.await("SELECT * FROM characters WHERE id=?", {self.id});
 end
 
 function Character:getId()
@@ -25,7 +25,7 @@ table.insert(Character.static.rpcWhitelist, "getUserId");
 
 function Character:getUser()
 	local userId = self:getUserId();
-	return M("user"):new(userId);
+	return M("user").GetById(userId);
 end
 
 function Character:setPosition(coords)
@@ -79,39 +79,16 @@ table.insert(Character.static.rpcWhitelist, "getInventoryId");
 
 function Character:getInventory()
 	local inventoryId = self:getInventoryId();
-	return Inventory:new(inventoryId);
+	return Inventory.GetById(inventoryId);
 end
 
-callback.register("character:rpc", function(playerId, cb, id, name, ...)
-	local character = Character:new(id);
-
-	if not character then
-		logger.warn("Character not found - rpc failed");
-		return;
-	end
-
-	if character:getUser():getPlayerId() ~= playerId and not character:getUser():getIsAdmin() then
-		logger.warn("Character not owned by requester - rpc failed");
-		return;
-	end	
-
-	if not utils.table.contains(Character.rpcWhitelist, name) then
-		logger.warn("Requested character rpc " .. name .. " not whitelisted - rpc failed");
-		return;
-	end
-
-	-- we have to pass the character object because we are not using the colon syntax like character:getName(...)
-	cb(character[name](character, ...));
-end);
-
-
-local charactersCache = {};
+local cache = {};
 module.GetById = function(id)
-	if charactersCache[id] then
-		charactersCache[id] = module.GetById(id);
+	if not cache[id] then
+		cache[id] = Character:new(id);
 	end
 
-	return charactersCache[id];
+	return cache[id];
 end
 
 module.Create = function(userId, firstname, lastname, dateOfBirth, skin)
@@ -130,7 +107,7 @@ module.Create = function(userId, firstname, lastname, dateOfBirth, skin)
 		inventoryId,
 	});
 
-	return Character:new(id);
+	return module.GetById(id);
 end;
 
 module.GetByPlayerId = function(playerId)
@@ -146,13 +123,30 @@ module.GetByPlayerId = function(playerId)
 end
 
 module.GetAll = function()
-	local characters = {};
+	local results = MySQL.query.await("SELECT id FROM characters");
 
-	local data = MySQL.query.await("SELECT id FROM characters");
-	for _,v in pairs(data) do
-		local character = module.GetById(v.id);
-		table.insert(characters, character);
-	end
-
+	local characters = utils.table.map(results, function(v)
+		return module.GetById(v.id);
+	end)
 	return characters;
 end
+
+
+
+callback.register("character:rpc", function(playerId, cb, id, name, ...)
+	local character = module.GetById(id);
+
+	logger.debug("event - character:rpc", "id", id);
+	if not character then
+		logger.warn("Character not found - rpc failed");
+		return;
+	end
+
+	if not utils.table.contains(Character.rpcWhitelist, name) then
+		logger.warn("Requested character rpc " .. name .. " not whitelisted - rpc failed");
+		return;
+	end
+
+	-- we have to pass the character object because we are not using the colon syntax like character:getName(...)
+	cb(character[name](character, ...));
+end);

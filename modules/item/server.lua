@@ -1,33 +1,45 @@
 ---@diagnostic disable: deprecated
 local logger = M("logger");
-local utils = M("utils");
-local callback = M("callback");
 local class = M("class");
+local core = M("core");
 
-Item = class("Item");
+Item = class("Item", core.SyncObject);
+core.RegisterSyncClass(Item);
 
 Item.static.rpcWhitelist = {};
 Item.static.name = "default";
 Item.static.label = "Default";
 
-function Item.static:Create()
+function Item.static:Create(options)
     local id = MySQL.insert.await("INSERT INTO items (name, label) VALUES (?, ?)", {
-        self.name,
-        self.label,
+        options.name,
+        options.label,
     });
 
 	return module.GetById(id);
 end;
 
-function Item:initialize(id)
-    self.id = id;
-    self._data = MySQL.single.await("SELECT * FROM items WHERE id=?", {self.id});
+function Item:initialize(id, options)
+    core.SyncObject.initialize(self, "Item", id, "items");
+    logger.debug("Item:initialize", "id", id);
+    self.options = options;
+
+    self:syncProperty("id", true, false);
+    self:syncProperty("name", true, true);
+    self:syncProperty("label", true, true);
+    self:syncProperty("inventoryId", true, true);
+    self:syncProperty("isUsable", true, false);
+    self:rpcMethod("getItemData", true);
+    self:rpcMethod("use", true);
 end
 
-function Item:getInventoryId()
-    return self._data.inventory_id;
+function Item:getId()
+    return self:getData("id");
 end;
-table.insert(Item.static.rpcWhitelist, "getInventoryId");
+
+function Item:getInventoryId()
+    return self:getData("inventoryId");
+end;
 
 function Item:getInventory()
     local id = self:getInventoryId();
@@ -38,96 +50,62 @@ function Item:getInventory()
     end
 end;
 
-function Item:setInventoryId(newInventoryId)
-    print("Item:setInventoryId", "newInventoryId", newInventoryId);
-    print("Item:setInventoryId", "self.id", self.id);
-    MySQL.update.await("UPDATE items SET inventory_id=? WHERE id=?", {newInventoryId, self.id});
-    self._data.inventory_id = newInventoryId;
+function Item:setInventoryId(inventoryId)
+    logger.debug("Item:setInventoryId", "inventoryId", inventoryId);
+    logger.debug("Item:setInventoryId", "self:getId()", self:getId());
+    self:setData("inventoryId", inventoryId);
 end;
-table.insert(Item.static.rpcWhitelist, "setInventoryId");
 
 function Item:setInventory(inventory)
     self:setInventoryId(inventory.id);
 end;
 
 function Item:getName()
-    return self._data.name;
+    return self:getData("name");
 end;
-table.insert(Item.static.rpcWhitelist, "getName");
 
 function Item:getLabel()
-    return self._data.label;
+    return self:getData("label");
 end;
-table.insert(Item.static.rpcWhitelist, "getLabel");
 
-function Item:getData()
-    return json.decode(self._data.data);
+function Item:getItemData()
+    return json.decode(self:getData("data"));
 end;
-table.insert(Item.static.rpcWhitelist, "getData");
 
-function Item:setData(data)
-    local dataStr = json.encode(data);
-    MySQL.update.await("UPDATE items SET data=? WHERE id=?", {dataStr, self.id});
-    self._data.data = dataStr;
+function Item:setItemData(data)
+    self:setData("data", json.encode(data));
 end;
 
 function Item:getIsUsable()
-    return self._data.is_usable;
+    return self:getData("isUsable");
 end
-table.insert(Item.static.rpcWhitelist, "getIsUsable");
 
-function Item:setIsUsable(newIsUsable)
-    MySQL.update.await("UPDATE is_usable SET data=? WHERE id=?", {newIsUsable, self.id});
-    self._data.is_usable = newIsUsable;
+function Item:setIsUsable(isUsable)
+    self:setData("isUsable", isUsable);
 end
 
 function Item:use()
     logger.warn("Item " .. self:getName() .. " got used but has no usage implemented.");
 end;
-table.insert(Item.static.rpcWhitelist, "use");
 
 function Item:destroy()
-    MySQL.query.await("DELETE FROM items WHERE id=?", {self.id});
-    self = nil;
+    self:setData("destroyed", true);
 end;
 
-callback.register("item:rpc", function(playerId, cb, id, name, ...)
-	local item = module.GetById(id);
-
-	if not item then
-		logger.warn("Item not found - rpc failed");
-		return;
-	end
-
-	if not utils.table.contains(Item.rpcWhitelist, name) then
-		logger.warn("Requested item rpc " .. name .. " not whitelisted - rpc failed");
-		return;
-	end
-
-	-- we have to pass the item object because we are not using the colon syntax like item:getLabel(...)
-	cb(item[name](item, ...));
-end);
 
 
 
 local registeredItems = {};
-function RegisterItem(itemClass)
-    registeredItems[itemClass.name] = itemClass;
+function RegisterItem(options)
+    registeredItems[options.name] = options;
 end;
 
-module.GetItemClass = function(name)
-    return registeredItems[name];
-end
-
-local cache = {};
 module.GetById = function(id)
-    if not cache[id] then
-        local name = MySQL.scalar.await("SELECT name FROM items WHERE id=?", {id});
-        local specificItemClass = module.GetItemClass(name);
-        cache[id] = specificItemClass:new(id);
-    end
+    logger.debug("(item) module.GetById", "id", id);
+    local name = MySQL.scalar.await("SELECT name FROM items WHERE id=?", {id});
+    local options = registeredItems[name];
 
-    return cache[id];
+    return core.GetSyncObject("Item", id, options);
 end
 
 -- Exports

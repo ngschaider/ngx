@@ -3,6 +3,7 @@ local charcreator = M("charcreator");
 local User = M("user");
 local utils = M("utils");
 local skin = M("skin");
+local logger = M("logger");
 
 -- Disable default idle camera
 Citizen.CreateThread(function()
@@ -50,30 +51,30 @@ local SpawnWithCharacter = function(character)
 	--print("Spawning " .. character:getName());
 end;
 
-print("loaded base");
+logger.debug("loaded base");
 Citizen.CreateThread(function()
     while true do
-		print("waiting for network session");
+		logger.debug("waiting for network session");
 		if NetworkIsSessionStarted() then
-			print("session started");
+			logger.debug("session started");
 			if IsScreenFadedOut() then
 				DoScreenFadeIn();
 			end
 
 			ShutdownLoadingScreen();
 
-			print("getting character ids");
+			logger.debug("getting character ids");
 			local selfUser = User:GetSelf();
-			print("got selfUser");
+			logger.debug("got selfUser", selfUser);
 			local characterIds = selfUser:getCharacterIds();
-			print("got character ids");
+			logger.debug("got character ids");
 			if utils.table.size(characterIds) == 0 then
-				print("opening charcreator");
+				logger.debug("opening charcreator");
 				charcreator.CreateNewCharacter(function(character)
 					SpawnWithCharacter(character);
 				end);
 			else
-				print("opening charselector");
+				logger.debug("opening charselector");
 				characterSelector.StartSelection(function(character)
 					SpawnWithCharacter(character);
 				end);

@@ -11,20 +11,20 @@ function Beer:use()
 end
 
 RegisterCommand("beer", function(playerId, args, rawCommand)
-    print("giving player a beer");
+    logger.debug("giving player a beer");
     local beer = Beer:Create();
-    print("beer");
+    logger.debug("beer");
 
-    print("getting character");
+    logger.debug("getting character");
     local character = M("character").GetByPlayerId(playerId);
     if not character then
         logger.debug("failed to get current character");
         return;
     end
 
-    print("getting inventory")
+    logger.debug("getting inventory")
     local inventory = character:getInventory();
-    print("setting item inventory_id", inventory.id);
+    logger.debug("setting item inventoryId", inventory.id);
     beer:setInventoryId(inventory.id)
 end, true);
 

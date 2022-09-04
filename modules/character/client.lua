@@ -1,48 +1,54 @@
-local callback = M("callback");
 local Inventory = M("inventory");
 local class = M("class");
+local logger = M("logger");
+local core = M("core");
 
-local Character = class("Character");
+local Character = class("Character", core.SyncObject);
+core.RegisterSyncClass(Character);
 
 function Character:initialize(id)
-	print("Character.initialize", "id", id);
-	self.id = id;
+	core.SyncObject.initialize(self, "Character", id, "characters");
 end
 
-function Character:_rpc(name, ...)
-	print("Character.rpc", name, self.id);
-	local p = promise.new();
-	callback.trigger("character:rpc", function(...)
-		p:resolve(...);
-	end, self.id, name, ...);
-	return Citizen.Await(p);
+function Character:getId()
+	return self:getData("id");
 end
 
-function Character:getName()
-	return self:_rpc("getName");
+function Character:getUserId()
+	return self:getData("userId");
 end
 
 function Character:getLastPosition()
-	return self:_rpc("getLastPosition");
-end;
+	return {
+		x = tonumber(self:getData("lastPositionX")),
+		y = tonumber(self:getData("lastPositionY")),
+		z = tonumber(self:getData("lastPositionZ")),
+	};
+end
+
+function Character:getName()
+	return self:getData("firstname") .. " " .. self:getData("lastname");
+end
 
 function Character:getSkin()
-	return self:_rpc("getSkin");
-end;
+	return self:rpc("getSkin");
+end
 
 function Character:setSkin(skin)
-	self:_rpc("setSkin", skin);
-end;
+	self:rpc("setSkin", skin);
+end
 
 function Character:getInventoryId()
-	return self:_rpc("getInventoryId");
-end;
+	return self:getData("inventoryId");
+end
 
 function Character:getInventory()
+	logger.debug("Character:getInventory");
 	local id = self:getInventoryId();
+	logger.debug("Character:getInventory", "id", id);
 	return Inventory.GetById(id);
-end;
+end
 
 module.GetById = function(id)
-	return Character:new(id);
+	return core.GetSyncObject("Character", id);
 end

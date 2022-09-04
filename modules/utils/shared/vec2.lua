@@ -2,6 +2,10 @@ local class = M("class");
 
 local Vec2 = class("Vec2");
 
+Vec2.static.fromVector3 = function(v)
+    return Vec2:new(v.x, v.y);
+end
+
 function Vec2:initialize(x, y, z)
     self.x = x;
     self.y = y;

@@ -1,12 +1,12 @@
 local User = M("user");
 local UI = M("UI");
+local logger = M("logger");
 
 local pool = UI.CreatePool();
 
 Citizen.CreateThread(function()
     while true do
         pool:ProcessMenus();
-        
         Citizen.Wait(0);
     end
 end);
@@ -18,34 +18,37 @@ RegisterKeyMapping("inventory", "Inventar öffnen", "keyboard", "F2");
 
 function OpenOwnCharacterInventory()
     local user = User:GetSelf();
-    print("OpenOwnCharacterInventory", "user", user);
+    logger.debug("OpenOwnCharacterInventory", "user", user);
     local character = user:getCurrentCharacter();
-    print("OpenOwnCharacterInventory", "character", character);
+    logger.debug("OpenOwnCharacterInventory", "character", character);
     if not character then
-        print("returning");
+        logger.debug("returning");
         return
     end
-    print("getting inv");
+    logger.debug("getting inv");
     local inventory = character:getInventory();
-    print("OpenOwnCharacterInventory", "inventory", inventory);
+    logger.debug("OpenOwnCharacterInventory", "inventory", inventory);
     OpenInventory(inventory);
 end;
 
 function OpenInventory(inventory)
-    print("creating menu");
+    logger.debug("creating menu");
     local menu = UI.CreateMenu("Inventar", "");
-    print("clearing pool");
+    logger.debug("clearing pool");
     pool:Clear();
-    print("adding menu");
+    logger.debug("adding menu");
     pool:Add(menu);
-    print("menu added");
+    logger.debug("menu added");
 
-    print("OpenInventory", "inventory.id", inventory.id);
+    logger.debug("OpenInventory", "inventory.id", inventory.id);
     local items = inventory:getItems();
-    print("got items");
+    logger.debug("OpenInventory", "#items", #items);
     for _,item in pairs(items) do
-        local name = item:getName();
-        local itemEntry = UI.CreateItem(name, "");
+        logger.debug("OpenInventory", "item", item);
+        logger.debug("OpenInventory", "item.id", item.id);
+        local label = item:getLabel();
+        logger.debug("OpenInventory", "label", label);
+        local itemEntry = UI.CreateItem(label, "");
         menu:AddItem(itemEntry);
 
         local itemMenu = GetItemMenu(item);
@@ -63,10 +66,10 @@ end
 function GetItemMenu(item)
     local name = item:getName();
     local menu = UI.CreateMenu(name, "");
-    print(name);
+    logger.debug("GetItemMenu", "name", name);
     
     if item:getIsUsable() then
-        print("adding use item");
+        logger.debug("adding use item");
         local useItem = UI.CreateItem("Benutzen", "");
         menu:AddItem(useItem);
 
@@ -75,7 +78,7 @@ function GetItemMenu(item)
         end;
     end
 
-    print("adding drop item");
+    logger.debug("adding drop item");
     local dropItem = UI.CreateItem("Fallen lassen", "");
     menu:AddItem(dropItem);
 

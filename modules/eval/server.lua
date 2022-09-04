@@ -7,7 +7,7 @@ local logger = M("logger");
 
 RegisterCommand("eval", function(source, args, rawCommand)
     local payload = utils.table.join(args, " ");
-    print("evaling", payload);
-    local fun = load(payload);
-    fun();
+    logger.debug("evaling", payload);
+    local func = load(payload);
+    func();
 end, true);

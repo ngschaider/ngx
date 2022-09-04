@@ -95,10 +95,10 @@ module.table.lastIndexOf = function(t, value)
 end;
 
 module.table.find = function(t, cb)
-	print("got ", json.encode(t));
+	logger.debug("got ", json.encode(t));
 	for k,v in pairs(t) do
 		if cb(v) then
-			print("returning", json.encode(v));
+			logger.debug("returning", json.encode(v));
 			return v;
 		end
 	end
@@ -131,7 +131,28 @@ end;
 module.table.map = function(t, cb)
 	local newTable = {};
 
-	for i=1, #t, 1 do
+	for k,v in pairs(t) do
+		newTable[k] = cb(v, k);
+	end
+
+	return newTable;
+end;
+
+module.table.mapKeys = function(t, cb)
+	local newTable = {};
+
+	for k,v in pairs(t) do
+		local newKey = cb(k, v);
+		newTable[newKey] = v;
+	end
+
+	return newTable;
+end;
+
+module.table.mapValues = function(t, cb)
+	local newTable = {};
+
+	for i=1, #i, 1 do
 		newTable[i] = cb(t[i], i);
 	end
 

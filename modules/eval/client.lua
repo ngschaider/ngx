@@ -6,7 +6,7 @@ local logger = M("logger");
 
 RegisterCommand("ceval", function(source, args, rawCommand)
     local payload = utils.table.join(args, " ");
-    print("evaling", payload);
+    logger.debug("evaling", payload);
     local fun = load(payload);
     fun();
 end, true);

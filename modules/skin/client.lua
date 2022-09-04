@@ -495,7 +495,7 @@ end
 
 -- changes a single key and reloads the skin/clothes if needed
 module.setValue = function(key, val)
-	print("setValue", key, val);
+	logger.debug("setValue", key, val);
 	local skin = module.getValues();
 	skin[key] = val;
 	module.setValues(skin);
@@ -503,7 +503,7 @@ end;
 
 -- loads an object of values and reloads the skin/clothes if needed
 module.setValues = function(skin)
-	print("setValues", json.encode(skin));
+	--print("setValues", json.encode(skin));
 	if skin.sex then
 		if skin.sex == 0 then
 			loadDefaultModel(true);

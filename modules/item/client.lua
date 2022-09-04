@@ -1,30 +1,26 @@
 local callback = M("callback");
 local class = M("class");
+local core = M("core");
+local logger = M("logger");
 
-local Item = class("Item");
+local Item = class("Item", core.SyncObject);
+core.RegisterSyncClass(Item);
 
 function Item:initialize(id)
-    self.id = id;
+    core.SyncObject.initialize(self, "Item", id, "items");
 end
 
-function Item:_rpc(name, ...)
-    local p = promise.new();
-    callback.trigger("item:rpc", function(...) 
-        p:resolve(...);
-    end, self.id, name, ...);
-    return Citizen.Await(p);
-end;
-
 function Item:getName()
-    return self:_rpc("getName");
+    return self:getData("name");
 end;
 
-function Item:getType()
-    return self:_rpc("getType");
+function Item:getLabel()
+    logger.debug("Item:getLabel", "self._data", json.encode(self._data));
+    return self:getData("label");
 end;
 
 function Item:getInventoryId()
-    return self:_rpc("getInventoryId");
+    return self:getData("inventoryId");
 end;
 
 function Item:getInventory()
@@ -32,23 +28,23 @@ function Item:getInventory()
     return M("inventory").GetById(inventoryId);
 end;
 
-function Item:setInventoryId(inventoryId)
-    return self:_rpc("setInventoryId", inventoryId);
+function Item:setInventoryId(id)
+    self:setData("inventoryId", id);
 end;
 
 function Item:setInventory(inventory)
-    self:setInventoryId(inventory.id);
+    self:setData("inventoryId", inventory.id);
 end;
 
 function Item:getIsUsable()
-    self:_rpc("getIsUsable");
+    return self:getData("getIsUsable");
 end
 
 function Item:use()
-    self:_rpc("use");
+    return self:rpc("use");
 end
 
 module.GetById = function(id)
-    print("Item.GetById", "id", id);
-    return Item:new(id);
+    logger.debug("(item) module.GetById", "id", id);
+    return core.GetSyncObject("Item", id);
 end

@@ -3,34 +3,40 @@ local callback = M("callback");
 local logger = M("logger");
 local Inventory = M("inventory");
 local class = M("class");
+local core = M("core");
 
-local Character = class("Character");
-
-Character.static.rpcWhitelist = {};
+local Character = class("Character", core.SyncObject);
+core.RegisterSyncClass(Character);
 
 function Character:initialize(id)
-	self.id = id;
-	self._data = MySQL.single.await("SELECT * FROM characters WHERE id=?", {self.id});
+	logger.debug("Character:initialize", "id", id);
+	core.SyncObject.initialize(self, "Character", id, "characters");
+
+	self:syncProperty("id", true, false);
+	self:syncProperty("userId", true, false);
+	self:syncProperty("lastPositionX", true, false);
+	self:syncProperty("lastPositionY", true, false);
+	self:syncProperty("lastPositionZ", true, false);
+	self:syncProperty("firstname", true, false);
+	self:syncProperty("lastname", true, false);
+	self:syncProperty("dateOfBirth", true, false);
+	self:syncProperty("inventoryId", true, false);
+	self:rpcMethod("getSkin", true);
+	self:rpcMethod("setSkin", true);
 end
 
 function Character:getId()
-	return self.id;
-end 
-table.insert(Character.static.rpcWhitelist, "getId");
+	return self:getData("id");
+end
 
 function Character:getUserId()
-	return self._data.user_id;
+	return self:getData("userId");
 end
-table.insert(Character.static.rpcWhitelist, "getUserId");
 
 function Character:getUser()
 	local userId = self:getUserId();
 	return M("user").GetById(userId);
 end
-
-function Character:setPosition(coords)
-	utils.teleport(coords);
-end;
 
 function Character:getPosition()
 	local playerId = self:getUser():getPlayerId();
@@ -40,62 +46,55 @@ end
 
 function Character:getLastPosition()
 	return {
-		x = tonumber(self._data.position_x),
-		y = tonumber(self._data.position_y),
-		z = tonumber(self._data.position_z),
+		x = tonumber(self:getData("lastPositionX")),
+		y = tonumber(self:getData("lastPositionY")),
+		z = tonumber(self:getData("lastPositionZ")),
 	};
 end
-table.insert(Character.static.rpcWhitelist, "getLastPosition");
 
 function Character:getName()
-	return self._data.firstname .. " " .. self._data.lastname;
+	return self:getData("firstname") .. " " .. self:getData("lastname");
 end
-table.insert(Character.static.rpcWhitelist, "getName");
 
 function Character:getDateOfBirth()
-	return self._data.dateOfBirth;
+	return self:getData("dateOfBirth");
 end
-table.insert(Character.static.rpcWhitelist, "getDateOfBirth");
 
 function Character:getSkin()
-	return json.decode(self._data.skin);
+	logger.debug("Character:getSkin", "self:getName()", self:getName());
+	logger.debug("Character:getSkin", "self._data", json.encode(self._data));
+	return json.decode(self:getData("skin"));
 end
-table.insert(Character.static.rpcWhitelist, "getSkin");
 
 function Character:setSkin(skin)
 	local skinStr = json.encode(skin);
 	MySQL.update.await("UPDATE characters SET skin=? WHERE id=?", {skinStr, self.id});
-	self._data.skin = skinStr;
+	self:setData("skin", skinStr);
 end
-table.insert(Character.static.rpcWhitelist, "setSkin");
 
 function Character:getInventoryId()
-	logger.debug("Character:getInventory", "self.id", self.id);
-	local inventoryId = self._data.inventory_id;
-	logger.debug("Character:getInventory", "inventoryId", inventoryId);
+	logger.debug("Character:getInventoryId", "self.id", self.id);
+	local inventoryId = self:getData("inventoryId");
+	logger.debug("Character:getInventoryId", "inventoryId", inventoryId);
 	return inventoryId;
 end
-table.insert(Character.static.rpcWhitelist, "getInventoryId");
 
 function Character:getInventory()
+	logger.debug("Character:getInventory");
 	local inventoryId = self:getInventoryId();
+	logger.debug("Character:getInventory", "inventoryId", inventoryId);
 	return Inventory.GetById(inventoryId);
 end
 
-local cache = {};
 module.GetById = function(id)
-	if not cache[id] then
-		cache[id] = Character:new(id);
-	end
-
-	return cache[id];
+	return core.GetSyncObject("Character", id);
 end
 
 module.Create = function(userId, firstname, lastname, dateOfBirth, skin)
 	local inventoryId = Inventory.Create(20);
 
 	local skinStr = json.encode(skin);
-	local id = MySQL.insert.await("INSERT INTO characters (user_id, firstname, lastname, date_of_birth, skin, position_x, position_y, position_z, inventory_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", {
+	local id = MySQL.insert.await("INSERT INTO characters (userId, firstname, lastname, dateOfBirth, skin, lastPositionX, lastPositionY, lastPositionZ, inventoryId) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", {
 		userId, 
 		firstname, 
 		lastname, 
@@ -118,7 +117,7 @@ module.GetByPlayerId = function(playerId)
 		return nil;
 	end
 
-	print("Character.static:GetByPlayerId", "user.id", user.id)
+	logger.debug("Character.static:GetByPlayerId", "user.id", user.id)
 	return user:getCurrentCharacter();
 end
 

@@ -2,29 +2,24 @@ local callback = M("callback");
 local Character = M("character");
 local class = M("class");
 local utils = M("utils");
+local core = M("core");
+local logger = M("logger");
 
-local User = class("User");
+local User = class("User", core.SyncObject);
+core.RegisterSyncClass(User);
 
 function User:initialize(id)
-	print("User.initialize", "id", id);
-	self.id = id;
+	core.SyncObject.initialize(self, "User", id, "users");
+	logger.debug("User.initialize", "id", id);
+	logger.debug("User.initialize", "self._data", json.encode(self._data));
 end
 
-function User:_rpc(name, ...)
-	print("User:rpc", name, self.id);
-	local p = promise.new();
-	callback.trigger("user:rpc", function(...)
-		p:resolve(...);
-	end, self.id, name, ...);
-	return Citizen.Await(p);
-end;
-
 function User:getName()
-	return self:_rpc("getName");
+	return self:rpc("getName");
 end;
 
 function User:getCharacterIds()
-	return self:_rpc("getCharacterIds")
+	return self:rpc("getCharacterIds")
 end;
 
 function User:getCharacters()
@@ -35,32 +30,34 @@ function User:getCharacters()
 	return characters;
 end;
 
-function User:setCurrentCharacterId(id)
-	self:_rpc("setCurrentCharacterId", id);
+function User:getCurrentCharacterId()
+	local id = self:getData("currentCharacterId");
+	logger.debug("User:getCurrentCharacterId", "id", id);
+	return id;
 end;
 
-function User:getCurrentCharacterId()
-	return self:_rpc("getCurrentCharacterId");
+function User:setCurrentCharacterId(id)
+	logger.debug("User:setCurrentCharacterId", "id", id);
+	self:setData("currentCharacterId", id);
 end;
 
 function User:getCurrentCharacter()
-	local currentCharacterId = self:getCurrentCharacterId();
-	if currentCharacterId then
-		return Character.GetById(currentCharacterId);
+	local id = self:getCurrentCharacterId();
+	logger.debug("User:getCurrentCharacter", "id", id);
+	if id then
+		return Character.GetById(id);
 	else
 		return nil;
 	end
 end;
 
 function User:createCharacter(firstname, lastname, dateofbirth, skin)
-	local id = self:_rpc("createCharacter", firstname, lastname, dateofbirth, skin);
+	local id = self:rpc("createCharacter", firstname, lastname, dateofbirth, skin);
 	return Character.GetById(id);
 end;
 
-
-
 module.GetById = function(id)
-	return User:new(id);
+	return core.GetSyncObject("User", id);
 end;
 
 module.GetSelf = function()

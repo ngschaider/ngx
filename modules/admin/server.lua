@@ -1,6 +1,6 @@
 local command = M("command");
 local logger = M("logger");
-local event = M("event");
+local event = M("core").event;
 
 command.registerCommand("admin", function(user)
     logger.debug("User " .. user.id .. " opened the Admin Menu");

@@ -1,7 +1,7 @@
 local logger = M("logger");
 local utils = M("utils");
 local callback = M("callback");
-local event = M("event");
+local event = M("core").event;
 local Character = M("character");
 local class = M("class");
 local core = M("core");
@@ -18,7 +18,7 @@ function User:initialize(id)
 	self:syncProperty("currentCharacterId", true, true);
 end
 
-function User:emit(name, ...)
+function User:emitClient(name, ...)
 	event.emitClient(name, self:getPlayerId(), ...);
 end
 
@@ -52,11 +52,11 @@ function User:getIdentifier()
 end
 
 function User:showNotification(msg)
-	self:emit("notification:showNotification", msg);
+	self:emitClient("notification:showNotification", msg);
 end
 
 function User:showHelpNotification(msg, thisFrame, beep, duration)
-	self:emit("notification:showHelpNotification", msg, thisFrame, beep, duration);
+	self:emitClient("notification:showHelpNotification", msg, thisFrame, beep, duration);
 end
 
 function User:setCurrentCharacterId(id)

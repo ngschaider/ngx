@@ -1,5 +1,5 @@
 local logger = M("logger");
-local event = M("event");
+local event = M("core").event;
 
 local serverCallbacks = {};
 local lastRequestId = 0;

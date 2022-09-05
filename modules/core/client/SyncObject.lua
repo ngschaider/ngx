@@ -10,8 +10,8 @@ Refer to the server-side docs for SyncObject. It is mostly used the same way, ex
 ]]
 
 
+local event = module.event;
 local class = M("class");
-local event = M("event");
 local callback = M("callback");
 local logger = M("logger");
 

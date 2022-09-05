@@ -1,4 +1,4 @@
-local event = M("event");
+local event = M("core").event;
 local logger = M("logger");
 local User = M("user");
 local UI = M("UI");

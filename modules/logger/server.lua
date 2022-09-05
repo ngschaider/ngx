@@ -1,5 +1,5 @@
 --[[
-local event = M("event");
+local event = M("core").event;
 
 module.debug = function(msg, ...)
     print("^3[DEBUG]^7 " .. msg, ...);

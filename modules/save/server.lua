@@ -1,6 +1,6 @@
 local Character = M("character");
 local logger = M("logger");
-local event = M("event");
+local event = M("core").event;
 
 local SaveCharacter = function(character)
     logger.debug("Saving Character", character.id);

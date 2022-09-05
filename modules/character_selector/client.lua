@@ -1,4 +1,4 @@
-local event = M("event");
+local event = M("core").event;
 local streaming = M("streaming");
 local User = M("user");
 local charcreator = M("charcreator");

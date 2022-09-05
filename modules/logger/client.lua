@@ -1,5 +1,5 @@
 --[[
-local event = M("event");
+local event = M("core").event;
 
 module.debug = function(msg, ...)
     event.emitServer("logger:debug", msg, ...);

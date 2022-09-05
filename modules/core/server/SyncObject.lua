@@ -45,10 +45,9 @@ For getting a SyncObject (for example, get the Character with ID 2):
 local character = core.GetSyncObject("Character", 2);
 ]]
 
-
+local event = module.event;
 local class = M("class");
 local callback = M("callback");
-local event = M("event");
 local logger = M("logger");
 local utils = M("utils");
 

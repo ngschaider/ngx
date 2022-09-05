@@ -1,6 +1,6 @@
 --[[
     
-local event = M("event");
+local event = M("core").event;
 local command = M("command");
 local callback = M("callback");
 

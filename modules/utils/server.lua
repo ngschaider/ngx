@@ -1,5 +1,5 @@
 local logger = M("logger");
-local event = M("event");
+local event = M("core").event;
 
 module.getIdentifier = function(playerId)
 	for k,v in pairs(GetPlayerIdentifiers(playerId)) do

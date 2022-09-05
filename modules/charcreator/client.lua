@@ -1,6 +1,6 @@
 run("client/config.lua");
 
-local event = M("event");
+local event = M("core").event;
 local utils = M("utils");
 local skin = M("skin");
 local User = M("user");

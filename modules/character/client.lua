@@ -19,11 +19,11 @@ function Character:getUserId()
 end
 
 function Character:getLastPosition()
-	return {
-		x = tonumber(self:getData("lastPositionX")),
-		y = tonumber(self:getData("lastPositionY")),
-		z = tonumber(self:getData("lastPositionZ")),
-	};
+	return vector3(
+		self:getData("lastPositionX"),
+		self:getData("lastPositionY"),
+		self:getData("lastPositionZ")
+	);
 end
 
 function Character:getName()

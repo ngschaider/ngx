@@ -1,4 +1,3 @@
-local callback = M("core").callback;
 local class = M("class");
 local core = M("core");
 local logger = M("core").logger;
@@ -15,7 +14,7 @@ function Item:getName()
 end;
 
 function Item:getLabel()
-    logger.debug("Item:getLabel", "self._data", json.encode(self._data));
+    logger.debug("item", "getLabel", "self._data", json.encode(self._data));
     return self:getData("label");
 end;
 
@@ -45,6 +44,6 @@ function Item:use()
 end
 
 module.GetById = function(id)
-    logger.debug("(item) module.GetById", "id", id);
+    logger.debug("item", "module.GetById", "id", id);
     return core.GetSyncObject("Item", id);
 end

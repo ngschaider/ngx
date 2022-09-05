@@ -3,6 +3,6 @@ local logger = M("core").logger;
 local event = M("core").event;
 
 command.registerCommand("admin", function(user)
-    logger.debug("User " .. user.id .. " opened the Admin Menu");
+    logger.debug("command", "Command 'admin' executed!");
     event.emitClient("admin:OpenMenu", user:getPlayerId());
 end, true);

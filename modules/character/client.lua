@@ -43,9 +43,9 @@ function Character:getInventoryId()
 end
 
 function Character:getInventory()
-	logger.debug("Character:getInventory");
+	logger.debug("character", "Character:getInventory");
 	local id = self:getInventoryId();
-	logger.debug("Character:getInventory", "id", id);
+	logger.debug("character", "Character:getInventory", "id", id);
 	return Inventory.GetById(id);
 end
 

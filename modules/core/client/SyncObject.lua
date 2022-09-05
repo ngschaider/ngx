@@ -20,7 +20,7 @@ local cache = {};
 local SyncObject = class("SyncObject");
 
 function SyncObject:initialize(type, id, tableName)
-    logger.debug("SyncObject:initialize", "type,id,tableName", type, id, tableName);
+    logger.debug("core->SyncObject", "SyncObject:initialize", "type,id,tableName", type, id, tableName);
     self.type = type;
     self.id = id;
     self.table = tableName;
@@ -35,9 +35,9 @@ function SyncObject:initialize(type, id, tableName)
 end
 
 function SyncObject:getData(key)
-    logger.debug("SyncObject:getData", "key", key);
+    logger.debug("core->SyncObject", "SyncObject:getData", "key", key);
     local value = self._data[key];
-    logger.debug("SyncObject:getData", "value", value);
+    logger.debug("core->SyncObject", "SyncObject:getData", "value", value);
     return value;
 end
 
@@ -54,7 +54,7 @@ function SyncObject:rpc(name, ...)
 end
 
 event.onServer("core:SyncObject:setProperty", function(type, id, key, value)
-    logger.debug("core:SyncObject:setProperty", "type,id,key,value", type, id, key, value);
+    logger.debug("core->SyncObject", "core:SyncObject:setProperty", "type,id,key,value", type, id, key, value);
     local obj = module.GetSyncObject(type, id);
     obj._data[key] = value;
 end);

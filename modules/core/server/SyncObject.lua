@@ -24,7 +24,7 @@ local Character = class("Character", core.SyncObject);
 core.RegisterSyncClass(Character);
 
 function Character:initialize(id)
-	logger.debug("Character:initialize", "id", id);
+	logger.debug("core->SyncObect", "Character:initialize", "id", id);
 	core.SyncObject.initialize(self, "Character", id, "characters");
 
 	self:syncProperty("id", true, false);
@@ -63,8 +63,8 @@ local SyncObject = class("SyncObject");
     Returns true if the client can read the specified key on the specified type, false otherwise.
 ]]
 SyncObject.static.canClientRead = function (type, key)
-    logger.debug("SyncObject->canClientRead", "type", type);
-    logger.debug("SyncObject->canClientRead", "key", key);
+    logger.debug("core->SyncObect", "SyncObject->canClientRead", "type", type);
+    logger.debug("core->SyncObect", "SyncObject->canClientRead", "key", key);
     return SyncObject._sync[type] and SyncObject._sync[type].properties[key] and SyncObject._sync[type].properties[key].read;
 end
 
@@ -91,7 +91,7 @@ SyncObject.static._sync = {
     It also saves the column names in the columns property to later know which values should be saved in the db
 ]]
 function SyncObject:initialize(type, id, tableName)
-    logger.debug("SyncObject:initialize", "type,id,tableName", type, id, tableName);
+    logger.debug("core->SyncObect", "SyncObject:initialize", "type,id,tableName", type, id, tableName);
     self.type = type;
     self.id = id;
     self.table = tableName;
@@ -108,7 +108,7 @@ end
 ]]
 function SyncObject:getData(key)
     local value = self._data[key];
-    logger.debug("SyncObject:getData", "type,id,key,value", self.type, self.id, key, value);
+    logger.debug("core->SyncObect", "SyncObject:getData", "type,id,key,value", self.type, self.id, key, value);
     return value;
 end
 
@@ -116,7 +116,7 @@ end
     sets the given value in the _data property by the given key.
 ]]
 function SyncObject:setData(key, value)
-    logger.debug("SyncObject:setData", "type,id,key,value", self.type, self.id, key, value);
+    logger.debug("core->SyncObect", "SyncObject:setData", "type,id,key,value", self.type, self.id, key, value);
     if SyncObject.canClientRead(self.type, key) then
         event.emitClient("core:SyncObject:setProperty", -1, self.type, self.id, key, value);
     end
@@ -131,7 +131,7 @@ end
     if write is true sets the given key to be writable by the client, otherwise the client can't write to the given key.
 ]]
 function SyncObject:syncProperty(key, read, write)
-    logger.debug("SyncObject:syncProperty", "key", key);
+    logger.debug("core->SyncObect", "SyncObject:syncProperty", "key", key);
     if not SyncObject._sync[self.type] then
         SyncObject._sync[self.type] = {
             properties = {},
@@ -139,13 +139,13 @@ function SyncObject:syncProperty(key, read, write)
         };
     end
     
-    logger.debug("syncProperty", "self.type,key,read,write", self.type, key, read, write);
+    logger.debug("core->SyncObect", "syncProperty", "self.type,key,read,write", self.type, key, read, write);
     SyncObject._sync[self.type].properties[key] = {
         read = read,
         write = write,
     };
 
-    logger.debug("SyncObject:syncProperty", "SyncObject._sync", json.encode(SyncObject._sync));
+    logger.debug("core->SyncObect", "SyncObject:syncProperty", "SyncObject._sync", json.encode(SyncObject._sync));
 end
 
 
@@ -175,7 +175,7 @@ end
 
 module.GetSyncObject = function(type, id, ...)
     if not cache[type .. id] then
-        logger.debug("creating new SyncObject", "type,id", type, id);
+        logger.debug("core->SyncObect", "creating new SyncObject", "type,id", type, id);
         cache[type .. id] = syncClasses[type]:new(id, ...);
     end
 
@@ -186,13 +186,13 @@ callback.register("core:SyncObject:rpc", function(playerId, cb, type, id, name, 
     local obj = module.GetSyncObject(type, id);
 
     if not obj then
-        logger.debug("SyncObject not found", type, id);
+        logger.debug("core->SyncObect", "SyncObject not found", type, id);
         return;
     end
 
-    logger.debug("core:SyncObject:rpc", "type,name", type, name)
+    logger.debug("core->SyncObect", "rpc", "type,name", type, name)
     if not SyncObject._sync[type] or not SyncObject._sync[type].rpcs[name] then
-        logger.debug("SyncObject rpc not allowed", type, id, name);
+        logger.debug("core->SyncObect", "SyncObject rpc not allowed", type, id, name);
         return;
     end
 
@@ -201,11 +201,11 @@ callback.register("core:SyncObject:rpc", function(playerId, cb, type, id, name, 
 end)
 
 event.onClient("core:SyncObject:setProperty", function(playerId, type, id, key, value)
-    logger.debug("core:SyncObject:setProperty", "type,id,key,value", type, id, key, value);
+    logger.debug("core->SyncObect", "core:SyncObject:setProperty", "type,id,key,value", type, id, key, value);
     local obj = module.GetSyncObject(type, id);
 
     if not obj then
-        logger.debug("SyncObject not found", type, id);
+        logger.debug("core->SyncObect", "SyncObject not found", type, id);
         return;
     end
 
@@ -215,23 +215,23 @@ event.onClient("core:SyncObject:setProperty", function(playerId, type, id, key, 
 end)
 
 callback.register("core:SyncObject:getObjectData", function(playerId, cb, type, id)
-    logger.debug("core:SyncObject:getObjectData", "type,id", type, id);
+    logger.debug("core->SyncObect", "getObjectData", "type,id", type, id);
     local obj = module.GetSyncObject(type, id);
 
     if not obj then
-        logger.debug("SyncObject not found", type, id);
+        logger.debug("core->SyncObect", "SyncObject not found", type, id);
         cb(nil);
         return nil;
     end
 
     local data = {};
     for k,v in pairs(obj._data) do
-        logger.debug("core:SyncObject:getObjectData", "k,v", k, json.encode(v));
+        logger.debug("core->SyncObect", "getObjectData", "k,v", k, json.encode(v));
         if SyncObject.canClientRead(type, k) then
             data[k] = v;
         end
     end
 
-    logger.debug("core:SyncObject:getObjectData", json.encode(data));
+    logger.debug("core->SyncObect", "getObjectData", json.encode(data));
     cb(data);
 end)

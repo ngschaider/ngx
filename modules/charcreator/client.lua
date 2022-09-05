@@ -40,7 +40,7 @@ module.CreateNewCharacter = function(cb)
     --print("module.CreateNewCharacter", "ped", ped, PlayerPedId());
 	SetPedDefaultComponentVariation(ped);
 
-    logger.debug("freezing ped 1");
+    logger.debug("charcreator", "freezing ped 1");
 	FreezeEntityPosition(ped, true);
 
     utils.teleport({x = -75.015, y = -818.215, z = 325.0});

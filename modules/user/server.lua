@@ -61,12 +61,12 @@ end
 
 function User:setCurrentCharacterId(id)
 	self:setData("currentCharacterId", id);
-	logger.debug("User:setCurrentCharacterId", "id", id);
+	logger.debug("user", "setCurrentCharacterId", "id", id);
 end
 
 function User:getCurrentCharacterId()
 	local id = self:getData("currentCharacterId")
-	logger.debug("User:getCurrentCharacterId", "id", id);
+	logger.debug("user", "getCurrentCharacterId", "id", id);
 	return id;
 end
 
@@ -109,9 +109,9 @@ module.Create = function(identifier)
 end;
 
 module.GetByIdentifier = function(identifier)
-	logger.debug("User:GetByIdentifier", "identifier", identifier);
+	logger.debug("user", "GetByIdentifier", "identifier", identifier);
 	local id = MySQL.scalar.await("SELECT id FROM users WHERE identifier=?", {identifier});
-	logger.debug("User:GetByIdentifier", "id", id);
+	logger.debug("user", "GetByIdentifier", "id", id);
 
 	if id then
 		return module.GetById(id);
@@ -123,11 +123,11 @@ end;
 
 
 module.GetByPlayerId = function(playerId)
-	logger.debug("User:GetByPlayerId", "playerId", playerId);
+	logger.debug("user", "GetByPlayerId", "playerId", playerId);
 	local identifier = utils.getIdentifier(playerId);
-	logger.debug("module.GetByPlayerId", "identifier", identifier);
+	logger.debug("user", "module.GetByPlayerId", "identifier", identifier);
 	local user = module.GetByIdentifier(identifier);
-	logger.debug("module.GetByPlayerId", "user.id", user.id);
+	logger.debug("user", "module.GetByPlayerId", "user.id", user.id);
 	return user;
 end;
 
@@ -152,9 +152,9 @@ module.GetOnlineIds = function()
 end;
 
 callback.register("user:getSelfId", function(playerId, cb)
-	logger.debug("callback called", playerId, cb);
+	logger.debug("user", "callback called", playerId, cb);
 	local user = module.GetByPlayerId(playerId);
-	logger.debug("calling cb");
+	logger.debug("user", "calling cb");
 	cb(user.id);
 end);
 

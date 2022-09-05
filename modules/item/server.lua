@@ -1,4 +1,3 @@
----@diagnostic disable: deprecated
 local logger = M("core").logger;
 local class = M("class");
 local core = M("core");
@@ -21,7 +20,7 @@ end;
 
 function Item:initialize(id, options)
     core.SyncObject.initialize(self, "Item", id, "items");
-    logger.debug("Item:initialize", "id", id);
+    logger.debug("item", "initialize", "id", id);
     self.options = options;
 
     self:syncProperty("id", true, false);
@@ -51,8 +50,8 @@ function Item:getInventory()
 end;
 
 function Item:setInventoryId(inventoryId)
-    logger.debug("Item:setInventoryId", "inventoryId", inventoryId);
-    logger.debug("Item:setInventoryId", "self:getId()", self:getId());
+    logger.debug("item", "setInventoryId", "inventoryId", inventoryId);
+    logger.debug("item", "setInventoryId", "self:getId()", self:getId());
     self:setData("inventoryId", inventoryId);
 end;
 
@@ -85,7 +84,7 @@ function Item:setIsUsable(isUsable)
 end
 
 function Item:use()
-    logger.warn("Item " .. self:getName() .. " got used but has no usage implemented.");
+    logger.warn("item", "Item " .. self:getName() .. " got used but has no usage implemented.");
 end;
 
 function Item:destroy()
@@ -101,7 +100,7 @@ function RegisterItem(options)
 end;
 
 module.GetById = function(id)
-    logger.debug("(item) module.GetById", "id", id);
+    logger.debug("item", "module.GetById", "id", id);
     local name = MySQL.scalar.await("SELECT name FROM items WHERE id=?", {id});
     local options = registeredItems[name];
 

@@ -51,30 +51,30 @@ local SpawnWithCharacter = function(character)
 	--print("Spawning " .. character:getName());
 end;
 
-logger.debug("loaded base");
+logger.debug("base", "loaded base");
 Citizen.CreateThread(function()
     while true do
-		logger.debug("waiting for network session");
+		logger.debug("base", "waiting for network session");
 		if NetworkIsSessionStarted() then
-			logger.debug("session started");
+			logger.debug("base", "session started");
 			if IsScreenFadedOut() then
 				DoScreenFadeIn();
 			end
 
 			ShutdownLoadingScreen();
 
-			logger.debug("getting character ids");
+			logger.debug("base", "getting character ids");
 			local selfUser = User:GetSelf();
-			logger.debug("got selfUser", selfUser);
+			logger.debug("base", "got selfUser", selfUser);
 			local characterIds = selfUser:getCharacterIds();
-			logger.debug("got character ids");
+			logger.debug("base", "got character ids");
 			if utils.table.size(characterIds) == 0 then
-				logger.debug("opening charcreator");
+				logger.debug("base", "opening charcreator");
 				charcreator.CreateNewCharacter(function(character)
 					SpawnWithCharacter(character);
 				end);
 			else
-				logger.debug("opening charselector");
+				logger.debug("base", "opening charselector");
 				characterSelector.StartSelection(function(character)
 					SpawnWithCharacter(character);
 				end);

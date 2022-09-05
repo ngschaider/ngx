@@ -73,7 +73,7 @@ module.StartSelection = function(cb)
 		item.OnSelected = function()
 			--print("onSelected");
 			local skinData = character:getSkin();
-			logger.debug("111", json.encode(skinData));
+			logger.debug("character_selector", "111", json.encode(skinData));
 			skin.setValues(skinData);
 		end;
 	end

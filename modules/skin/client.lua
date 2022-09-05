@@ -495,7 +495,7 @@ end
 
 -- changes a single key and reloads the skin/clothes if needed
 module.setValue = function(key, val)
-	logger.debug("setValue", key, val);
+	logger.debug("skin", "setValue", key, val);
 	local skin = module.getValues();
 	skin[key] = val;
 	module.setValues(skin);

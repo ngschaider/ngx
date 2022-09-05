@@ -95,10 +95,10 @@ module.table.lastIndexOf = function(t, value)
 end;
 
 module.table.find = function(t, cb)
-	logger.debug("got ", json.encode(t));
+	logger.debug("utils->table", "got ", json.encode(t));
 	for k,v in pairs(t) do
 		if cb(v) then
-			logger.debug("returning", json.encode(v));
+			logger.debug("utils->table", "returning", json.encode(v));
 			return v;
 		end
 	end

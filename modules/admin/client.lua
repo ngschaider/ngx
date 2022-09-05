@@ -73,7 +73,7 @@ end;
 
 
 event.onServer("admin:OpenMenu", function()
-    logger.debug("Opening Admin Menu");
+    logger.debug("admin", "admin:OpenMenu");
     OpenMenu();
 end);
 

@@ -6,19 +6,19 @@ local serverCallbacks = {};
 module.callback = {};
 
 module.callback.register = function(name, cb)
-	logger.info("(core) module.callback.register: " .. name);
+	logger.info("core.callback", "module.callback.register: " .. name);
 	serverCallbacks[name] = cb;
 end
 
 event.onClient("core:callback:request", function(playerId, name, requestId, ...)
 	if serverCallbacks[name] then
-		logger.debug("executing C->S->C callback function", playerId, name, ...);
+		logger.debug("core->callback", "executing C->S->C callback function", playerId, name, ...);
 		serverCallbacks[name](playerId, function(...)
-			--logger.debug("-> client " .. playerId, "core:callback:response", name, ...);
+			--logger.debug("core->callback", "-> client " .. playerId, "core:callback:response", name, ...);
 			event.emitClient("core:callback:response", playerId, requestId, ...);
 		end, ...);
 	else
-		logger.warn("C->S->C callback " .. name .. " not found.");
+		logger.warn("core->callback", "C->S->C callback " .. name .. " not found.");
 	end
 end)
 
@@ -34,14 +34,14 @@ local GetAndConsumeRequestId = function()
     end
 
 	if clientCallbacks[lastRequestId] then
-		logger.warn("overriding S->C->S callback with request id " .. lastRequestId);
+		logger.warn("core->callback", "overriding S->C->S callback with request id " .. lastRequestId);
 	end
 
     return lastRequestId;
 end
 
 module.callback.trigger = function(name, playerId, cb, ...)
-	logger.debug("triggered S->C->S callback " .. name);
+	logger.debug("core->callback", "triggered S->C->S callback " .. name);
 
     local requestId = GetAndConsumeRequestId();
 	clientCallbacks[requestId] = cb;

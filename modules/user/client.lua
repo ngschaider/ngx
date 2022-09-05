@@ -10,8 +10,8 @@ core.RegisterSyncClass(User);
 
 function User:initialize(id)
 	core.SyncObject.initialize(self, "User", id, "users");
-	logger.debug("User.initialize", "id", id);
-	logger.debug("User.initialize", "self._data", json.encode(self._data));
+	logger.debug("user", "initialize", "id", id);
+	logger.debug("user", "initialize", "self._data", json.encode(self._data));
 end
 
 function User:getName()
@@ -32,18 +32,18 @@ end;
 
 function User:getCurrentCharacterId()
 	local id = self:getData("currentCharacterId");
-	logger.debug("User:getCurrentCharacterId", "id", id);
+	logger.debug("user", "getCurrentCharacterId", "id", id);
 	return id;
 end;
 
 function User:setCurrentCharacterId(id)
-	logger.debug("User:setCurrentCharacterId", "id", id);
+	logger.debug("user", "setCurrentCharacterId", "id", id);
 	self:setData("currentCharacterId", id);
 end;
 
 function User:getCurrentCharacter()
 	local id = self:getCurrentCharacterId();
-	logger.debug("User:getCurrentCharacter", "id", id);
+	logger.debug("user", "getCurrentCharacter", "id", id);
 	if id then
 		return Character.GetById(id);
 	else

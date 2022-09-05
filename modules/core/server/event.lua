@@ -56,7 +56,7 @@ end
 RegisterNetEvent("core:event:trigger", function(name, ...)
     local playerId = source;
 
-    logger.debug("[" .. playerId .. "]->S ", name, ...);
+    logger.debug("core->event", "[" .. playerId .. "]->S ", name, ...);
 
     if handlers[name] then
         for _,cb in pairs(handlers[name]) do

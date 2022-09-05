@@ -21,12 +21,12 @@ function Inventory:getItemIds()
 end
 
 function Inventory:getItems()
-	logger.debug("Inventory:getItems", "getting item ids");
+	logger.debug("inventory", "getItems", "getting item ids");
 	local ids = self:getItemIds();
-	logger.debug("Inventory:getItems", "ids", json.encode(ids));
+	logger.debug("inventory", "getItems", "ids", json.encode(ids));
 	
 	local items = utils.table.map(ids, function(id)
-		logger.debug("Inventory:getItems", "id", id);
+		logger.debug("inventory", "getItems", "id", id);
 		return Item.GetById(id);
 	end);
 
@@ -34,6 +34,6 @@ function Inventory:getItems()
 end
 
 module.GetById = function(id)
-	logger.debug("(inventory) module.GetById", "id", id);
+	logger.debug("inventory", "module.GetById", "id", id);
 	return core.GetSyncObject("Inventory", id);
 end;

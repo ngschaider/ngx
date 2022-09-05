@@ -6,22 +6,13 @@ local lastRequestId = 0;
 
 local GetAndConsumeRequestId = function()
     lastRequestId = lastRequestId + 1;
-
-    if lastRequestId > 65535 then
-        lastRequestId = 0;
-    end
-
-	if serverCallbacks[lastRequestId] then
-		logger.warn("Overriding client->server->client callback with request id " .. lastRequestId);
-	end
-
     return lastRequestId;
 end;
 
 module.callback = {};
 
 module.callback.trigger = function(name, cb, ...)
-	logger.debug("triggered client->server->client callback " .. name);
+	logger.debug("core->callback", "triggered C->S->C callback " .. name);
 
     local requestId = GetAndConsumeRequestId();
 	serverCallbacks[requestId] = cb;
@@ -41,7 +32,7 @@ end);
 local clientCallbacks = {};
 
 module.callback.register = function(name, cb)
-	logger.debug("(core) module.callback.register", name);
+	logger.debug("core->callback", "module.callback.register", "name", name);
     clientCallbacks[name] = cb;
 end;
 
@@ -51,6 +42,6 @@ event.onServer("core:callback:request", function(name, requestId, ...)
 			event.emitServer("core:callback:response", requestId, ...);
 		end, ...);
 	else
-		logger.warn("server->client->server callback " .. name .. " not found.");
+		logger.warn("core->callback", "S->C->S callback " .. name .. " not found.");
 	end
 end);

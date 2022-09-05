@@ -11,7 +11,7 @@ end;
 module.event = {};
 
 module.event.on = function(name, cb)
-    logger.debug("(core) module.event.on", "name", name);
+    logger.debug("core->event", "(core) module.event.on", "name", name);
     local id = GetHandlerId();
 
     if not handlers[name] then
@@ -23,7 +23,7 @@ module.event.on = function(name, cb)
 end;
 
 module.event.off = function(name, id)
-    logger.debug("(core) module.event.off", name);
+    logger.debug("core->event", "module.event.off", name);
     if not handlers[name] then
         handlers[name] = {};
     end
@@ -31,7 +31,7 @@ module.event.off = function(name, id)
 end;
 
 module.event.emitServer = function(name, ...)
-    logger.debug("C->S", name, ...);
+    logger.debug("core->event", "C->S", name, ...);
     TriggerServerEvent("core:event:trigger", name, ...);
 end;
 
@@ -46,7 +46,7 @@ end;
 RegisterNetEvent("core:event:trigger", function(name, ...)
     handlers[name] = handlers[name] or {};
 
-    logger.debug("S->C", name, ...);
+    logger.debug("core->event", "S->C", name, ...);
 
     for _,cb in pairs(handlers[name]) do
         cb(...);

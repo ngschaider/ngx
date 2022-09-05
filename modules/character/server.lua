@@ -9,7 +9,7 @@ local Character = class("Character", core.SyncObject);
 core.RegisterSyncClass(Character);
 
 function Character:initialize(id)
-	logger.debug("Character:initialize", "id", id);
+	logger.debug("character", "Character:initialize", "id", id);
 	core.SyncObject.initialize(self, "Character", id, "characters");
 
 	self:syncProperty("id", true, false);
@@ -61,8 +61,8 @@ function Character:getDateOfBirth()
 end
 
 function Character:getSkin()
-	logger.debug("Character:getSkin", "self:getName()", self:getName());
-	logger.debug("Character:getSkin", "self._data", json.encode(self._data));
+	logger.debug("character", "Character:getSkin", "self:getName()", self:getName());
+	logger.debug("character", "Character:getSkin", "self._data", json.encode(self._data));
 	return json.decode(self:getData("skin"));
 end
 
@@ -73,16 +73,16 @@ function Character:setSkin(skin)
 end
 
 function Character:getInventoryId()
-	logger.debug("Character:getInventoryId", "self.id", self.id);
+	logger.debug("character", "Character:getInventoryId", "self.id", self.id);
 	local inventoryId = self:getData("inventoryId");
-	logger.debug("Character:getInventoryId", "inventoryId", inventoryId);
+	logger.debug("character", "Character:getInventoryId", "inventoryId", inventoryId);
 	return inventoryId;
 end
 
 function Character:getInventory()
-	logger.debug("Character:getInventory");
+	logger.debug("character", "Character:getInventory");
 	local inventoryId = self:getInventoryId();
-	logger.debug("Character:getInventory", "inventoryId", inventoryId);
+	logger.debug("character", "Character:getInventory", "inventoryId", inventoryId);
 	return Inventory.GetById(inventoryId);
 end
 
@@ -113,11 +113,11 @@ module.GetByPlayerId = function(playerId)
 	local user = M("user").GetByPlayerId(playerId);
 
 	if not user then
-		logger.error("User with player id " .. playerId .. " not found - returning nil");
+		logger.error("character", "User with player id " .. playerId .. " not found - returning nil");
 		return nil;
 	end
 
-	logger.debug("Character.static:GetByPlayerId", "user.id", user.id)
+	logger.debug("character", "Character.static:GetByPlayerId", "user.id", user.id)
 	return user:getCurrentCharacter();
 end
 
@@ -129,23 +129,3 @@ module.GetAll = function()
 	end)
 	return characters;
 end
-
-
-
-callback.register("character:rpc", function(playerId, cb, id, name, ...)
-	local character = module.GetById(id);
-
-	logger.debug("event - character:rpc", "id", id);
-	if not character then
-		logger.warn("Character not found - rpc failed");
-		return;
-	end
-
-	if not utils.table.contains(Character.rpcWhitelist, name) then
-		logger.warn("Requested character rpc " .. name .. " not whitelisted - rpc failed");
-		return;
-	end
-
-	-- we have to pass the character object because we are not using the colon syntax like character:getName(...)
-	cb(character[name](character, ...));
-end);

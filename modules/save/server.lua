@@ -3,7 +3,7 @@ local logger = M("core").logger;
 local event = M("core").event;
 
 local SaveCharacter = function(character)
-    logger.debug("Saving Character", character.id);
+    logger.debug("save", "Saving Character", character.id);
     --logger.debug("save", "character.id", character.id);
     local user = character:getUser();
     --logger.debug("save", "user.id", user.id);
@@ -11,7 +11,7 @@ local SaveCharacter = function(character)
     --logger.debug("save", "user:getCurrentCharacterId()", user:getCurrentCharacterId());
     if user:getIsOnline() and user:getCurrentCharacterId() == character.id then
         local position = character:getPosition();
-        logger.debug("Saving position of character", character:getName(), position.x, position.y, position.z);
+        logger.debug("save", "Saving position of character", character:getName(), position.x, position.y, position.z);
         MySQL.update("UPDATE characters SET lastPositionX=?, lastPositionY=?, lastPositionZ=? WHERE id=?", {
             position.x,
             position.y,
@@ -32,7 +32,7 @@ end;
 event.on("event:playerDropped", function(playerId, reason)
     local character = Character.GetByPlayerId(playerId);
     if character then
-        logger.debug("Saving " .. character:getName() .. " because they left.");
+        logger.debug("save", "Saving " .. character:getName() .. " because they left.");
         SaveCharacter(character);
     end
 end);
@@ -42,7 +42,7 @@ end);
 -- Maybe this can be fixed by using synchronous queries.
 
 event.on("event:resourceStop", function()
-    logger.info("Saving characters because the resource shuts down.");
+    logger.info("save", "Saving characters because the resource shuts down.");
     SaveCharacters();
 end);
 ]]
@@ -61,7 +61,7 @@ Citizen.CreateThread(function()
     while true do
         Citizen.Wait(60 * 1000) -- 1 minute = 60 seconds = 60 * 1000 milliseconds
 
-        logger.info("Timer ran out. Saving characters...");
+        logger.info("save", "Timer ran out. Saving characters...");
         SaveCharacters();
     end
 end)

@@ -29,7 +29,7 @@ function Inventory:getItemIds()
 	local ids = utils.table.map(results, function(v)
 		return v.id;
 	end);
-	logger.debug("Inventory:getItemIds", "ids", json.encode(ids));
+	logger.debug("inventory", "getItemIds", "ids", json.encode(ids));
 	return ids;
 end;
 
@@ -52,6 +52,6 @@ module.Create = function(maxWeight)
 end
 
 module.GetById = function(id)
-	logger.debug("(inventory) module.GetById", "id", id);
+	logger.debug("inventory", "module.GetById", "id", id);
 	return core.GetSyncObject("Inventory", id);
 end;

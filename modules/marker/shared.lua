@@ -1,4 +1,4 @@
-module.MARKER_TYPES = {
+module.TYPES = {
     UpsideDownCone = 0,
     VerticalCylinder = 1,
     ThickChevronUp = 2,

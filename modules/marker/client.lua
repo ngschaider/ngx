@@ -7,28 +7,25 @@ local GetMarkerId = function()
 end
 
 local markers = {};
-module.AddMarker = function(type, pos, distance, color, dir, rot, scale, bob, faceCamera, rotate)
+module.AddMarker = function(options)
+    assert(options and options.type and options.position)
+
+    options.distance = options.distance or 20;
+    options.color = options.color or vector3(100, 255, 0);
+    options.direction = options.dir or vector3(0.0, 0.0, 0.0);
+    options.rotation = options.rot or vector3(0.0, 0.0, 0.0);
+    options.scale = options.scale or vector3(1.0, 1.0, 2.0);
+    options.bobUpAndDown = options.bobUpAndDown or false;
+    options.faceCamera = options.faceCamera or false;
+    options.rotate = options.rotate or false;
+
     local id = GetMarkerId();
 
-    distance = distance or 20;
-    color = color or vector3(100, 255, 0);
-    dir = dir or vector3(0.0, 0.0, 0.0);
-    rot = rot or vector3(0.0, 0.0, 0.0);
-    scale = scale or vector3(1.0, 1.0, 2.0);
-
-    local marker = {
+    table.insert(markers, {
         id = id,
-        distance = distance,
-        type = type,
-        pos = pos,
-        dir = dir,
-        rot = rot,
-        scale = scale,
-        color = color,
-        bob = bob,
-        faceCamera = faceCamera,
-        rotate = rotate,
-    }
+        visible = true,
+        options = options,
+    });
 end
 
 module.RemoveMarker = function(id)
@@ -41,9 +38,10 @@ Citizen.CreateThread(function()
         local playerPos = GetEntityCoords(playerPed);
         for _,marker in pairs(markers) do
             if marker.visible then
-                local dist = #(marker.pos - playerPos);
+                local dist = #(marker.position - playerPos);
                 if dist < marker.dist then
-                    DrawMarker(marker.type, marker.pos, marker.dir, marker.rot, marker.scale, marker.color, marker.bob, marker.faceCamera, marker.rotate, nil, nil);
+                    local o = marker.options;
+                    DrawMarker(o.type, o.position, o.direction, o.rotation, o.scale, o.color, o.bobUpAndDown, o.faceCamera, o.rotate, nil, nil);
                 end
             end
         end

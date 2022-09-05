@@ -1,39 +1,16 @@
-local class = M("class");
-local logger = M("logger");
-local utils = M("utils");
-local core = M("core");
+run("client/class.lua");
 
-local Garage = class("Garage", core.SyncObject);
-core.RegisterSyncClass(Garage);
+Citizen.CreateThread(function()
+    local garages = module.GetAll();
 
-function Garage:initialize(id)
-    core.SyncObject.initialize(self, "Garage", id, "garages");
-end
+    local playerPed = PlayerPedId();
+    local playerPos = GetEntityCoords(playerPed);
 
-function Garage:getName()
-    return self:getData("name");
-end
-
-function Garage:getVehicleIds()
-    return self:rpc("getVehicleIds");
-end
-
-function Garage:getPosition()
-    return vector3(
-        self:getData("positionX"),
-        self:getData("positionY"),
-        self:getData("positionZ")
-    )
-end
-
-function Garage:getVehicles()
-    local ids = self:getVehicleIds();
-    local vehicles = utils.table.map(ids, function(id)
-        return Vehicle.GetById(id);
-    end);
-    return vehicles;
-end
-
-module.GetById = function(id)
-    return core.GetSyncObject("Garage", id);
-end
+    for _,garage in pairs(garages) do
+        marker.AddMarker({
+            type = marker.TYPES.HorizontalSplitArrowCircle;
+            position = garage.position,
+            scale = vector3(2.0, 2.0, 2.0),
+        });
+    end
+end)

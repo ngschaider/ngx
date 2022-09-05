@@ -1,5 +1,5 @@
-module.AddMarker = function(playerId, type, pos, distance, color, dir, rot, scale, bob, faceCamera, rotate)
-    event.trigger("marker:addMarker", playerId, type, pos, distance, color, dir, rot, scale, bob, faceCamera, rotate);
+module.AddMarker = function(playerId, options)
+    event.trigger("marker:addMarker", playerId, options);
 end
 
 module.RemoveMarker = function(playerId, id)

@@ -1,4 +1,4 @@
-local logger = M("logger");
+local logger = M("core").logger;
 local utils = M("utils");
 local callback = M("core").callback;
 local event = M("core").event;

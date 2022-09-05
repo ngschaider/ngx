@@ -3,7 +3,7 @@ local charcreator = M("charcreator");
 local User = M("user");
 local utils = M("utils");
 local skin = M("skin");
-local logger = M("logger");
+local logger = M("core").logger;
 
 -- Disable default idle camera
 Citizen.CreateThread(function()

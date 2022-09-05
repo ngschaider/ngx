@@ -1,6 +1,6 @@
 local User = M("user");
 local UI = M("UI");
-local logger = M("logger");
+local logger = M("core").logger;
 
 local pool = UI.CreatePool();
 

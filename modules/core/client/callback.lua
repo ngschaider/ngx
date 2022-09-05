@@ -1,5 +1,5 @@
 local event = module.event;
-local logger = M("logger");
+local logger = module.logger;
 
 local serverCallbacks = {};
 local lastRequestId = 0;

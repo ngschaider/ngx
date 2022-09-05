@@ -1,5 +1,5 @@
 local event = M("core").event;
-local logger = M("logger");
+local logger = M("core").logger;
 local User = M("user");
 local UI = M("UI");
 

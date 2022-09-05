@@ -1,7 +1,7 @@
 local callback = M("core").callback;
 local Item = M("item");
 local class = M("class");
-local logger = M("logger");
+local logger = M("core").logger;
 local utils = M("utils");
 local core = M("core");
 

@@ -1,4 +1,4 @@
-local logger = M("logger");
+local logger = M("core").logger;
 local event = M("core").event;
 
 module.getIdentifier = function(playerId)

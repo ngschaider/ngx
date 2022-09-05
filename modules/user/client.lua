@@ -3,7 +3,7 @@ local Character = M("character");
 local class = M("class");
 local utils = M("utils");
 local core = M("core");
-local logger = M("logger");
+local logger = M("core").logger;
 
 local User = class("User", core.SyncObject);
 core.RegisterSyncClass(User);

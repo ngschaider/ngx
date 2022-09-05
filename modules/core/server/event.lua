@@ -1,4 +1,4 @@
-local logger = M("logger");
+local logger = module.logger;
 
 --[[
     stores the callbacks indexed by it's id 

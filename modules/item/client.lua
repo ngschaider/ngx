@@ -1,7 +1,7 @@
 local callback = M("core").callback;
 local class = M("class");
 local core = M("core");
-local logger = M("logger");
+local logger = M("core").logger;
 
 local Item = class("Item", core.SyncObject);
 core.RegisterSyncClass(Item);

@@ -1,6 +1,6 @@
 local Inventory = M("inventory");
 local class = M("class");
-local logger = M("logger");
+local logger = M("core").logger;
 local core = M("core");
 
 local Character = class("Character", core.SyncObject);

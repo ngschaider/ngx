@@ -1,5 +1,5 @@
 local command = M("command");
-local logger = M("logger");
+local logger = M("core").logger;
 local event = M("core").event;
 
 command.registerCommand("admin", function(user)

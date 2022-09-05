@@ -1,5 +1,5 @@
 ---@diagnostic disable: deprecated
-local logger = M("logger");
+local logger = M("core").logger;
 local class = M("class");
 local core = M("core");
 

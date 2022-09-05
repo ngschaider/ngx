@@ -5,10 +5,6 @@ local core = M("core");
 Item = class("Item", core.SyncObject);
 core.RegisterSyncClass(Item);
 
-Item.static.rpcWhitelist = {};
-Item.static.name = "default";
-Item.static.label = "Default";
-
 function Item.static:Create(options)
     local id = MySQL.insert.await("INSERT INTO items (name, label) VALUES (?, ?)", {
         options.name,
@@ -84,14 +80,12 @@ function Item:setIsUsable(isUsable)
 end
 
 function Item:use()
-    logger.warn("item", "Item " .. self:getName() .. " got used but has no usage implemented.");
+    options.use(self);
 end;
 
 function Item:destroy()
     self:setData("destroyed", true);
 end;
-
-
 
 
 local registeredItems = {};

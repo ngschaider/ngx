@@ -1,14 +1,15 @@
 local class = M("class");
 
-local Beer = class("Beer", Item);
+module.RegisterItem({
+    name = "beer",
+    label = "Bier",
+    onUse = function(item)
+        print("Beer got used!");
+        self:destroy();
+    end,
+})
 
-Beer.static.name = "beer";
-Beer.static.label = "Bier";
 
-function Beer:use()
-    print("Beer got used!");
-    self:destroy();
-end
 
 RegisterCommand("beer", function(playerId, args, rawCommand)
     logger.debug("item->beer", "giving player a beer");

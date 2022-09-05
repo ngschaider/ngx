@@ -1,4 +1,4 @@
-local callback = M("callback");
+local callback = M("core").callback;
 local Character = M("character");
 local class = M("class");
 local utils = M("utils");

@@ -53,7 +53,7 @@ module.event.emitClient = function(name, playerId, ...)
     end
 end
 
-RegisterNetEvent("event:trigger", function(name, ...)
+RegisterNetEvent("core:event:trigger", function(name, ...)
     local playerId = source;
 
     logger.debug("[" .. playerId .. "]->S ", name, ...);

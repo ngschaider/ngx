@@ -32,7 +32,7 @@ end;
 
 module.event.emitServer = function(name, ...)
     logger.debug("C->S", name, ...);
-    TriggerServerEvent("event:trigger", name, ...);
+    TriggerServerEvent("core:event:trigger", name, ...);
 end;
 
 module.event.emitClient = function(name, ...)
@@ -43,7 +43,7 @@ module.event.emitClient = function(name, ...)
     end
 end;
 
-RegisterNetEvent("event:trigger", function(name, ...)
+RegisterNetEvent("core:event:trigger", function(name, ...)
     handlers[name] = handlers[name] or {};
 
     logger.debug("S->C", name, ...);

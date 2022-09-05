@@ -1,5 +1,5 @@
 local utils = M("utils");
-local callback = M("callback");
+local callback = M("core").callback;
 local logger = M("logger");
 local Inventory = M("inventory");
 local class = M("class");

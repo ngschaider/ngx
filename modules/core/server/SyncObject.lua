@@ -46,8 +46,8 @@ local character = core.GetSyncObject("Character", 2);
 ]]
 
 local event = module.event;
+local callback = module.callback;
 local class = M("class");
-local callback = M("callback");
 local logger = M("logger");
 local utils = M("utils");
 

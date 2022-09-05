@@ -11,8 +11,8 @@ Refer to the server-side docs for SyncObject. It is mostly used the same way, ex
 
 
 local event = module.event;
+local callback = module.callback;
 local class = M("class");
-local callback = M("callback");
 local logger = M("logger");
 
 local cache = {};

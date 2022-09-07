@@ -1,7 +1,6 @@
 [
     "admin",
     "base",
-    "callback",
     "character",
     "character_selector",
     "charcreator",
@@ -9,15 +8,16 @@
     "command",
     "core",
     "eval",
-    "event",
+    "garage",
     "inventory",
     "inventory_ui",
     "item",
-    "logger",
+    "marker",
     "save",
     "skin",
     "streaming",
     "UI",
     "user",
-    "utils"
+    "utils",
+    "vehicle"
 ]

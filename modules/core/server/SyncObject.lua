@@ -49,7 +49,6 @@ local event = module.event;
 local callback = module.callback;
 local logger = module.logger;
 local class = M("class");
-local utils = M("utils");
 
 --[[
     holds all constructed syncObjects. The key of this table is composed by concatenating the type with the object's id like
@@ -63,8 +62,8 @@ local SyncObject = class("SyncObject");
     Returns true if the client can read the specified key on the specified type, false otherwise.
 ]]
 SyncObject.static.canClientRead = function (type, key)
-    logger.debug("core->SyncObect", "SyncObject->canClientRead", "type", type);
-    logger.debug("core->SyncObect", "SyncObject->canClientRead", "key", key);
+    --logger.debug("core->SyncObect", "SyncObject->canClientRead", "type", type);
+    --logger.debug("core->SyncObect", "SyncObject->canClientRead", "key", key);
     return SyncObject._sync[type] and SyncObject._sync[type].properties[key] and SyncObject._sync[type].properties[key].read;
 end
 
@@ -96,7 +95,7 @@ function SyncObject:initialize(type, id, tableName)
     self.id = id;
     self.table = tableName;
     self._data = MySQL.single.await("SELECT * FROM `" .. tableName .. "` WHERE id=?", {id});
-    self.columns = utils.table.map(self._data, function()
+    self.columns = M("utils").table.map(self._data, function()
         return true;
     end);
 
@@ -108,7 +107,7 @@ end
 ]]
 function SyncObject:getData(key)
     local value = self._data[key];
-    logger.debug("core->SyncObect", "SyncObject:getData", "type,id,key,value", self.type, self.id, key, value);
+    --logger.debug("core->SyncObect", "SyncObject:getData", "type,id,key,value", self.type, self.id, key, value);
     return value;
 end
 
@@ -145,7 +144,7 @@ function SyncObject:syncProperty(key, read, write)
         write = write,
     };
 
-    logger.debug("core->SyncObect", "SyncObject:syncProperty", "SyncObject._sync", json.encode(SyncObject._sync));
+    --logger.debug("core->SyncObect", "SyncObject:syncProperty", "SyncObject._sync", json.encode(SyncObject._sync));
 end
 
 
@@ -200,8 +199,8 @@ callback.register("core:SyncObject:rpc", function(playerId, cb, type, id, name, 
     cb(ret);
 end)
 
-event.onClient("core:SyncObject:setProperty", function(playerId, type, id, key, value)
-    logger.debug("core->SyncObect", "core:SyncObject:setProperty", "type,id,key,value", type, id, key, value);
+event.on("core:SyncObject:setProperty", function(playerId, type, id, key, value)
+    --logger.debug("core->SyncObect", "core:SyncObject:setProperty", "type,id,key,value", type, id, key, value);
     local obj = module.GetSyncObject(type, id);
 
     if not obj then
@@ -226,7 +225,7 @@ callback.register("core:SyncObject:getObjectData", function(playerId, cb, type, 
 
     local data = {};
     for k,v in pairs(obj._data) do
-        logger.debug("core->SyncObect", "getObjectData", "k,v", k, json.encode(v));
+        --logger.debug("core->SyncObect", "getObjectData", "k,v", k, json.encode(v));
         if SyncObject.canClientRead(type, k) then
             data[k] = v;
         end

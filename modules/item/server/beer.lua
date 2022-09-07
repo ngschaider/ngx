@@ -28,5 +28,3 @@ RegisterCommand("beer", function(playerId, args, rawCommand)
     logger.debug("item->beer", "setting item inventoryId", inventory.id);
     beer:setInventoryId(inventory.id)
 end, true);
-
-RegisterItem(Beer);

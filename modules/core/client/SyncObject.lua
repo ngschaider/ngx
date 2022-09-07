@@ -53,7 +53,7 @@ function SyncObject:rpc(name, ...)
     return Citizen.Await(p);
 end
 
-event.onServer("core:SyncObject:setProperty", function(type, id, key, value)
+event.on("core:SyncObject:setProperty", function(type, id, key, value)
     logger.debug("core->SyncObject", "core:SyncObject:setProperty", "type,id,key,value", type, id, key, value);
     local obj = module.GetSyncObject(type, id);
     obj._data[key] = value;

@@ -1,5 +1,8 @@
 run("client/class.lua");
 
+local Marker = M("marker");
+local logger = M("core").logger;
+
 Citizen.CreateThread(function()
     local garages = module.GetAll();
 
@@ -7,10 +10,8 @@ Citizen.CreateThread(function()
     local playerPos = GetEntityCoords(playerPed);
 
     for _,garage in pairs(garages) do
-        marker.AddMarker({
-            type = marker.TYPES.HorizontalSplitArrowCircle;
-            position = garage.position,
-            scale = vector3(2.0, 2.0, 2.0),
-        });
+        --logger.debug("garage", "adding garage marker", garage:getPosition());
+        local marker = Marker.Create(garage:getPosition());
+        marker.scale = vector3(4.0, 4.0, 0.2);
     end
 end)

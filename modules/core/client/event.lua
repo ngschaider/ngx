@@ -1,4 +1,4 @@
-local logger = M("core").logger;
+local logger = module.logger;
 
 local handlers = {};
 

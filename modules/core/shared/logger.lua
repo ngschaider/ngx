@@ -1,6 +1,9 @@
 module.logger = {};
 
-local hiddenCategories = {};
+local hiddenCategories = {
+    ["core->SyncObject"] = true,
+};
+
 module.logger.hideCategory = function(name)
     hiddenCategories[name] = true;
 end;
@@ -18,14 +21,14 @@ module.logger.debug = function(cat, msg, ...)
     log("^3[DEBUG]^7", cat, msg, ...);
 end;
 
-module.logger.info = function(msg, ...)
+module.logger.info = function(cat, msg, ...)
     log("^3[INFO]^7", cat, msg, ...);
 end;
 
-module.logger.warn = function(msg, ...)
+module.logger.warn = function(cat, msg, ...)
     log("^3[WARNING]^7", cat, msg, ...);
 end;
 
-module.logger.error = function(msg, ...)
+module.logger.error = function(cat, msg, ...)
     log("^3[ERROR]^7", cat, msg, ...);
 end;

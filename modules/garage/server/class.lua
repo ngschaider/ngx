@@ -1,6 +1,7 @@
 local class = M("class");
 local core = M("core");
-local logger = M("logger");
+local logger = M("core").logger;
+local callback = M("core").callback;
 local Vehicle = M("vehicle");
 local utils = M("utils");
 
@@ -12,9 +13,9 @@ function Garage:initialize(id)
     core.SyncObject.initialize(self, "Garage", id, "garages");
 
     self:syncProperty("name", true, false);
-    self.syncProperty("positionX", true, false);
-    self.syncProperty("positionY", true, false);
-    self.syncProperty("positionZ", true, false);
+    self:syncProperty("positionX", true, false);
+    self:syncProperty("positionY", true, false);
+    self:syncProperty("positionZ", true, false);
     self:rpcMethod("getVehicleIds", true);
 end
 
@@ -24,9 +25,9 @@ end
 
 function Garage:getPosition()
     return vector3(
-        self:getData("positionX"),
-        self:getData("positionY"),
-        self:getData("positionZ")
+        tonumber(self:getData("positionX")),
+        tonumber(self:getData("positionY")),
+        tonumber(self:getData("positionZ"))
     )
 end
 
@@ -48,3 +49,16 @@ end
 module.GetById = function(id)
     return core.GetSyncObject("Garage", id);
 end
+
+callback.register("garage:getAllIds", function(playerId, cb)
+    logger.debug("garage", "garage:getAllIds", "querying");
+    local results = MySQL.query.await("SELECT id FROM garages");
+
+    logger.debug("garage", "garage:getAllIds", "mapping");
+	local ids = utils.table.map(results, function(v)
+		return v.id;
+	end)
+
+    logger.debug("garage", "garage:getAllIds", "calling back");
+	cb(ids);
+end);

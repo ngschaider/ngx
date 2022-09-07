@@ -14,6 +14,10 @@ function User:initialize(id)
 	logger.debug("user", "initialize", "self._data", json.encode(self._data));
 end
 
+function User:getIdentifier()
+	return self:getData("identifier");
+end
+
 function User:getName()
 	return self:rpc("getName");
 end;

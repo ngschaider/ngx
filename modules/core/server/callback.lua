@@ -10,11 +10,10 @@ module.callback.register = function(name, cb)
 	serverCallbacks[name] = cb;
 end
 
-event.onClient("core:callback:request", function(playerId, name, requestId, ...)
+event.on("core:callback:request", function(playerId, name, requestId, ...)
 	if serverCallbacks[name] then
 		logger.debug("core->callback", "executing C->S->C callback function", playerId, name, ...);
 		serverCallbacks[name](playerId, function(...)
-			--logger.debug("core->callback", "-> client " .. playerId, "core:callback:response", name, ...);
 			event.emitClient("core:callback:response", playerId, requestId, ...);
 		end, ...);
 	else
@@ -49,7 +48,7 @@ module.callback.trigger = function(name, playerId, cb, ...)
 	event.emitClient("core:callback:request", playerId, name, requestId, ...)
 end;
 
-event.onClient("core:callback:response", function(playerId, requestId, ...)
+event.on("core:callback:response", function(playerId, requestId, ...)
 	clientCallbacks[requestId](...);
 	clientCallbacks[requestId] = nil;
 end)

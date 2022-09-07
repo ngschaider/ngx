@@ -1,5 +1,6 @@
 local class = M("class");
-local logger = M("logger");
+local logger = M("core").logger;
+local callback = M("core").callback;
 local utils = M("utils");
 local core = M("core");
 
@@ -20,10 +21,10 @@ end
 
 function Garage:getPosition()
     return vector3(
-        self:getData("positionX"),
-        self:getData("positionY"),
-        self:getData("positionZ")
-    )
+        tonumber(self:getData("positionX")),
+        tonumber(self:getData("positionY")),
+        tonumber(self:getData("positionZ"))
+    );
 end
 
 function Garage:getVehicles()
@@ -39,12 +40,15 @@ module.GetById = function(id)
 end
 
 module.GetAll = function()
+    logger.debug("garage->class", "module.GetAll");
 	local p = promise.new();
-	callback.trigger("garage:getAll", function(ids)
+	callback.trigger("garage:getAllIds", function(ids)
 		p:resolve(ids);
 	end);
+    logger.debug("garage->class", "module.GetAll", "resolving");
 	local ids = Citizen.Await(p);
 
+    logger.debug("garage->class", "module.GetAll", "iterating");
 	local garages = {};
 	for _,id in pairs(ids) do
 		local garage = module.GetById(id);

@@ -4,12 +4,14 @@ local event = M("core").event;
 
 local SaveCharacter = function(character)
     logger.debug("save", "Saving Character", character.id);
-    --logger.debug("save", "character.id", character.id);
+    logger.debug("save", "character.id", character.id);
     local user = character:getUser();
-    --logger.debug("save", "user.id", user.id);
-    --logger.debug("save", "user:getIsOnline()", user:getIsOnline());
-    --logger.debug("save", "user:getCurrentCharacterId()", user:getCurrentCharacterId());
-    if user:getIsOnline() and user:getCurrentCharacterId() == character.id then
+    logger.debug("save", "user.id", user.id);
+    logger.debug("save", "user:getPlayerId()", user:getPlayerId());
+    logger.debug("save", "user:getIsOnline()", user:getIsOnline());
+    logger.debug("save", "user:getCurrentCharacterId()", user:getCurrentCharacterId());
+    logger.debug("save", "character:getId()", character:getId());
+    if user:getIsOnline() and user:getCurrentCharacterId() == character:getId() then
         local position = character:getPosition();
         logger.debug("save", "Saving position of character", character:getName(), position.x, position.y, position.z);
         MySQL.update("UPDATE characters SET lastPositionX=?, lastPositionY=?, lastPositionZ=? WHERE id=?", {

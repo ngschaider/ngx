@@ -1,4 +1,8 @@
-module.TYPES = {
+local logger = M("core").logger;
+
+--logger.debug("garage", "loading shared");
+
+TYPES = {
     UpsideDownCone = 0,
     VerticalCylinder = 1,
     ThickChevronUp = 2,
@@ -43,3 +47,5 @@ module.TYPES = {
     Jetpack = 41,
     SawbladeSymbol = 42
 };
+
+module.TYPES = TYPES;

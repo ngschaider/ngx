@@ -1,3 +1,7 @@
+run("client/commands.lua");
+
+
+
 local event = M("core").event;
 local logger = M("core").logger;
 local User = M("user");
@@ -72,7 +76,7 @@ local OpenMenu = function()
 end;
 
 
-event.onServer("admin:OpenMenu", function()
+event.on("admin:OpenMenu", function()
     logger.debug("admin", "admin:OpenMenu");
     OpenMenu();
 end);

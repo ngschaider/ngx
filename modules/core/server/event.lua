@@ -48,9 +48,8 @@ module.event.emitServer = function(name, ...)
 end
 
 module.event.emitClient = function(name, playerId, ...)
-    if handlers[name] then
-        TriggerClientEvent("core:event:trigger", name, playerId, ...);
-    end
+    logger.debug("core->event", "S->[" .. playerId .. "]", name, ...);
+    TriggerClientEvent("core:event:trigger", playerId, name, ...);
 end
 
 RegisterNetEvent("core:event:trigger", function(name, ...)

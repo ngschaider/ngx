@@ -48,7 +48,9 @@ local CreateEnv = function(moduleName)
     
     env.module = {};
 
-    setmetatable(env, {__index = _G});
+    setmetatable(env, {
+        __index = _G
+    });
 
     return env;
 end;
@@ -66,7 +68,7 @@ M = function(moduleName)
     local success = true;
     for k,v in pairs(entryPoints) do
         moduleEnv, success = NGX.EvalFile(resourceName, v, moduleEnv);
-        if not success then 
+        if not success then
             break;
         end
     end

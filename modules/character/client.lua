@@ -20,9 +20,9 @@ end
 
 function Character:getLastPosition()
 	return vector3(
-		self:getData("lastPositionX"),
-		self:getData("lastPositionY"),
-		self:getData("lastPositionZ")
+		tonumber(self:getData("lastPositionX")),
+		tonumber(self:getData("lastPositionY")),
+		tonumber(self:getData("lastPositionZ"))
 	);
 end
 

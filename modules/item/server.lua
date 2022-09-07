@@ -89,7 +89,7 @@ end;
 
 
 local registeredItems = {};
-function RegisterItem(options)
+module.RegisterItem = function(options)
     registeredItems[options.name] = options;
 end;
 

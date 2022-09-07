@@ -24,7 +24,11 @@ end
 
 function User:getPlayerId()
 	for _,v in pairs(GetPlayers()) do
-		if utils.getIdentifier(v) == self.identifier then
+		local identifier = utils.getIdentifier(v);
+		logger.debug("User:getPlayerId", "v", v);
+		logger.debug("User:getPlayerId", "identifier", identifier);
+		logger.debug("User:getPlayerId", "self:getIdentifier", self:getIdentifier());
+		if identifier == self:getIdentifier() then
 			return tonumber(v);
 		end
 	end
@@ -48,7 +52,7 @@ function User:kick(reason)
 end
 
 function User:getIdentifier()
-	return self.identifier;
+	return self:getData("identifier");
 end
 
 function User:showNotification(msg)

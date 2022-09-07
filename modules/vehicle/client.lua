@@ -39,7 +39,7 @@ end
 
 function Vehicle:getOwner()
     local ownerType = self:getOwnerType();
-    local ownerId = self.getOwnerId();
+    local ownerId = self:getOwnerId();
     if ownerType == "Character" then
         return Character.GetById(ownerId);
     end

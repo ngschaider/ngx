@@ -20,7 +20,7 @@ module.callback.trigger = function(name, cb, ...)
 	event.emitServer("core:callback:request", name, requestId, ...);
 end;
 
-event.onServer("core:callback:response", function(requestId, ...)
+event.on("core:callback:response", function(requestId, ...)
 	-- developer does not need to provide a callback function when triggering a callback
 	if serverCallbacks[requestId] then
 		serverCallbacks[requestId](...);
@@ -36,7 +36,7 @@ module.callback.register = function(name, cb)
     clientCallbacks[name] = cb;
 end;
 
-event.onServer("core:callback:request", function(name, requestId, ...)
+event.on("core:callback:request", function(name, requestId, ...)
 	if clientCallbacks[name] then
 		clientCallbacks[name](function(...)
 			event.emitServer("core:callback:response", requestId, ...);

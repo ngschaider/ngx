@@ -1,5 +1,7 @@
 local class = M("class");
 local Character = M("character");
+local core = M("core");
+local logger = M("core").logger;
 
 local Vehicle = class("Vehicle", core.SyncObject);
 core.RegisterSyncClass(Vehicle);

@@ -25,7 +25,7 @@ function Inventory:getItems()
 	local ids = self:getItemIds();
 	logger.debug("inventory", "getItems", "ids", json.encode(ids));
 	
-	local items = utils.table.map(ids, function(id)
+	local items = utils.table.mapValues(ids, function(id)
 		logger.debug("inventory", "getItems", "id", id);
 		return Item.GetById(id);
 	end);

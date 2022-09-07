@@ -51,7 +51,7 @@ function OpenInventory(inventory)
         local itemEntry = UI.CreateItem(label, "");
         menu:AddItem(itemEntry);
 
-        local itemMenu = GetItemMenu(item);
+        local itemMenu = GetItemMenu(inventory, item);
         pool:Add(itemMenu);
         menu:BindMenuToItem(itemMenu, itemEntry);
         menu:AddItem(itemMenu);
@@ -63,10 +63,8 @@ function OpenInventory(inventory)
 end
 
 
-function GetItemMenu(item)
-    local name = item:getName();
-    local menu = UI.CreateMenu(name, "");
-    logger.debug("inventory_ui", "GetItemMenu", "name", name);
+function GetItemMenu(inventory, item)
+    local menu = UI.CreateMenu(item:getLabel(), "");
     
     if item:getIsUsable() then
         logger.debug("inventory_ui", "adding use item");
@@ -74,13 +72,23 @@ function GetItemMenu(item)
         menu:AddItem(useItem);
 
         useItem.Activated = function()
-            item.use();
+            item:use();
+            menu:Visible(false);
+            OpenInventory(inventory);
         end;
     end
 
-    logger.debug("inventory_ui", "adding drop item");
-    local dropItem = UI.CreateItem("Fallen lassen", "");
-    menu:AddItem(dropItem);
+    if item:getIsDroppable() then
+        logger.debug("inventory_ui", "adding drop item");
+        local dropItem = UI.CreateItem("Fallen lassen", "");
+        menu:AddItem(dropItem);
+
+        dropItem.Activated = function()
+            item:drop();
+        end;
+    end
+
+    item:onMenuBuild();
 
     return menu;
 end

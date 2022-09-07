@@ -124,7 +124,7 @@ end
 module.GetAll = function()
 	local results = MySQL.query.await("SELECT id FROM characters");
 
-	local characters = utils.table.map(results, function(v)
+	local characters = utils.table.mapValues(results, function(v)
 		return module.GetById(v.id);
 	end)
 	return characters;

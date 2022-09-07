@@ -1,4 +1,3 @@
-local event = M("core").event;
 
 module.textPrompt = function(title, placeholder, maxLength)
 	if not maxLength then 

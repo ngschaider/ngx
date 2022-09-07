@@ -86,7 +86,7 @@ end
 
 function User:getCharacterIds()
 	local results = MySQL.query.await("SELECT id FROM characters WHERE userId=?", {self.id});
-	local ids = utils.table.map(results, function(v)
+	local ids = utils.table.mapValues(results, function(v)
 		return v.id;
 	end);
 	return ids;
@@ -95,7 +95,7 @@ end
 function User:getCharacters()
 	local ids = self:getCharacterIds();
 
-	local characters = utils.table.map(ids, function(id)
+	local characters = utils.table.mapValues(ids, function(id)
 		return Character.GetById(id);
 	end);
 	

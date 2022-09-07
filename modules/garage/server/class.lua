@@ -33,7 +33,7 @@ end
 
 function Garage:getVehicleIds()
     local results = MySQL.query.await("SELECT id FROM vehicles WHERE garageId=?", {self.id});
-	local ids = utils.table.map(results, function(v)
+	local ids = utils.table.mapValues(results, function(v)
 		return v.id;
 	end);
 	return ids;
@@ -41,9 +41,10 @@ end
 
 function Garage:getVehicles()
     local ids = self:getVehicleIds();
-    local vehicles = utils.table.map(ids, function(id)
+    local vehicles = utils.table.mapValues(ids, function(id)
         return Vehicle.GetById(id);
     end)
+    return vehicles;
 end
 
 module.GetById = function(id)
@@ -55,7 +56,7 @@ callback.register("garage:getAllIds", function(playerId, cb)
     local results = MySQL.query.await("SELECT id FROM garages");
 
     logger.debug("garage", "garage:getAllIds", "mapping");
-	local ids = utils.table.map(results, function(v)
+	local ids = utils.table.mapValues(results, function(v)
 		return v.id;
 	end)
 

@@ -24,7 +24,7 @@ local Character = class("Character", core.SyncObject);
 core.RegisterSyncClass(Character);
 
 function Character:initialize(id)
-	logger.debug("core->SyncObect", "Character:initialize", "id", id);
+	logger.debug("core->SyncObject", "Character:initialize", "id", id);
 	core.SyncObject.initialize(self, "Character", id, "characters");
 
 	self:syncProperty("id", true, false);
@@ -49,6 +49,7 @@ local event = module.event;
 local callback = module.callback;
 local logger = module.logger;
 local class = M("class");
+local utils = M("utils");
 
 --[[
     holds all constructed syncObjects. The key of this table is composed by concatenating the type with the object's id like
@@ -62,8 +63,8 @@ local SyncObject = class("SyncObject");
     Returns true if the client can read the specified key on the specified type, false otherwise.
 ]]
 SyncObject.static.canClientRead = function (type, key)
-    --logger.debug("core->SyncObect", "SyncObject->canClientRead", "type", type);
-    --logger.debug("core->SyncObect", "SyncObject->canClientRead", "key", key);
+    --logger.debug("core->SyncObject", "SyncObject->canClientRead", "type", type);
+    --logger.debug("core->SyncObject", "SyncObject->canClientRead", "key", key);
     return SyncObject._sync[type] and SyncObject._sync[type].properties[key] and SyncObject._sync[type].properties[key].read;
 end
 
@@ -90,14 +91,17 @@ SyncObject.static._sync = {
     It also saves the column names in the columns property to later know which values should be saved in the db
 ]]
 function SyncObject:initialize(type, id, tableName)
-    logger.debug("core->SyncObect", "SyncObject:initialize", "type,id,tableName", type, id, tableName);
+    logger.debug("core->SyncObject", "SyncObject:initialize", "type,id,tableName", type, id, tableName);
     self.type = type;
     self.id = id;
     self.table = tableName;
     self._data = MySQL.single.await("SELECT * FROM `" .. tableName .. "` WHERE id=?", {id});
-    self.columns = M("utils").table.map(self._data, function()
-        return true;
+
+    local columnResults = MySQL.query.await("SHOW COLUMNS FROM `" .. tableName .. "`");
+    self.columns = utils.table.map(columnResults, function(v)
+        return v.Field, true;
     end);
+    self._deleted = false;
 
     table.insert(cache, self);
 end
@@ -106,8 +110,12 @@ end
     returns the value from the _data property with the given key.
 ]]
 function SyncObject:getData(key)
+    if self._deleted then
+        logger.error("core->SyncObject", "SyncObject:getData", "accessing deleted SyncObject: type,id", self.type, self.id);
+        return;
+    end
     local value = self._data[key];
-    --logger.debug("core->SyncObect", "SyncObject:getData", "type,id,key,value", self.type, self.id, key, value);
+    --logger.debug("core->SyncObject", "SyncObject:getData", "type,id,key,value", self.type, self.id, key, value);
     return value;
 end
 
@@ -115,13 +123,23 @@ end
     sets the given value in the _data property by the given key.
 ]]
 function SyncObject:setData(key, value)
-    logger.debug("core->SyncObect", "SyncObject:setData", "type,id,key,value", self.type, self.id, key, value);
+    if self._deleted then
+        logger.error("core->SyncObject", "SyncObject:setData", "accessing deleted SyncObject: type,id", self.type, self.id);
+        return;
+    end
+    logger.debug("core->SyncObject", "SyncObject:setData", "type,id,key,value", self.type, self.id, key, value);
     if SyncObject.canClientRead(self.type, key) then
         event.emitClient("core:SyncObject:setProperty", -1, self.type, self.id, key, value);
+        print("in end of if statement");
     end
+    print("below if statement");
+    logger.debug("core->SyncObject", "SyncObject:setData", "self.columns", json.encode(self.columns));
+    print("below log");
     if self.columns[key] then
-        MySQL.update.await("UPDATE `" .. self.table .. "` SET `" .. key .. "`=?", {value});
+        print("saving to db");
+        MySQL.update.await("UPDATE `" .. self.table .. "` SET `" .. key .. "`=? WHERE id=?", {value, self.id});
     end
+    print("setting value");
     self._data[key] = value;
 end
 
@@ -130,7 +148,11 @@ end
     if write is true sets the given key to be writable by the client, otherwise the client can't write to the given key.
 ]]
 function SyncObject:syncProperty(key, read, write)
-    logger.debug("core->SyncObect", "SyncObject:syncProperty", "key", key);
+    if self._deleted then
+        logger.error("core->SyncObject", "SyncObject:syncProperty", "accessing deleted SyncObject: type,id", self.type, self.id);
+        return;
+    end
+    logger.debug("core->SyncObject", "SyncObject:syncProperty", "key", key);
     if not SyncObject._sync[self.type] then
         SyncObject._sync[self.type] = {
             properties = {},
@@ -138,13 +160,13 @@ function SyncObject:syncProperty(key, read, write)
         };
     end
     
-    logger.debug("core->SyncObect", "syncProperty", "self.type,key,read,write", self.type, key, read, write);
+    logger.debug("core->SyncObject", "syncProperty", "self.type,key,read,write", self.type, key, read, write);
     SyncObject._sync[self.type].properties[key] = {
         read = read,
         write = write,
     };
 
-    --logger.debug("core->SyncObect", "SyncObject:syncProperty", "SyncObject._sync", json.encode(SyncObject._sync));
+    --logger.debug("core->SyncObject", "SyncObject:syncProperty", "SyncObject._sync", json.encode(SyncObject._sync));
 end
 
 
@@ -152,6 +174,10 @@ end
     if toggle is true sets the given method name to be callable by the client, otherwise the client can't call the given method.
 ]]
 function SyncObject:rpcMethod(name, toggle)
+    if self._deleted then
+        logger.error("core->SyncObject", "SyncObject:rpcMethod", "accessing deleted SyncObject: type,id", self.type, self.id);
+        return;
+    end
     if not SyncObject._sync[self.type] then
         SyncObject._sync[self.type] = {
             properties = {},
@@ -174,24 +200,32 @@ end
 
 module.GetSyncObject = function(type, id, ...)
     if not cache[type .. id] then
-        logger.debug("core->SyncObect", "creating new SyncObject", "type,id", type, id);
+        logger.debug("core->SyncObject", "creating new SyncObject", "type,id", type, id);
         cache[type .. id] = syncClasses[type]:new(id, ...);
     end
 
     return cache[type .. id];
 end;
 
+module.DeleteSyncObject = function(obj)
+    cache[obj.type .. obj.id] = nil;
+    obj._deleted = true;
+
+    MySQL.query.await("DELETE FROM `" .. obj.table .. "` WHERE id=?", {obj.id});
+    event.emitClient("core:SyncObject:delete", obj.type, obj.id);
+end;
+
 callback.register("core:SyncObject:rpc", function(playerId, cb, type, id, name, ...)
     local obj = module.GetSyncObject(type, id);
 
     if not obj then
-        logger.debug("core->SyncObect", "SyncObject not found", type, id);
+        logger.debug("core->SyncObject", "SyncObject not found", type, id);
         return;
     end
 
-    logger.debug("core->SyncObect", "rpc", "type,name", type, name)
+    logger.debug("core->SyncObject", "rpc", "type,name", type, name)
     if not SyncObject._sync[type] or not SyncObject._sync[type].rpcs[name] then
-        logger.debug("core->SyncObect", "SyncObject rpc not allowed", type, id, name);
+        logger.debug("core->SyncObject", "SyncObject rpc not allowed", type, id, name);
         return;
     end
 
@@ -200,11 +234,11 @@ callback.register("core:SyncObject:rpc", function(playerId, cb, type, id, name, 
 end)
 
 event.on("core:SyncObject:setProperty", function(playerId, type, id, key, value)
-    --logger.debug("core->SyncObect", "core:SyncObject:setProperty", "type,id,key,value", type, id, key, value);
+    --logger.debug("core->SyncObject", "core:SyncObject:setProperty", "type,id,key,value", type, id, key, value);
     local obj = module.GetSyncObject(type, id);
 
     if not obj then
-        logger.debug("core->SyncObect", "SyncObject not found", type, id);
+        logger.debug("core->SyncObject", "SyncObject not found", type, id);
         return;
     end
 
@@ -214,23 +248,23 @@ event.on("core:SyncObject:setProperty", function(playerId, type, id, key, value)
 end)
 
 callback.register("core:SyncObject:getObjectData", function(playerId, cb, type, id)
-    logger.debug("core->SyncObect", "getObjectData", "type,id", type, id);
+    logger.debug("core->SyncObject", "getObjectData", "type,id", type, id);
     local obj = module.GetSyncObject(type, id);
 
     if not obj then
-        logger.debug("core->SyncObect", "SyncObject not found", type, id);
+        logger.debug("core->SyncObject", "SyncObject not found", type, id);
         cb(nil);
         return nil;
     end
 
     local data = {};
     for k,v in pairs(obj._data) do
-        --logger.debug("core->SyncObect", "getObjectData", "k,v", k, json.encode(v));
+        --logger.debug("core->SyncObject", "getObjectData", "k,v", k, json.encode(v));
         if SyncObject.canClientRead(type, k) then
             data[k] = v;
         end
     end
 
-    logger.debug("core->SyncObect", "getObjectData", json.encode(data));
+    --logger.debug("core->SyncObject", "getObjectData", json.encode(data));
     cb(data);
 end)

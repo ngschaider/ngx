@@ -1,14 +1,25 @@
 local class = M("class");
 local logger = M("core").logger;
-local callback = M("core").callback;
 local utils = M("utils");
 local core = M("core");
+local Marker = M("marker");
 
 local Garage = class("Garage", core.SyncObject);
 core.RegisterSyncClass(Garage);
 
 function Garage:initialize(id)
     core.SyncObject.initialize(self, "Garage", id, "garages");
+
+    self.notification = core.notification.CreateHelpNotification("Drücke ~INPUT_CONTEXT~ um auf die Garage zuzugreifen");
+
+    self.marker = Marker.Create(self:getPosition());
+    self.marker.scale = vector3(3.0, 3.0, 0.2);
+    self.marker.onEnter = function()
+        self.notification.visible = true;
+    end
+    self.marker.onExit = function()
+        self.notification.visible = false;
+    end
 end
 
 function Garage:getName()
@@ -29,7 +40,7 @@ end
 
 function Garage:getVehicles()
     local ids = self:getVehicleIds();
-    local vehicles = utils.table.map(ids, function(id)
+    local vehicles = utils.table.mapValues(ids, function(id)
         return Vehicle.GetById(id);
     end);
     return vehicles;
@@ -42,7 +53,7 @@ end
 module.GetAll = function()
     logger.debug("garage->class", "module.GetAll");
 	local p = promise.new();
-	callback.trigger("garage:getAllIds", function(ids)
+	core.callback.trigger("garage:getAllIds", function(ids)
 		p:resolve(ids);
 	end);
     logger.debug("garage->class", "module.GetAll", "resolving");

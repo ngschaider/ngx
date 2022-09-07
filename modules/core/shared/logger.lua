@@ -1,7 +1,6 @@
 module.logger = {};
 
 local hiddenCategories = {
-    ["core->SyncObject"] = true,
 };
 
 module.logger.hideCategory = function(name)

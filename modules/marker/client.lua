@@ -21,27 +21,49 @@ function Marker:initialize(position)
     self.faceCamera = false;
     self.distance = 10;
 
+    self.onEnter = function() end;
+    self.onExit = function() end;
+    self.onTickWhileInside = function() end;
+    self.isPlayerInside = false;
+
     table.insert(markers, self);
 end
 
-function Marker:draw()
-    DrawMarker(self.type, self.position, self.direction, self.rotation, self.scale, self.color.r, self.color.g, self.color.b, self.color.a, self.bobUpAndDown, self.faceCamera, 2, nil, nil, false);
+function Marker:tick()
+    local ped = PlayerPedId();
+    local playerPos = GetEntityCoords(ped);
+
+    local dist = #(playerPos - self.position);
+
+    if dist < self.distance then
+        local radius = math.max(math.max(self.scale.x, self.scale.y) * 0.65, 1.2);
+
+        if not self.isPlayerInside and dist < radius then
+            self.isPlayerInside = true;
+            self.onEnter();
+        end
+
+        if self.isPlayerInside and dist > radius then
+            self.isPlayerInside = false;
+            self.onExit();
+        end
+
+        if self.isPlayerInside then
+            self.onTickWhileInside();
+        end
+
+        DrawMarker(self.type, self.position, self.direction, self.rotation, self.scale, self.color.r, self.color.g, self.color.b, self.color.a, self.bobUpAndDown, self.faceCamera, 2, nil, nil, false);
+    end
 end
 
 Citizen.CreateThread(function()
     while true do
-        local ped = PlayerPedId();
-        local playerPos = GetEntityCoords(ped);
-
         --logger.debug("marker", "looping marker");
         for _,marker in pairs(markers) do
-            local dist = #(playerPos - marker.position);
             --logger.debug("marker", "dist,marker.distance", dist, marker.distance)
-
-            if dist < marker.distance then
-                --logger.debug("marker", "drawing");
-                marker:draw();
-            end
+            
+            --logger.debug("marker", "tick");
+            marker:tick();
         end
         Citizen.Wait(0);
     end

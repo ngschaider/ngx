@@ -26,7 +26,7 @@ end;
 function Inventory:getItemIds()
 	local results = MySQL.query.await("SELECT id FROM items WHERE inventoryId=?", {self.id});
 	
-	local ids = utils.table.map(results, function(v)
+	local ids = utils.table.mapValues(results, function(v)
 		return v.id;
 	end);
 	logger.debug("inventory", "getItemIds", "ids", json.encode(ids));
@@ -36,7 +36,7 @@ end;
 function Inventory:getItems()
 	local ids = self:getItemIds();
 
-	local items = utils.table.map(ids, function(id)
+	local items = utils.table.mapValues(ids, function(id)
 		return Item.GetById(id);
 	end);
 	

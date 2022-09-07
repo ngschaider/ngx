@@ -28,7 +28,7 @@ end;
 
 function User:getCharacters()
 	local ids = self:getCharacterIds();
-	local characters = utils.table.map(ids, function(id)
+	local characters = utils.table.mapValues(ids, function(id)
 		return Character.GetById(id);
 	end);
 	return characters;

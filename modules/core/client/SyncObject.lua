@@ -24,6 +24,7 @@ function SyncObject:initialize(type, id, tableName)
     self.type = type;
     self.id = id;
     self.table = tableName;
+    self._deleted = false;
 
     local p = promise.new();
     callback.trigger("core:SyncObject:getObjectData", function(data)
@@ -35,6 +36,10 @@ function SyncObject:initialize(type, id, tableName)
 end
 
 function SyncObject:getData(key)
+    if self._deleted then
+        logger.error("core->SyncObject", "SyncObject:getData", "accessing deleted SyncObject: type,id", self.type, self.id);
+        return;
+    end
     logger.debug("core->SyncObject", "SyncObject:getData", "key", key);
     local value = self._data[key];
     logger.debug("core->SyncObject", "SyncObject:getData", "value", value);
@@ -42,10 +47,18 @@ function SyncObject:getData(key)
 end
 
 function SyncObject:setData(key, value)
+    if self._deleted then
+        logger.error("core->SyncObject", "SyncObject:setData", "accessing deleted SyncObject: type,id", self.type, self.id);
+        return;
+    end
     event.emitServer("core:SyncObject:setProperty", self.type, self.id, key, value);
 end
 
 function SyncObject:rpc(name, ...)
+    if self._deleted then
+        logger.error("core->SyncObject", "SyncObject:rpc", "accessing deleted SyncObject: type,id", self.type, self.id);
+        return;
+    end
     local p = promise.new();
     callback.trigger("core:SyncObject:rpc", function(...)
         p:resolve(...);
@@ -57,6 +70,16 @@ event.on("core:SyncObject:setProperty", function(type, id, key, value)
     logger.debug("core->SyncObject", "core:SyncObject:setProperty", "type,id,key,value", type, id, key, value);
     local obj = module.GetSyncObject(type, id);
     obj._data[key] = value;
+end);
+
+event.on("core:SyncObject:delete", function(type, id)
+    if not cache[type .. id] then
+        return;
+    end
+
+    local obj = module.GetSyncObject(type, id);
+    cache[type .. id] = nil;
+    obj._deleted = true;
 end);
 
 module.SyncObject = SyncObject;

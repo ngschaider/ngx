@@ -1,19 +1,19 @@
-local class = M("class");
+local logger = M("core").logger;
 
-module.RegisterItem({
+module.Register({
     name = "beer",
     label = "Bier",
+    isUsable = true,
+    isDroppable = true,
     onUse = function(item)
         print("Beer got used!");
-        self:destroy();
+        item:destroy();
     end,
-})
-
-
+});
 
 RegisterCommand("beer", function(playerId, args, rawCommand)
     logger.debug("item->beer", "giving player a beer");
-    local beer = Beer:Create();
+    local beer = module.Create("beer");
     logger.debug("item->beer", "beer");
 
     logger.debug("item->beer", "getting character");
@@ -26,5 +26,5 @@ RegisterCommand("beer", function(playerId, args, rawCommand)
     logger.debug("item->beer", "getting inventory")
     local inventory = character:getInventory();
     logger.debug("item->beer", "setting item inventoryId", inventory.id);
-    beer:setInventoryId(inventory.id)
+    beer:setInventory(inventory);
 end, true);

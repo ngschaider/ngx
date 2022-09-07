@@ -132,31 +132,25 @@ module.table.map = function(t, cb)
 	local newTable = {};
 
 	for k,v in pairs(t) do
-		newTable[k] = cb(v, k);
+		local newKey, newValue = cb(v, k);
+		newTable[newKey] = newValue;
 	end
 
 	return newTable;
 end;
 
 module.table.mapKeys = function(t, cb)
-	local newTable = {};
-
-	for k,v in pairs(t) do
-		local newKey = cb(k, v);
-		newTable[newKey] = v;
-	end
-
-	return newTable;
+	return module.table.map(t, function(v, k)
+		local newKey = cb(v, k);
+		return newKey, v;
+	end)
 end;
 
 module.table.mapValues = function(t, cb)
-	local newTable = {};
-
-	for i=1, #i, 1 do
-		newTable[i] = cb(t[i], i);
-	end
-
-	return newTable;
+	return module.table.map(t, function(v, k)
+		local newValue = cb(v, k);
+		return k, newValue;
+	end);
 end;
 
 module.table.reverse = function(t)
@@ -170,7 +164,7 @@ module.table.reverse = function(t)
 end;
 
 module.table.clone = function(t)
-	if type(t) ~= "table" then 
+	if type(t) ~= "table" then
 		return t;
 	end
 

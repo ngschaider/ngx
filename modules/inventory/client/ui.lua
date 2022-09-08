@@ -2,15 +2,6 @@ local User = M("user");
 local UI = M("UI");
 local logger = M("core").logger;
 
-local pool = UI.CreatePool();
-
-Citizen.CreateThread(function()
-    while true do
-        pool:ProcessMenus();
-        Citizen.Wait(0);
-    end
-end);
-
 RegisterCommand("inventory", function()
     OpenOwnCharacterInventory();
 end);
@@ -34,11 +25,6 @@ end;
 function OpenInventory(inventory)
     logger.debug("inventory_ui", "creating menu");
     local menu = UI.CreateMenu("Inventar", "");
-    logger.debug("inventory_ui", "clearing pool");
-    pool:Clear();
-    logger.debug("inventory_ui", "adding menu");
-    pool:Add(menu);
-    logger.debug("inventory_ui", "menu added");
 
     logger.debug("inventory_ui", "OpenInventory", "inventory.id", inventory.id);
     local items = inventory:getItems();
@@ -52,7 +38,6 @@ function OpenInventory(inventory)
         menu:AddItem(itemEntry);
 
         local itemMenu = GetItemMenu(inventory, item);
-        pool:Add(itemMenu);
         menu:BindMenuToItem(itemMenu, itemEntry);
         menu:AddItem(itemMenu);
     end

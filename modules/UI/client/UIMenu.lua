@@ -147,6 +147,9 @@ function UIMenu.New(Title, Subtitle, X, Y, TxtDictionary, TxtName)
 			end
 		end
 	end)
+
+	RegisterMenu(_UIMenu);
+
 	return setmetatable(_UIMenu, UIMenu)
 end
 
@@ -449,6 +452,10 @@ end
 
 function UIMenu:Visible(bool)
 	if bool ~= nil then
+		if tobool(bool) and IsAnyMenuOpen() then
+			return;
+		end
+
 		self._Visible = tobool(bool)
 		self.JustOpened = tobool(bool)
 		self.Dirty = tobool(bool)

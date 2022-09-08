@@ -21,7 +21,7 @@ run("client/panels/UIMenuPercentagePanel.lua");
 run("client/UIMenu.lua");
 run("client/MenuPool.lua");
 
-module.CreatePool = MenuPool.New;
+--module.CreatePool = MenuPool.New;
 module.CreateMenu = UIMenu.New;
 module.CreateItem = UIMenuItem.New;
 module.CreateColouredItem = UIMenuColouredItem.New;
@@ -36,4 +36,22 @@ module.CreatePercentagePanel = UIMenuPercentagePanel.New;
 module.CreateSprite = Sprite.New;
 module.CreateRectangle = UIResRectangle.New;
 module.CreateText = UIResText.New;
+
+
+
+local mainPool = MenuPool.New();
+RegisterMenu = function(menu)
+    mainPool:Add(menu);
+end
+
+IsAnyMenuOpen = function()
+    return mainPool:IsAnyMenuOpen();
+end
+
+Citizen.CreateThread(function()
+    while true do
+        mainPool:ProcessMenus();
+        Citizen.Wait(0);
+    end
+end);
 

@@ -6,7 +6,7 @@ local convertArg = function(argument, config)
 	elseif config.type == "character" then
 		return Character.GetById(argument);
 	elseif config.type == "item" then
-		return Item.GetbyId(argument);
+		return Item.GetById(argument);
 	end
 end
 

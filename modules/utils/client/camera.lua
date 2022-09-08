@@ -15,14 +15,15 @@ local RotationToDirection = function(rotation)
 end;
 
 module.camera.RaycastGameplayCamera = function()
-    local cameraRotation = GetGameplayCamRot();
-    local cameraCoord = GetGameplayCamCoord();
-    local direction = RotationToDirection(cameraRotation);
-    local destination = {
-        x = cameraCoord.x + direction.x * distance,
-        y = cameraCoord.y + direction.y * distance,
-        z = cameraCoord.z + direction.z * distance
+    local camRot = GetGameplayCamRot();
+    local camPos = GetGameplayCamCoord();
+    local direction = RotationToDirection(camRot);
+    local dest = {
+        x = camPos.x + direction.x * distance,
+        y = camPos.y + direction.y * distance,
+        z = camPos.z + direction.z * distance
     };
-    local a, hit, endCoords, d, entityHit = GetShapeTestResult(StartShapeTestRay(cameraCoord.x, cameraCoord.y, cameraCoord.z, destination.x, destination.y, destination.z, -1, -1, 1));
+	local handle = StartShapeTestRay(camPos.x, camPos.y, camPos.z, dest.x, dest.y, dest.z, -1, -1, 1);
+    local _, hit, endCoords, _, entityHit = GetShapeTestResult(handle);
     return hit, endCoords, entityHit;
 end

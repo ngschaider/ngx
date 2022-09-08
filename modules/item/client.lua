@@ -41,6 +41,10 @@ function Item:getIsUsable()
     return self:getData("isUsable");
 end
 
+function Item:getItemData()
+    return json.decode(self:getData("data"));
+end
+
 function Item:use()
     return self:rpc("use");
 end

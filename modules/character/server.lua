@@ -21,7 +21,7 @@ function Character:initialize(id)
 	self:syncProperty("lastname", true, false);
 	self:syncProperty("dateOfBirth", true, false);
 	self:syncProperty("inventoryId", true, false);
-	self:rpcMethod("getSkin", true);
+	self:syncProperty("skin", true, false);
 	self:rpcMethod("setSkin", true);
 end
 

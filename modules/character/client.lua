@@ -31,7 +31,7 @@ function Character:getName()
 end
 
 function Character:getSkin()
-	return self:rpc("getSkin");
+	return json.decode(self:getData("skin"));
 end
 
 function Character:setSkin(skin)

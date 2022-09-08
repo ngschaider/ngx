@@ -38,7 +38,7 @@ function Item:initialize(id)
     self:syncProperty("inventoryId", true, true);
     self:syncProperty("isUsable", true, false);
     self:syncProperty("isDroppable", true, false);
-    self:rpcMethod("getItemData", true);
+    self:syncProperty("data", true, false);
     self:rpcMethod("use", true);
     self:rpcMethod("drop", true);
 end

@@ -53,9 +53,9 @@ function Item:getIsDroppable()
     return self:getData("isDroppable");
 end
 
-function Item:onMenuBuild()
+function Item:onMenuBuild(menu)
     if self.options and self.options.onMenuBuild then
-        self.options.onMenuBuild(self);
+        self.options.onMenuBuild(self, menu);
     end
 end
 

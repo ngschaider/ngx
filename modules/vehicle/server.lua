@@ -11,10 +11,19 @@ function Vehicle:initialize(id)
 
     self:syncProperty("plate", true, false);
     self:syncProperty("model", true, false);
-    self:rpcMethod("getDeformations", true);
+    self:syncProperty("positionX", true, false);
+    self:syncProperty("positionY", true, false);
+    self:syncProperty("positionZ", true, false);
+    self:syncProperty("deformations", true, false);
+    self:rpcMethod("save", true, false);
     self:syncProperty("ownerType", true, false);
     self:syncProperty("ownerId", true, false);
-    self:syncProperty("garageId", true, false);
+    self:syncProperty("garageId", true, true);
+    self:syncProperty("primaryColor", true, false);
+    self:syncProperty("secondaryColor", true, false);
+    self:syncProperty("modKit", true, false);
+    self:syncProperty("netId", true, true);
+    self:syncProperty("mods", true, false);
 end
 
 function Vehicle:getId()
@@ -27,6 +36,52 @@ end
 
 function Vehicle:getModel()
     return self:getData("model");
+end
+
+function Vehicle:getPosition()
+    return vector3(
+        tonumber(self:getData("positionX")),
+        tonumber(self:getData("positionY")),
+        tonumber(self:getData("positionZ"))
+    );
+end
+
+function Vehicle:setPosition(vec)
+    self:setData("positionX", vec.x);
+    self:setData("positionY", vec.y);
+    self:setData("positionZ", vec.z);
+end
+
+function Vehicle:getPrimaryColor()
+    return self:getData("primaryColor");
+end
+
+function Vehicle:setPrimaryColor(primaryColor)
+    self:setData("primaryColor", primaryColor);
+end
+
+function Vehicle:getSecondaryColor()
+    return self:getData("secondaryColor");
+end
+
+function Vehicle:setSecondaryColor(secondaryColor)
+    self:setData("secondaryColor", secondaryColor);
+end
+
+function Vehicle:getMods()
+    return json.decode(self:getData("mods"));
+end
+
+function Vehicle:setMods(mods)
+    self:setData("mods", json.encode(mods));
+end
+
+function Vehicle:getModKit()
+    return self:getData("modKit");
+end
+
+function Vehicle:setModKit(modKit)
+    return self:setData("modKit", modKit);
 end
 
 function Vehicle:getDeformations()
@@ -65,6 +120,17 @@ end
 
 function Vehicle:setNetId(netId)
     self:setData("netId", netId);
+end
+
+function Vehicle:save(deformations)
+    self:setDeformations(deformations);
+
+    local netId = self:getNetId()
+    if netId then
+        local veh = NetworkGetEntityFromNetworkId(netId);
+        local pos = GetEntityCoords(netId);
+        self:setPosition()
+    end
 end
 
 function Vehicle:getOwner()

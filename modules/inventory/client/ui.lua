@@ -43,8 +43,7 @@ function OpenInventory(inventory)
     end
 
     menu:Visible(true);
-    pool:RefreshIndex();
-	pool:MouseEdgeEnabled(false);
+    menu:RefreshIndex();
 end
 
 

@@ -4,6 +4,7 @@ local User = M("user");
 local utils = M("utils");
 local skin = M("skin");
 local logger = M("core").logger;
+local Character = M("character");
 
 -- Disable default idle camera
 Citizen.CreateThread(function()
@@ -23,7 +24,6 @@ Citizen.CreateThread(function()
 	end
 end);
 ]]
-
 
 local SpawnWithCharacter = function(character)
 	local player = PlayerId();
@@ -49,6 +49,8 @@ local SpawnWithCharacter = function(character)
 	User:GetSelf():setCurrentCharacterId(character.id);
 	--print("Setting current character id ", character.id);
 	--print("Spawning " .. character:getName());
+
+	Character.onCharacterSpawned:Invoke(character);
 end;
 
 logger.debug("base", "loaded base");

@@ -2,6 +2,7 @@ local Inventory = M("inventory");
 local class = M("class");
 local logger = M("core").logger;
 local core = M("core");
+local Event = M("event");
 
 local Character = class("Character", core.SyncObject);
 core.RegisterSyncClass(Character);
@@ -52,3 +53,5 @@ end
 module.GetById = function(id)
 	return core.GetSyncObject("Character", id);
 end
+
+module.onCharacterSpawned = Event:new();

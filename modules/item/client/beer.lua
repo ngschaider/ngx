@@ -1,6 +1,4 @@
-local class = M("class");
-
-module.RegisterItem({
+module.Register({
     name = "beer",
     onMenuBuild = function(item)
         

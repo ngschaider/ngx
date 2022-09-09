@@ -103,6 +103,8 @@ function Vehicle:spawn()
     utils.vehicle.SetMods(veh, self:getMods());
     SetVehicleNumberPlateText(veh, self:getPlate());
 
+    self:setGarageId(nil);
+
     Citizen.Await(p);
 end
 

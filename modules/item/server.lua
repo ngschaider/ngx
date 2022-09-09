@@ -5,7 +5,7 @@ local core = M("core");
 
 local registeredItems = {};
 
-local GetOptions = function(name)
+GetOptions = function(name)
     local options = registeredItems[name];
     if not options then
         logger.warn("item", "GetOptions", "Using default options", "name", name);
@@ -30,7 +30,9 @@ module.Create = function(name)
         options.isDroppable or false,
     });
 
-	return module.GetById(id);
+	local item = module.GetById(id);
+    logger.debug("item", "module.Create", "item.id", item.id);
+    return item;
 end;
 
 module.GetById = function(id)

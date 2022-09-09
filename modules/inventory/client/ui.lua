@@ -1,6 +1,7 @@
 local User = M("user");
 local UI = M("UI");
 local logger = M("core").logger;
+local utils = M("utils");
 
 RegisterCommand("inventory", function()
     OpenOwnCharacterInventory();
@@ -8,7 +9,7 @@ end);
 RegisterKeyMapping("inventory", "Inventar öffnen", "keyboard", "F2");
 
 function OpenOwnCharacterInventory()
-    local user = User:GetSelf();
+    local user = User.GetSelf();
     logger.debug("inventory_ui", "OpenOwnCharacterInventory", "user", user);
     local character = user:getCurrentCharacter();
     logger.debug("inventory->ui", "OpenOwnCharacterInventory", "character", character);
@@ -19,6 +20,7 @@ function OpenOwnCharacterInventory()
     logger.debug("inventory->ui", "getting inv");
     local inventory = character:getInventory();
     logger.debug("inventory->ui", "OpenOwnCharacterInventory", "inventory", inventory);
+
     OpenInventory(inventory);
 end;
 
@@ -30,20 +32,32 @@ function OpenInventory(inventory)
     local items = inventory:getItems();
     logger.debug("inventory->ui", "OpenInventory", "#items", #items);
 
-    local itemsStacked = {};
+    local itemStacks = {};
     for _,item in pairs(items) do
-        local index = utils.table.findIndex(itemsStacked, function(v)
-            return v:getItemData() == item:getItemData();
+        logger.debug("inventory->ui", "OpenInventory", "finding itemStack");
+        local itemStack = utils.table.find(itemStacks, function(v)
+            return v.item:getName() == item:getName() and v.item:getItemData() == item:getItemData();
         end);
+        logger.debug("inventory->ui", "OpenInventory", "got itemStack");
 
-        if index then
-            itemsStacked[index] = itemsStacked[index] + 1;
+        if itemStack then
+            logger.debug("inventory->ui", "OpenInventory", "incrementing name", itemStack.item:getName());
+            itemStack.amount = itemStack.amount + 1;
         else
-            itemsStacked[item] = 1;
+            logger.debug("inventory->ui", "OpenInventory", "inserting new itemstack", "name", item:getName());
+            table.insert(itemStacks, {
+                item = item,
+                amount = 1,
+            });
         end
     end
 
-    for item,amount in pairs(itemsStacked) do
+    logger.debug("inventory->ui", "OpenInventory", "#itemStacks", #itemStacks);
+
+    for _,itemStack in pairs(itemStacks) do
+        local item = itemStack.item;
+        local amount = itemStack.amount;
+
         logger.debug("inventory->ui", "OpenInventory", "item.id", item.id);
         logger.debug("inventory->ui", "OpenInventory", "amount", amount);
 

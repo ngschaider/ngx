@@ -14,6 +14,7 @@ local net = module.net;
 local callback = module.callback;
 local logger = module.logger;
 local class = M("class");
+local utils = M("utils");
 
 local cache = {};
 
@@ -90,7 +91,10 @@ module.RegisterSyncClass = function(objectClass)
 end;
 
 module.GetSyncObject = function(type, id, ...)
+    logger.debug("core->SyncObject", "module.GetSyncObject", "type,id", type, id);
     if not cache[type .. id] then
+        logger.debug("core->SyncObject", "syncClasses", json.encode(utils.table.map(syncClasses, function(v, k) return k, k; end)));
+        logger.debug("core->SyncObject", "module.GetSyncObject", "#syncClasses", utils.table.size(syncClasses));
         cache[type .. id] = syncClasses[type]:new(id, ...);
     end
 

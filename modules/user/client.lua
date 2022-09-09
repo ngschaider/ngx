@@ -71,6 +71,7 @@ module.GetSelf = function()
 	end);
 	local id = Citizen.Await(p);
 	local user = module.GetById(id);
+	
 	return user;
 end;
 

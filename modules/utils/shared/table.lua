@@ -1,3 +1,5 @@
+local logger = M("core").logger;
+
 module.table = {};
 
 module.table.dump = function(table, nb)
@@ -98,7 +100,7 @@ module.table.find = function(t, cb)
 	logger.debug("utils->table", "got ", json.encode(t));
 	for k,v in pairs(t) do
 		if cb(v) then
-			logger.debug("utils->table", "returning", json.encode(v));
+			logger.debug("utils->table", "returning");
 			return v;
 		end
 	end
@@ -119,8 +121,8 @@ end;
 module.table.filter = function(t, cb)
 	local newTable = {};
 
-	for i=1, #t, 1 do
-		if cb(t[i]) then
+	for k,v in pairs(t) do
+		if cb(v, k) then
 			table.insert(newTable, t[i]);
 		end
 	end

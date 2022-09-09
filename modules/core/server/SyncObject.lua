@@ -84,7 +84,6 @@ SyncObject.static._sync = {
     rpcs = {},
 };
 
-
 --[[
     Initialize the SyncObject
     This also also gets the data from the DB and saves it in the _data property
@@ -130,16 +129,16 @@ function SyncObject:setData(key, value)
     logger.debug("core->SyncObject", "SyncObject:setData", "type,id,key,value", self.type, self.id, key, value);
     if SyncObject.canClientRead(self.type, key) then
         net.send(nil, "core:SyncObject:setProperty", self.type, self.id, key, value);
-        print("in end of if statement");
+        --print("in end of if statement");
     end
-    print("below if statement");
+    --print("below if statement");
     logger.debug("core->SyncObject", "SyncObject:setData", "self.columns", json.encode(self.columns));
-    print("below log");
+    --print("below log");
     if self.columns[key] then
-        print("saving to db");
+        --print("saving to db");
         MySQL.update.await("UPDATE `" .. self.table .. "` SET `" .. key .. "`=? WHERE id=?", {value, self.id});
     end
-    print("setting value");
+    --print("setting value");
     self._data[key] = value;
 end
 
@@ -202,8 +201,8 @@ module.RegisterSyncClass = function(objectClass)
 end
 
 module.GetSyncObject = function(type, id, ...)
+    logger.debug("core->SyncObject", "module.GetSyncObject", "type,id", type, id);
     if not cache[type .. id] then
-        logger.debug("core->SyncObject", "creating new SyncObject", "type,id", type, id);
         logger.debug("core->SyncObject", "syncClasses", json.encode(utils.table.map(syncClasses, function(v, k) return k, k; end)));
         logger.debug("core->SyncObject", "module.GetSyncObject", "#syncClasses", utils.table.size(syncClasses));
         local syncClass = syncClasses[type];

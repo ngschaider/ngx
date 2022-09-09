@@ -16,4 +16,5 @@ function Event:Invoke(...)
     end
 end
 
+print("Event class created");
 module.Event = Event;

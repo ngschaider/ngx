@@ -1,6 +1,7 @@
 local core = M("core");
 local logger = M("core").logger;
 local class = M("class");
+local Inventory = M("inventory");
 
 Item = class("Item", core.SyncObject);
 core.RegisterSyncClass(Item);
@@ -35,7 +36,7 @@ end;
 function Item:getInventory()
     local id = self:getInventoryId();
     if id then
-        return M("inventory").GetById(id);
+        return Inventory.GetById(id);
     else
         return nil;
     end

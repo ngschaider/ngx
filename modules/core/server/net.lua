@@ -1,5 +1,5 @@
-local logger = module.logger;
 local User = M("user");
+local logger = module.logger;
 
 --[[
     stores the callbacks indexed by it's id 

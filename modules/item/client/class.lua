@@ -1,6 +1,7 @@
 local class = M("class");
 local core = M("core");
 local logger = M("core").logger;
+local Inventory = M("inventory");
 
 Item = class("Item", core.SyncObject);
 core.RegisterSyncClass(Item);
@@ -26,7 +27,7 @@ end;
 
 function Item:getInventory()
     local inventoryId = self:getInventoryId();
-    return M("inventory").GetById(inventoryId);
+    return Inventory.GetById(inventoryId);
 end;
 
 function Item:setInventoryId(id)

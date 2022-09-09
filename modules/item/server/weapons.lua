@@ -5,7 +5,7 @@ local RegisterWeapon = function(name, label)
         isUsable = false,
         isDroppable = true,
         onDrop = function(item)
-            local 
+            
         end,
         onCharacterSpawned = function(character)
             local user = character:getUser();

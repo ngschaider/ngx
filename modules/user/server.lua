@@ -115,7 +115,7 @@ end;
 
 
 module.GetByPlayerId = function(playerId)
-	logger.debug("user", "GetByPlayerId", "playerId", playerId);
+	logger.debug("user", "module.GetByPlayerId", "playerId", playerId);
 	local identifier = utils.getIdentifier(playerId);
 	logger.debug("user", "module.GetByPlayerId", "identifier", identifier);
 	local user = module.GetByIdentifier(identifier);
@@ -143,14 +143,12 @@ module.GetOnlineIds = function()
 	return ids;
 end;
 
-callback.register("user:getSelfId", function(playerId, cb)
-	logger.debug("user", "callback called", playerId, cb);
-	local user = module.GetByPlayerId(playerId);
-	logger.debug("user", "calling cb");
+callback.register("user:getSelfId", function(user, cb)
+	logger.debug("user", "user:getSelfId", user.id, cb);
 	cb(user.id);
 end);
 
-callback.register("user:getOnlineIds", function(playerId, cb)
+callback.register("user:getOnlineIds", function(user, cb)
 	local ids = module.GetOnlineIds();
 	cb(ids);
 end);

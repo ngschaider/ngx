@@ -186,13 +186,7 @@ local DefaultMixin = {
 	}
 }
 
-module.class = function(name, super)
+module = function(name, super)
 	assert(type(name) == 'string', "A name (string) is needed for the new class")
 	return super and super:subclass(name) or _includeMixin(_createClass(name), DefaultMixin)
 end
-
-setmetatable(module, { 
-	__call = function(_, ...) 
-		return module.class(...) 
-	end,
-});

@@ -29,8 +29,9 @@ NGX.EvalFile = function(resource, file, env)
 end;
 
 local modules = json.decode(LoadResourceFile(GetCurrentResourceName(), "modules.json"));
-for k,v in pairs(modules) do
-    M(v);
+for _,name in pairs(modules) do
+    NGX.LoadModule(name);
 end
+
 
 --print('[^2INFO^7] ^5NGX^0 initialized with ' .. #modules .. " modules.");

@@ -4,6 +4,7 @@ local logger = M("core").logger;
 local Inventory = M("inventory");
 local class = M("class");
 local core = M("core");
+local User = M("user");
 
 local Character = class("Character", core.SyncObject);
 core.RegisterSyncClass(Character);
@@ -35,7 +36,7 @@ end
 
 function Character:getUser()
 	local userId = self:getUserId();
-	return M("user").GetById(userId);
+	return User.GetById(userId);
 end
 
 function Character:getPosition()
@@ -110,7 +111,7 @@ module.Create = function(userId, firstname, lastname, dateOfBirth, skin)
 end;
 
 module.GetByPlayerId = function(playerId)
-	local user = M("user").GetByPlayerId(playerId);
+	local user = User.GetByPlayerId(playerId);
 
 	if not user then
 		logger.error("character", "User with player id " .. playerId .. " not found - returning nil");

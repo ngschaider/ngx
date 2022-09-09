@@ -6,8 +6,6 @@ local utils = M("utils");
 local skin = M("skin");
 local UI = M("UI");
 
-local pool = UI.CreatePool();
-
 local cam = nil;
 
 module.StartSelection = function(cb)
@@ -48,7 +46,6 @@ module.StartSelection = function(cb)
 	local selfUser = User:GetSelf();
 	local characters = selfUser:getCharacters();
 	local menu = UI.CreateMenu("Charakterauswahl");
-	pool:Add(menu);
 
 	menu.Controls.Back.enabled = false;
 
@@ -99,17 +96,7 @@ module.StartSelection = function(cb)
 	end;
 
 	menu:Visible(true);
-	pool:RefreshIndex();
 end;
-
-Citizen.CreateThread(function()
-	while true do
-		if pool then
-        	pool:ProcessMenus();
-		end
-		Citizen.Wait(0);
-	end
-end)
 
 net.on("net:resourceStop", function()
   if cam then

@@ -1,4 +1,5 @@
 local logger = M("core").logger;
+local Character = M("character");
 
 module.Register({
     name = "beer",
@@ -17,7 +18,7 @@ RegisterCommand("beer", function(playerId, args, rawCommand)
     logger.debug("item->beer", "beer");
 
     logger.debug("item->beer", "getting character");
-    local character = M("character").GetByPlayerId(playerId);
+    local character = Character.GetByPlayerId(playerId);
     if not character then
         logger.debug("item->beer", "failed to get current character");
         return;

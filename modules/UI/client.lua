@@ -1,8 +1,5 @@
 run("client/Utils.lua");
-
-
 run("client/elements/UIResRectangle.lua");
-
 run("client/elements/UIResText.lua");
 run("client/elements/Sprite.lua");
 run("client/elements/StringMeasurer.lua");

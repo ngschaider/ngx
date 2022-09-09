@@ -148,9 +148,11 @@ function UIMenu.New(Title, Subtitle, X, Y, TxtDictionary, TxtName)
 		end
 	end)
 
+	setmetatable(_UIMenu, UIMenu)
+
 	RegisterMenu(_UIMenu);
 
-	return setmetatable(_UIMenu, UIMenu)
+	return _UIMenu;
 end
 
 function UIMenu:SetMenuWidthOffset(Offset)
@@ -452,8 +454,12 @@ end
 
 function UIMenu:Visible(bool)
 	if bool ~= nil then
-		if tobool(bool) and IsAnyMenuOpen() then
-			return;
+		if tobool(bool) then
+			if IsAnyMenuOpen() then
+				return;
+			else
+				self:RefreshIndex();
+			end
 		end
 
 		self._Visible = tobool(bool)

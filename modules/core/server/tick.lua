@@ -1,10 +1,10 @@
-local Event = module.event;
+local Event = module.Event;
 
 module.onTick = Event:new();
 
 Citizen.CreateThread(function()
     while true do
-        onTick:Invoke();
+        module.onTick:Invoke();
         Citizen.Wait(0);
     end
 end);

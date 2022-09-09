@@ -2,6 +2,7 @@ local class = M("class");
 local logger = M("core").logger;
 local Color = M("core").Color;
 local Event = M("core").Event;
+local core = M("core");
 
 local Marker = class("Marker");
 

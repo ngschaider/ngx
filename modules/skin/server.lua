@@ -5,7 +5,7 @@ local command = M("command");
 local callback = M("core").callback;
 
 -command.registerCommand("getskin", function(user, args)
-    callback.trigger("skin:getSkin", user:getPlayerId(), function(skin)
+    callback.trigger(user, "skin:getSkin", function(skin)
         --print(json.encode(skin));
     end);
 end, true, {

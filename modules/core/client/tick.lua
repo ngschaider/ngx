@@ -1,4 +1,4 @@
-local Event = module.event;
+local Event = module.Event;
 
 module.onTick = Event:new();
 
@@ -14,7 +14,7 @@ Citizen.CreateThread(function()
             playerVehicle = playerVehicle,
         };
 
-        onTick:Invoke(data);
+        module.onTick:Invoke(data);
         Citizen.Wait(0);
     end
 end);

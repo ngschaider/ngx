@@ -58,6 +58,7 @@ AddEventHandler("txAdmin:events:scheduledRestart", function(eventData)
     end
 end);
 
+
 -- save every minute
 Citizen.CreateThread(function()
     while true do

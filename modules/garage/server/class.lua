@@ -51,7 +51,7 @@ module.GetById = function(id)
     return core.GetSyncObject("Garage", id);
 end
 
-callback.register("garage:getAllIds", function(playerId, cb)
+callback.register("garage:getAllIds", function(user, cb)
     logger.debug("garage", "garage:getAllIds", "querying");
     local results = MySQL.query.await("SELECT id FROM garages");
 

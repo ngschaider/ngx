@@ -195,13 +195,19 @@ module.SyncObject = SyncObject;
 ]]
 local syncClasses = {};
 module.RegisterSyncClass = function(objectClass)
+    logger.debug("core->SyncObject", "module.RegisterSyncClass", "objectClass.name", objectClass.name);
+    logger.debug("core->SyncObject", "module.RegisterSyncClass", "#syncClasses", utils.table.size(syncClasses));
     syncClasses[objectClass.name] = objectClass;
+    logger.debug("core->SyncObject", "module.RegisterSyncClass", "#syncClasses", utils.table.size(syncClasses));
 end
 
 module.GetSyncObject = function(type, id, ...)
     if not cache[type .. id] then
         logger.debug("core->SyncObject", "creating new SyncObject", "type,id", type, id);
-        cache[type .. id] = syncClasses[type]:new(id, ...);
+        logger.debug("core->SyncObject", "syncClasses", json.encode(utils.table.map(syncClasses, function(v, k) return k, k; end)));
+        logger.debug("core->SyncObject", "module.GetSyncObject", "#syncClasses", utils.table.size(syncClasses));
+        local syncClass = syncClasses[type];
+        cache[type .. id] = syncClass:new(id, ...);
     end
 
     return cache[type .. id];
@@ -215,7 +221,7 @@ module.DeleteSyncObject = function(obj)
     net.send(nil, "core:SyncObject:delete", obj.type, obj.id);
 end;
 
-callback.register("core:SyncObject:rpc", function(playerId, cb, type, id, name, ...)
+callback.register("core:SyncObject:rpc", function(user, cb, type, id, name, ...)
     local obj = module.GetSyncObject(type, id);
 
     if not obj then
@@ -233,7 +239,7 @@ callback.register("core:SyncObject:rpc", function(playerId, cb, type, id, name, 
     cb(ret);
 end)
 
-net.on("core:SyncObject:setProperty", function(playerId, type, id, key, value)
+net.on("core:SyncObject:setProperty", function(user, type, id, key, value)
     --logger.debug("core->SyncObject", "core:SyncObject:setProperty", "type,id,key,value", type, id, key, value);
     local obj = module.GetSyncObject(type, id);
 
@@ -247,7 +253,7 @@ net.on("core:SyncObject:setProperty", function(playerId, type, id, key, value)
     end
 end)
 
-callback.register("core:SyncObject:getObjectData", function(playerId, cb, type, id)
+callback.register("core:SyncObject:getObjectData", function(user, cb, type, id)
     logger.debug("core->SyncObject", "getObjectData", "type,id", type, id);
     local obj = module.GetSyncObject(type, id);
 

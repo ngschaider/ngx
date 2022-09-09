@@ -1,5 +1,6 @@
 run("client/config.lua");
 
+local core = M("core");
 local net = M("core").net;
 local utils = M("utils");
 local skin = M("skin");
@@ -7,9 +8,7 @@ local User = M("user");
 local streaming = M("streaming")
 local UI = M("UI");
 
-local pool = UI.CreatePool();
-
-local cam = nil
+local cam = nil;
 
 local heading = nil; -- this gets overriden by the loop controlling the camera rotation
 local camOffset = nil;
@@ -19,13 +18,6 @@ local intensityOptions = {0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
 
 -- firstname, lastname, dateofbirth
 local data = {};
-
-Citizen.CreateThread(function()
-    while true do
-        pool:ProcessMenus();
-        Citizen.Wait(0);
-    end
-end);
 
 module.CreateNewCharacter = function(cb)
     local playerId = PlayerId();
@@ -327,28 +319,24 @@ Citizen.CreateThread(function()
 end)
 ]]	
 
-Citizen.CreateThread(function()
-	local angle = -90;
+core.onTick:Add(function()
+    local angle = -90;
 
-	while true do
-		Citizen.Wait(0)
+    if cam ~= nil then
+        if IsDisabledControlPressed(0, 108) then -- NUMPAD 4
+            angle = angle - 1
+        elseif IsDisabledControlPressed(0, 109) then -- NUMPAD 6
+            angle = angle + 1
+        end
 
-		if cam ~= nil then
-            if IsDisabledControlPressed(0, 108) then -- NUMPAD 4
-                angle = angle - 1
-            elseif IsDisabledControlPressed(0, 109) then -- NUMPAD 6
-                angle = angle + 1
-            end
+        if angle > 360 then
+            angle = angle - 360
+        elseif angle < 0 then
+            angle = angle + 360
+        end
 
-            if angle > 360 then
-                angle = angle - 360
-            elseif angle < 0 then
-                angle = angle + 360
-            end
-
-            SetCamValues(angle, nil, nil);
-		end
-	end
+        SetCamValues(angle, nil, nil);
+    end
 end)
 
 net.on("net:resourceStop", function()

@@ -27,16 +27,13 @@ function Marker:initialize(position)
     self.onTickWhileInside = Event:new();
     self.isPlayerInside = false;
 
-    core.onTick:Add(function()
-        self:tick();
+    core.onTick:Add(function(data)
+        self:tick(data);
     end);
 end
 
-function Marker:tick()
-    local ped = PlayerPedId();
-    local playerPos = GetEntityCoords(ped);
-
-    local dist = #(playerPos - self.position);
+function Marker:tick(data)
+    local dist = #(data.playerPos - self.position);
 
     if dist < self.distance then
         local radius = math.max(math.max(self.scale.x, self.scale.y) * 0.65, 1.2);

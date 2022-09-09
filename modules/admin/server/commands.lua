@@ -1,29 +1,29 @@
 local command = M("command");
 local logger = M("core").logger;
-local event = M("core").event;
+local net = M("core").net;
 
 command.registerCommand("admin", function(user)
     logger.debug("command", "Command 'admin' executed!");
-    user:emit("admin:OpenMenu");
+    net.send(user, "admin:OpenMenu");
 end);
 
 command.registerCommand("car", function(user, args)
-    user:emit("admin:car", args[1]);
+    net.send(user, "admin:car", args[1]);
 end);
 
 command.registerCommand("freeze", function(user, args)
     local character = args[1];
     if character then
-        character:getUser():emit("admin:freeze", args[1]);
+        net.send(character:getUser(), "admin:freeze", args[1]);
     end
 end)
 
 command.registerCommand("tpm", function(user)
-    user:emit("admin:tpm");
+    net.send(user, "admin:tpm");
 end)
 
 command.registerCommand("coords", function(user)
-    user:emit("admin:coords");
+    net.send(user, "admin:coords");
 end)
 
 
@@ -86,7 +86,7 @@ end);
 command.registerCommand("kill", function(user, args)
     local character = args[1];
     if character then
-        character:getUser():emit("admin:kill");
+        nets.send(character:getUser(), "admin:kill");
     end
 end, {
     args = {
@@ -98,7 +98,7 @@ command.registerCommand("freeze", function(user, args)
     local character = args[1];
 
     if character then
-        character:getUser():emit("admin:freeze");
+        net.send(character:getUser(), "admin:freeze");
     end
 end, {
     args = {
@@ -109,7 +109,7 @@ end, {
 command.registerCommand("unfreeze", function(user, args)
     local character = args[1];
     if character then
-        user:emit("admin:unfreeze", character.id);
+        net.send(character:getUser(), "admin:unfreeze");
     end
 end, {
     args = {

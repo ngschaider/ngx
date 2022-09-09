@@ -1,11 +1,11 @@
-local event = M("core").event;
+local net = M("core").net;
 
-event.on("admin:kill", function()
+net.on("admin:kill", function()
     local ped = PlayerPedId();
     SetEntityHealth(ped, 0);
 end);
 
-event.on("admin:freeze", function()
+net.on("admin:freeze", function()
     local player = PlayerId();
     local ped = PlayerPedId();
     SetEntityCollision(ped, false);
@@ -13,7 +13,7 @@ event.on("admin:freeze", function()
     --SetPlayerInvincible(player, true);
 end);
 
-event.on("admin:unfreeze", function()
+net.on("admin:unfreeze", function()
     local player = PlayerId();
     local ped = PlayerPedId();
     SetEntityCollision(ped, true);
@@ -21,7 +21,7 @@ event.on("admin:unfreeze", function()
     --SetPlayerInvincible(player, true);
 end);
 
-event.on("admin:tpm", function()
+net.on("admin:tpm", function()
     local handle = GetFirstBlipInfoId(8);
     if DoesBlipExist(handle) then
         local coords = GetBlipInfoIdCoord(handle);

@@ -10,7 +10,7 @@ Refer to the server-side docs for SyncObject. It is mostly used the same way, ex
 ]]
 
 
-local event = module.event;
+local net = module.net;
 local callback = module.callback;
 local logger = module.logger;
 local class = M("class");
@@ -51,7 +51,7 @@ function SyncObject:setData(key, value)
         logger.error("core->SyncObject", "SyncObject:setData", "accessing deleted SyncObject: type,id", self.type, self.id);
         return;
     end
-    event.emitServer("core:SyncObject:setProperty", self.type, self.id, key, value);
+    net.send("core:SyncObject:setProperty", self.type, self.id, key, value);
 end
 
 function SyncObject:rpc(name, ...)
@@ -66,13 +66,13 @@ function SyncObject:rpc(name, ...)
     return Citizen.Await(p);
 end
 
-event.on("core:SyncObject:setProperty", function(type, id, key, value)
+net.on("core:SyncObject:setProperty", function(type, id, key, value)
     logger.debug("core->SyncObject", "core:SyncObject:setProperty", "type,id,key,value", type, id, key, value);
     local obj = module.GetSyncObject(type, id);
     obj._data[key] = value;
 end);
 
-event.on("core:SyncObject:delete", function(type, id)
+net.on("core:SyncObject:delete", function(type, id)
     if not cache[type .. id] then
         return;
     end

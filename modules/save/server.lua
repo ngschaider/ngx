@@ -1,6 +1,6 @@
 local Character = M("character");
 local logger = M("core").logger;
-local event = M("core").event;
+local net = M("core").net;
 
 local SaveCharacter = function(character)
     logger.debug("save", "Saving Character", character.id);
@@ -31,7 +31,7 @@ local SaveCharacters = function()
 end;
 
 -- save when player dropped
-event.on("event:playerDropped", function(playerId, reason)
+net.on("net:playerDropped", function(playerId, reason)
     local character = Character.GetByPlayerId(playerId);
     if character then
         logger.debug("save", "Saving " .. character:getName() .. " because they left.");
@@ -43,7 +43,7 @@ end);
 -- Disabled because there is not enough time to execute MySQL queries. 
 -- Maybe this can be fixed by using synchronous queries.
 
-event.on("event:resourceStop", function()
+net.on("net:resourceStop", function()
     logger.info("save", "Saving characters because the resource shuts down.");
     SaveCharacters();
 end);

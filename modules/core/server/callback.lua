@@ -1,4 +1,4 @@
-local event = module.event;
+local net = module.net;
 local logger = module.logger;
 
 local serverCallbacks = {};
@@ -10,11 +10,11 @@ module.callback.register = function(name, cb)
 	serverCallbacks[name] = cb;
 end
 
-event.on("core:callback:request", function(playerId, name, requestId, ...)
+net.on("core:callback:request", function(user, name, requestId, ...)
 	if serverCallbacks[name] then
-		logger.debug("core->callback", "executing C->S->C callback function", playerId, name, ...);
-		serverCallbacks[name](playerId, function(...)
-			event.emitClient("core:callback:response", playerId, requestId, ...);
+		logger.debug("core->callback", "executing C->S->C callback function", user.id, name, ...);
+		serverCallbacks[name](user, function(...)
+			net.send(user, "core:callback:response", requestId, ...);
 		end, ...);
 	else
 		logger.warn("core->callback", "C->S->C callback " .. name .. " not found.");
@@ -39,16 +39,16 @@ local GetAndConsumeRequestId = function()
     return lastRequestId;
 end
 
-module.callback.trigger = function(name, playerId, cb, ...)
+module.callback.trigger = function(user, name, cb, ...)
 	logger.debug("core->callback", "triggered S->C->S callback " .. name);
 
     local requestId = GetAndConsumeRequestId();
 	clientCallbacks[requestId] = cb;
 
-	event.emitClient("core:callback:request", playerId, name, requestId, ...)
+	net.send(user, "core:callback:request", name, requestId, ...)
 end;
 
-event.on("core:callback:response", function(playerId, requestId, ...)
+net.on("core:callback:response", function(playerId, requestId, ...)
 	clientCallbacks[requestId](...);
 	clientCallbacks[requestId] = nil;
 end)

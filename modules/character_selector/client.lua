@@ -1,4 +1,4 @@
-local event = M("core").event;
+local net = M("core").net;
 local streaming = M("streaming");
 local User = M("user");
 local charcreator = M("charcreator");
@@ -111,7 +111,7 @@ Citizen.CreateThread(function()
 	end
 end)
 
-event.on("event:resourceStop", function()
+net.on("net:resourceStop", function()
   if cam then
 	DestroyCam(cam, true);
   end

@@ -1,6 +1,6 @@
 --[[
     
-local event = M("core").event;
+local net = M("core").net;
 local command = M("command");
 local callback = M("core").callback;
 

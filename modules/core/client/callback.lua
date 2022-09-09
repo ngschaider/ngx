@@ -1,4 +1,4 @@
-local event = module.event;
+local net = module.net;
 local logger = module.logger;
 
 local serverCallbacks = {};
@@ -17,10 +17,10 @@ module.callback.trigger = function(name, cb, ...)
     local requestId = GetAndConsumeRequestId();
 	serverCallbacks[requestId] = cb;
 
-	event.emitServer("core:callback:request", name, requestId, ...);
+	net.send("core:callback:request", name, requestId, ...);
 end;
 
-event.on("core:callback:response", function(requestId, ...)
+net.on("core:callback:response", function(requestId, ...)
 	-- developer does not need to provide a callback function when triggering a callback
 	if serverCallbacks[requestId] then
 		serverCallbacks[requestId](...);
@@ -36,10 +36,10 @@ module.callback.register = function(name, cb)
     clientCallbacks[name] = cb;
 end;
 
-event.on("core:callback:request", function(name, requestId, ...)
+net.on("core:callback:request", function(name, requestId, ...)
 	if clientCallbacks[name] then
 		clientCallbacks[name](function(...)
-			event.emitServer("core:callback:response", requestId, ...);
+			net.send("core:callback:response", requestId, ...);
 		end, ...);
 	else
 		logger.warn("core->callback", "S->C->S callback " .. name .. " not found.");

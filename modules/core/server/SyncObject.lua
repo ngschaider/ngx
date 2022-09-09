@@ -45,7 +45,7 @@ For getting a SyncObject (for example, get the Character with ID 2):
 local character = core.GetSyncObject("Character", 2);
 ]]
 
-local event = module.event;
+local net = module.net;
 local callback = module.callback;
 local logger = module.logger;
 local class = M("class");
@@ -129,7 +129,7 @@ function SyncObject:setData(key, value)
     end
     logger.debug("core->SyncObject", "SyncObject:setData", "type,id,key,value", self.type, self.id, key, value);
     if SyncObject.canClientRead(self.type, key) then
-        event.emitClient("core:SyncObject:setProperty", -1, self.type, self.id, key, value);
+        net.send(nil, "core:SyncObject:setProperty", self.type, self.id, key, value);
         print("in end of if statement");
     end
     print("below if statement");
@@ -212,7 +212,7 @@ module.DeleteSyncObject = function(obj)
     obj._deleted = true;
 
     MySQL.query.await("DELETE FROM `" .. obj.table .. "` WHERE id=?", {obj.id});
-    event.emitClient("core:SyncObject:delete", obj.type, obj.id);
+    net.send(nil, "core:SyncObject:delete", obj.type, obj.id);
 end;
 
 callback.register("core:SyncObject:rpc", function(playerId, cb, type, id, name, ...)
@@ -233,7 +233,7 @@ callback.register("core:SyncObject:rpc", function(playerId, cb, type, id, name, 
     cb(ret);
 end)
 
-event.on("core:SyncObject:setProperty", function(playerId, type, id, key, value)
+net.on("core:SyncObject:setProperty", function(playerId, type, id, key, value)
     --logger.debug("core->SyncObject", "core:SyncObject:setProperty", "type,id,key,value", type, id, key, value);
     local obj = module.GetSyncObject(type, id);
 

@@ -1,4 +1,4 @@
-local event = M("core").event;
+local net = M("core").net;
 local logger = M("core").logger;
 local User = M("user");
 local UI = M("UI");
@@ -65,7 +65,7 @@ local OpenMenu = function()
 end;
 
 
-event.on("admin:OpenMenu", function()
+net.on("admin:OpenMenu", function()
     logger.debug("admin", "admin:OpenMenu");
     OpenMenu();
 end);

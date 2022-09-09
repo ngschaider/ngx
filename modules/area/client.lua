@@ -3,29 +3,31 @@ local class = M("class");
 local core = M("core");
 local utils = M("utils");
 
-local pointsDrawn = {};
-Citizen.CreateThread(function()
-    while true do 
-        local p1 = nil;
-        for _,p2 in pairs(pointsDrawn) do
-            if p1 then
-                DrawPoly(p1.x, p1.y, p1.z, p2.x, p2.y, p2.z, p1.x, p1.y, p2.z + 20);
-                DrawPoly(p2.x, p2.y, p2.z, p2.x, p2.y, p2.z + 20, p1.x, p1.y, p1.z + 20);
-
-                p1 = nil;
-            else
-                p1 = point;
-            end
-        end
-        Citizen.Wait(0);
-    end
-end);
-
 local Area = class("Area", core.SyncObject);
 core.RegisterSyncClass(Area);
 
 function Area:initialize(id)
     core.SyncObject.initialize("Area", id, "areas");
+
+    self.visible = false;
+
+    core.onTick:Add(function()
+        self:tick();
+    end)
+end
+
+function Area:tick()
+    local p1 = nil;
+    for _,p2 in pairs(self:getPoints()) do
+        if p1 then
+            DrawPoly(p1.x, p1.y, p1.z, p2.x, p2.y, p2.z, p1.x, p1.y, p2.z + 20, 100, 255, 0, 60);
+            DrawPoly(p2.x, p2.y, p2.z, p2.x, p2.y, p2.z + 20, p1.x, p1.y, p1.z + 20, 100, 255, 0, 60);
+            p1 = nil;
+        else
+            p1 = point;
+        end
+    end
+    Citizen.Wait(0);
 end
 
 function Area:getPoints()
@@ -49,7 +51,6 @@ function Area:startSelection()
 
         if IsControlJustPressed(0, 51) then -- E
             table.insert(points, point);
-            table.insert(pointsDrawn, point);
         end
 
         if IsControlJustPressed(0, 23) then -- ENTER
@@ -59,7 +60,6 @@ function Area:startSelection()
         Citizen.Wait(0);
     end
 
-    pointsDrawn = {};
     self:setPoints(points);
 end
 

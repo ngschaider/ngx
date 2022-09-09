@@ -16,4 +16,4 @@ function Event:Invoke(...)
     end
 end
 
-module.event = Event;
+module.Event = Event;

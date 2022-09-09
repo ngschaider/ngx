@@ -1,6 +1,7 @@
 local class = M("class");
 local logger = M("core").logger;
 local Color = M("core").Color;
+local Event = M("core").Event;
 
 local Marker = class("Marker");
 
@@ -21,12 +22,14 @@ function Marker:initialize(position)
     self.faceCamera = false;
     self.distance = 10;
 
-    self.onEnter = function() end;
-    self.onExit = function() end;
-    self.onTickWhileInside = function() end;
+    self.onEnter = Event:new();
+    self.onExit = Event:new();
+    self.onTickWhileInside = Event:new();
     self.isPlayerInside = false;
 
-    table.insert(markers, self);
+    core.onTick:Add(function()
+        self:tick();
+    end);
 end
 
 function Marker:tick()
@@ -55,19 +58,6 @@ function Marker:tick()
         DrawMarker(self.type, self.position, self.direction, self.rotation, self.scale, self.color.r, self.color.g, self.color.b, self.color.a, self.bobUpAndDown, self.faceCamera, 2, nil, nil, false);
     end
 end
-
-Citizen.CreateThread(function()
-    while true do
-        --logger.debug("marker", "looping marker");
-        for _,marker in pairs(markers) do
-            --logger.debug("marker", "dist,marker.distance", dist, marker.distance)
-            
-            --logger.debug("marker", "tick");
-            marker:tick();
-        end
-        Citizen.Wait(0);
-    end
-end);
 
 module.Create = function(...)
     return Marker:new(...);

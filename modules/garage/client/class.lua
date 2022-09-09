@@ -14,12 +14,12 @@ function Garage:initialize(id)
 
     self.marker = Marker.Create(self:getPosition());
     self.marker.scale = vector3(3.0, 3.0, 0.2);
-    self.marker.onEnter = function()
+    self.marker.onEnter:Add(function()
         self.notification.visible = true;
-    end
-    self.marker.onExit = function()
+    end);
+    self.marker.onExit:Add(function()
         self.notification.visible = false;
-    end
+    end);
 end
 
 function Garage:getName()

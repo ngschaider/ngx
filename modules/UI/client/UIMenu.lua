@@ -1129,6 +1129,7 @@ end
 
 function UIMenu:AddInstructionButton(button)
 	if type(button) == "table" and #button == 2 then
+---@diagnostic disable-next-line: param-type-mismatch
 		table.insert(self.InstructionalButtons, button)
 	end
 end
@@ -1137,6 +1138,7 @@ function UIMenu:RemoveInstructionButton(button)
 	if type(button) == "table" then
 		for i = 1, #self.InstructionalButtons do
 			if button == self.InstructionalButtons[i] then
+---@diagnostic disable-next-line: param-type-mismatch
 				table.remove(self.InstructionalButtons, i)
 				break
 			end
@@ -1144,6 +1146,7 @@ function UIMenu:RemoveInstructionButton(button)
 	else
 		if tonumber(button) then
 			if self.InstructionalButtons[tonumber(button)] then
+---@diagnostic disable-next-line: param-type-mismatch
 				table.remove(self.InstructionalButtons, tonumber(button))
 			end
 		end

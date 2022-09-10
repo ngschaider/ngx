@@ -14,7 +14,8 @@ local RotationToDirection = function(rotation)
 	return direction;
 end;
 
-module.camera.RaycastGameplayCamera = function()
+module.camera.RaycastGameplayCamera = function(distance)
+	distance = distance or 100;
     local camRot = GetGameplayCamRot();
     local camPos = GetGameplayCamCoord();
     local direction = RotationToDirection(camRot);

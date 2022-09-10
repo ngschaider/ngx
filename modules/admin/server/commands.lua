@@ -74,9 +74,9 @@ end, {
 })
 
 command.registerCommand("goback", function(user)
-    local currentCharacter = user:getCurrentCharacter();
-    if character and currentCharacter then
-        local ped = GetPlayerPed(currentCharacter:getPlayerId());
+    local character = user:getCurrentCharacter();
+    if character then
+        local ped = GetPlayerPed(character:getPlayerId());
         SetEntityCoords(ped, savedCoords[character.id]);
 
         savedCoords[character.id] = nil;
@@ -86,7 +86,7 @@ end);
 command.registerCommand("kill", function(user, args)
     local character = args[1];
     if character then
-        nets.send(character:getUser(), "admin:kill");
+        net.send(character:getUser(), "admin:kill");
     end
 end, {
     args = {

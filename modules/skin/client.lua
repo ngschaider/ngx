@@ -1,4 +1,5 @@
 local utils = M("utils");
+local logger = M("core").logger;
 
 -- constant lookup table for default values, minimum values, zoom and cam offsets
 --[[

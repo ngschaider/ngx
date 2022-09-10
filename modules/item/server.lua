@@ -7,14 +7,10 @@ local registeredItems = {};
 
 GetOptions = function(name)
     local options = registeredItems[name];
+
     if not options then
-        logger.warn("item", "GetOptions", "Using default options", "name", name);
-        options = {
-            name = self:getName(),
-            label = "404_" .. self:getName(),
-            isUsable = false,
-            isDroppable = false,
-        };
+        logger.warn("item", "GetOptions", "Could not find options", "name", name);
+        return nil;
     end
 
     return options;

@@ -1,3 +1,5 @@
+local utils = M("utils");
+
 local RegisterWeapon = function(name, label)
     module.Register({
         name = name,

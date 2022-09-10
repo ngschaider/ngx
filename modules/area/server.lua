@@ -12,11 +12,11 @@ function Area:initialize(id)
 end
 
 function Area:getPoints()
-    return json_decode(self:getData("points"));
+    return json.decode(self:getData("points"));
 end
 
 function Area:setPoints(points)
-    self:setData("points", json_encode(points));
+    self:setData("points", json.encode(points));
 end
 
 function Area:isPointInside(point)

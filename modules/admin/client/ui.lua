@@ -1,5 +1,6 @@
 local net = M("core").net;
 local logger = M("core").logger;
+local callback = M("core").callback;
 local User = M("user");
 local UI = M("UI");
 

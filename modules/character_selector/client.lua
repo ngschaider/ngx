@@ -3,6 +3,7 @@ local streaming = M("streaming");
 local User = M("user");
 local charcreator = M("charcreator");
 local utils = M("utils");
+local logger = M("core").logger;
 local skin = M("skin");
 local UI = M("UI");
 

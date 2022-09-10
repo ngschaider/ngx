@@ -1,5 +1,9 @@
 local class = M("class");
 local core = M("core");
+local Garage = M("garage");
+local logger = M("core").logger;
+local Character = M("character");
+local utils = M("utils");
 
 local Vehicle = class("Vehicle", core.SyncObject);
 core.RegisterSyncClass(Vehicle);

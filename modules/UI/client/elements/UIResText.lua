@@ -93,7 +93,7 @@ function UIResText.New(Text, X, Y, Scale, R, G, B, A, Font, Alignment, DropShado
         _Colour = {R = tonumber(R) or 255, G = tonumber(G) or 255, B = tonumber(B) or 255, A = tonumber(A) or 255},
         Font = tonumber(Font) or 0,
         Alignment = Alignment or nil,
-        DropShadow = Dropshadow or nil,
+        DropShadow = DropShadow or nil,
         Outline = Outline or nil,
         WordWrap = tonumber(WordWrap) or 0,
     }
@@ -154,6 +154,7 @@ function UIResText:Draw()
 
     if tonumber(self.WordWrap) then
         if tonumber(self.WordWrap) ~= 0 then
+---@diagnostic disable-next-line: undefined-global
             SetTextWrap(Position.X, Position.X + (tonumber(self.WordWrap) / Resolution.Width))
         end
     end

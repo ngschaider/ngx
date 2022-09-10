@@ -1,3 +1,5 @@
+local logger = M("core").logger;
+
 module.vehicle = module.vehicle or {};
 
 -- iterations for damage application
@@ -116,10 +118,10 @@ module.vehicle.SetDeformation = function(vehicle, deformationPoints, callback)
 			for i, def in ipairs(deformationPoints) do
 				if (#(GetVehicleDeformationAtPos(vehicle, def[1])) < def[2]) then
 					SetVehicleDamage(
-						vehicle, 
-						def[1] * 2.0, 
-						def[2] * damageMult, 
-						radius, 
+						vehicle,
+						def[1] * 2.0,
+						def[2] * damageMult,
+						radius,
 						true
 					)
 

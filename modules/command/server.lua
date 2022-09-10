@@ -1,4 +1,6 @@
 local logger = M("core").logger;
+local User = M("user");
+local Character = M("character");
 
 local convertArg = function(argument, config)
 	if config.type == "user" then
@@ -14,7 +16,7 @@ local onCommandExecuted = function(command, playerId, args, raw)
 	local user = User.GetByPlayerId(playerId);
 
 	if command.options.raw then
-		cb(user, raw);
+		command.options.cb(user, raw);
 		return;
 	end
 
@@ -24,9 +26,7 @@ local onCommandExecuted = function(command, playerId, args, raw)
 			local convertedArg = convertArg(args[i], command.options.args[i]);
 			table.insert(convertedArgs, convertedArg);
 		end
-		Citizen.CreateThread(function()
-			cb(user, args);
-		end);
+		command.options.cb(user, args);
 		return;
 	end
 end
@@ -44,7 +44,9 @@ module.registerCommand = function(name, cb, options)
 		options = options,
 	};
 
-	RegisterCommand(command.name, function(...)
-		onCommandExecuted(command, ...);
+	RegisterCommand(command.name, function(playerId, args, raw)
+		Citizen.CreateThread(function()
+			onCommandExecuted(command, playerId, args, raw);
+		end);
 	end, false);
 end

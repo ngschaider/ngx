@@ -1,3 +1,5 @@
+---@diagnostic disable: undefined-global
+
 fx_version 'cerulean'
 
 games {

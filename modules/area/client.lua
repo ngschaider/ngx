@@ -24,18 +24,18 @@ function Area:tick()
             DrawPoly(p2.x, p2.y, p2.z, p2.x, p2.y, p2.z + 20, p1.x, p1.y, p1.z + 20, 100, 255, 0, 60);
             p1 = nil;
         else
-            p1 = point;
+            p1 = p2;
         end
     end
     Citizen.Wait(0);
 end
 
 function Area:getPoints()
-    return json_decode(self:getData("points"));
+    return json.decode(self:getData("points"));
 end
 
 function Area:setPoints(points)
-    self:setData("points", json_encode(points));
+    self:setData("points", json.encode(points));
 end
 
 function Area:isPointInside(point)

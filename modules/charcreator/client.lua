@@ -7,6 +7,7 @@ local skin = M("skin");
 local User = M("user");
 local streaming = M("streaming")
 local UI = M("UI");
+local logger = M("core").logger;
 
 local cam = nil;
 
@@ -21,19 +22,19 @@ local data = {};
 
 module.CreateNewCharacter = function(cb)
     local playerId = PlayerId();
-    local ped = PlayerPedId();
+    local playerPed = PlayerPedId();
 
     local model = "mp_m_freemode_01";
 	streaming.RequestModel(model);
 	SetPlayerModel(playerId, model);
-    playerId = PlayerPedId(); -- SetPlayerModel changes the ped handle!!!!!
+    playerPed = PlayerPedId(); -- SetPlayerModel changes the ped handle!!!!!
 	SetModelAsNoLongerNeeded(model);
 
     --print("module.CreateNewCharacter", "ped", ped, PlayerPedId());
-	SetPedDefaultComponentVariation(ped);
+	SetPedDefaultComponentVariation(playerPed);
 
     logger.debug("charcreator", "freezing ped 1");
-	FreezeEntityPosition(ped, true);
+	FreezeEntityPosition(playerPed, true);
 
     utils.teleport({x = -75.015, y = -818.215, z = 325.0});
     SetEntityHeading(playerPed, 0.0);
@@ -47,8 +48,6 @@ module.CreateNewCharacter = function(cb)
     DoScreenFadeIn(650);
 
     local menu = UI.CreateMenu("Dein Charakter");
-    pool:Clear();
-    pool:Add(menu);
 	
 	menu.Controls.Back.enabled = false;
 	
@@ -90,9 +89,13 @@ module.CreateNewCharacter = function(cb)
     menu:AddItem(genderItem);
 
 	-- START SUBMENU parents
-    local parentsMenu = pool:AddSubMenu(menu, "Eltern");
-    menu.Items[#menu.Items]:SetLeftBadge(BadgeStyle.Heart)
-    menu.Items[#menu.Items]:RightLabel("~b~→→→")
+    local parentsItem = UI.CreateItem("Eltern", "");
+    parentsItem:SetLeftBadge(BadgeStyle.Heart);
+    parentsItem:RightLabel("~b~→→→");
+
+    menu:AddItem(parentsItem);
+    local parentsMenu = UI.CreateMenu("Eltern");
+    menu:BindMenuToItem(parentsMenu, parentsItem);
 	
     local heritageWindow = UI.CreateHeritageWindow()
     parentsMenu:AddWindow(heritageWindow)
@@ -137,10 +140,14 @@ module.CreateNewCharacter = function(cb)
 	-- END SUBMENU parents
     
 	-- START SUBMENU advanced_face
-    local advancedFaceMenu = pool:AddSubMenu(menu, "Erweiterte Gesichtsoptionen")
-    menu.Items[#menu.Items]:RightLabel("~b~→→→")
+    local advancedFaceItem = UI.CreateItem("Erweiterte Gesichtsoptionen", "");
+    parentsItem:RightLabel("~b~→→→");
 
-    for k, v in pairs(Config.AdvancedFaceParts) do
+    menu:AddItem(advancedFaceItem);
+    local advancedFaceMenu = UI.CreateMenu("Erweiterte Gesichtsoptionen");
+    menu:BindMenuToItem(advancedFaceMenu, advancedFaceItem);
+
+    for _, v in pairs(Config.AdvancedFaceParts) do
         local advancedFaceItem = UI.CreateListItem(v.label, intensityOptions, math.ceil(#intensityOptions * 0.5))
         advancedFaceMenu:AddItem(advancedFaceItem);
 
@@ -236,8 +243,6 @@ module.CreateNewCharacter = function(cb)
     end
 
     menu:Visible(true);
-    pool:RefreshIndex();
-	pool:MouseEdgeEnabled(false);
 end;
 
 function SetCamValues(heading2, camOffset2, zoomOffset2)

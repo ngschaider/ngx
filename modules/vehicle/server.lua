@@ -1,6 +1,7 @@
 local class = M("class");
 local Character = M("character");
 local core = M("core");
+local Garage = M("garage");
 local logger = M("core").logger;
 
 local Vehicle = class("Vehicle", core.SyncObject);
@@ -125,18 +126,19 @@ end
 function Vehicle:save(deformations)
     self:setDeformations(deformations);
 
-    local netId = self:getNetId()
+    local netId = self:getNetId();
     if netId then
         local veh = NetworkGetEntityFromNetworkId(netId);
-        local pos = GetEntityCoords(netId);
-        self:setPosition()
+        local pos = GetEntityCoords(veh);
+        self:setPosition(pos);
     end
 end
 
 function Vehicle:getOwner()
-    logger.warn("vehicle", "Vehicle:getOwner", "ownerType,ownerId", ownerType, ownerId);
     local ownerType = self:getOwnerType();
     local ownerId = self:getOwnerId();
+    logger.warn("vehicle", "Vehicle:getOwner", "ownerType,ownerId", ownerType, ownerId);
+
     if ownerType == "Character" then
         return Character.GetById(ownerId);
     end

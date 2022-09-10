@@ -15,6 +15,7 @@ function math.round(num, numDecimalPlaces)
 	return tonumber(string.format("%." .. (numDecimalPlaces or 0) .. "f", num))
 end
 
+---@diagnostic disable-next-line: lowercase-global
 function tobool(input)
 	if input == "true" or tonumber(input) == 1 or input == true then
 		return true

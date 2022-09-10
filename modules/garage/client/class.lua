@@ -3,6 +3,7 @@ local logger = M("core").logger;
 local utils = M("utils");
 local core = M("core");
 local Marker = M("marker");
+local Vehicle = M("vehicle");
 
 local Garage = class("Garage", core.SyncObject);
 core.RegisterSyncClass(Garage);

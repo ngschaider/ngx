@@ -52,6 +52,7 @@ function SyncObject:setData(key, value)
         logger.error("core->SyncObject", "SyncObject:setData", "accessing deleted SyncObject: type,id", self.type, self.id);
         return;
     end
+    self._data[key] = value;
     net.send("core:SyncObject:setProperty", self.type, self.id, key, value);
 end
 

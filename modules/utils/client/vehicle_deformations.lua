@@ -86,66 +86,60 @@ module.vehicle.GetDeformation = function(vehicle)
 end
 
 -- sets deformation on a vehicle
-module.vehicle.SetDeformation = function(vehicle, deformationPoints, callback)
+module.vehicle.SetDeformation = function(vehicle, deformationPoints)
     assert(vehicle ~= nil and DoesEntityExist(vehicle), "Parameter \"vehicle\" must be a valid vehicle entity!")
     assert(deformationPoints ~= nil and type(deformationPoints) == "table", "Parameter \"deformationPoints\" must be a table!")
 
-	Citizen.CreateThread(function()
-		-- set radius and damage multiplier
-		local min, max = GetModelDimensions(GetEntityModel(vehicle))
-		local radius = #(max - min) * 40.0			-- might need some more experimentation
-		local damageMult = #(max - min) * 30.0		-- might need some more experimentation
-        
-        local printMsg = false
+	-- set radius and damage multiplier
+	local min, max = GetModelDimensions(GetEntityModel(vehicle))
+	local radius = #(max - min) * 40.0			-- might need some more experimentation
+	local damageMult = #(max - min) * 30.0		-- might need some more experimentation
+	
+	local printMsg = false
 
-		for i, def in ipairs(deformationPoints) do
-			def[1] = vector3(def[1].x, def[1].y, def[1].z)
+	for i, def in ipairs(deformationPoints) do
+		def[1] = vector3(def[1].x, def[1].y, def[1].z)
+	end
+
+	-- iterate over all deformation points and check if more than one application is necessary
+	-- looping is necessary for most vehicles that have a really bad damage model or take a lot of damage (e.g. neon, phantom3)
+	local deform = true
+	local iteration = 0
+	while (deform and iteration < MAX_DEFORM_ITERATIONS) do
+		if (not DoesEntityExist(vehicle)) then
+			logger.debug("vehicle", "Vehicle \"" .. tostring(GetVehicleNumberPlateText(vehicle)) .. "\" got deleted mid-deformation.")
+			return
 		end
 
-		-- iterate over all deformation points and check if more than one application is necessary
-		-- looping is necessary for most vehicles that have a really bad damage model or take a lot of damage (e.g. neon, phantom3)
-		local deform = true
-		local iteration = 0
-		while (deform and iteration < MAX_DEFORM_ITERATIONS) do
-			if (not DoesEntityExist(vehicle)) then
-				logger.debug("vehicle", "Vehicle \"" .. tostring(GetVehicleNumberPlateText(vehicle)) .. "\" got deleted mid-deformation.")
-				return
-			end
+		deform = false
 
-			deform = false
+		-- apply deformation if necessary
+		for i, def in ipairs(deformationPoints) do
+			if (#(GetVehicleDeformationAtPos(vehicle, def[1])) < def[2]) then
+				SetVehicleDamage(
+					vehicle,
+					def[1] * 2.0,
+					def[2] * damageMult,
+					radius,
+					true
+				)
 
-			-- apply deformation if necessary
-			for i, def in ipairs(deformationPoints) do
-				if (#(GetVehicleDeformationAtPos(vehicle, def[1])) < def[2]) then
-					SetVehicleDamage(
-						vehicle,
-						def[1] * 2.0,
-						def[2] * damageMult,
-						radius,
-						true
-					)
+				deform = true
 
-					deform = true
+				if (not printMsg) then
+					logger.debug("vehicle", "Applying deformation to \"" .. tostring(GetVehicleNumberPlateText(vehicle)) .. "\"")
 
-                    if (not printMsg) then
-                        logger.debug("vehicle", "Applying deformation to \"" .. tostring(GetVehicleNumberPlateText(vehicle)) .. "\"")
-
-                        printMsg = true
-                    end
+					printMsg = true
 				end
 			end
-
-			iteration = iteration + 1
-
-			Citizen.Wait(100)
 		end
 
-        if (printMsg) then
-		    logger.debug("vehicle", "Applying deformation finished for \"" .. tostring(GetVehicleNumberPlateText(vehicle)) .. "\"")
-        end
+		iteration = iteration + 1
 
-        if (callback) then
-		    callback()
-        end
-	end)
+		Citizen.Wait(100)
+	end
+
+	if (printMsg) then
+		logger.debug("vehicle", "Applying deformation finished for \"" .. tostring(GetVehicleNumberPlateText(vehicle)) .. "\"")
+	end
 end

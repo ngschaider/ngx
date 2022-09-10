@@ -1,6 +1,11 @@
 module.logger = {};
 
 local hiddenCategories = {
+    ["save"] = true,
+    --["core->SyncObject"] = true,
+    --["core->net"] = true,
+    --["core->callback"] = true,
+    ["user"] = true,
 };
 
 module.logger.hideCategory = function(name)

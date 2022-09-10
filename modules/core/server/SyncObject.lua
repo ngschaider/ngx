@@ -114,7 +114,7 @@ function SyncObject:getData(key)
         return;
     end
     local value = self._data[key];
-    --logger.debug("core->SyncObject", "SyncObject:getData", "type,id,key,value", self.type, self.id, key, value);
+    logger.debug("core->SyncObject", "SyncObject:getData", "type,id,key,value", self.type, self.id, key, value);
     return value;
 end
 
@@ -132,7 +132,7 @@ function SyncObject:setData(key, value)
         --print("in end of if statement");
     end
     --print("below if statement");
-    logger.debug("core->SyncObject", "SyncObject:setData", "self.columns", json.encode(self.columns));
+    --logger.debug("core->SyncObject", "SyncObject:setData", "self.columns", json.encode(self.columns));
     --print("below log");
     if self.columns[key] then
         --print("saving to db");
@@ -151,7 +151,7 @@ function SyncObject:syncProperty(key, read, write)
         logger.error("core->SyncObject", "SyncObject:syncProperty", "accessing deleted SyncObject: type,id", self.type, self.id);
         return;
     end
-    logger.debug("core->SyncObject", "SyncObject:syncProperty", "key", key);
+    --logger.debug("core->SyncObject", "SyncObject:syncProperty", "key", key);
     if not SyncObject._sync[self.type] then
         SyncObject._sync[self.type] = {
             properties = {},
@@ -159,7 +159,7 @@ function SyncObject:syncProperty(key, read, write)
         };
     end
     
-    logger.debug("core->SyncObject", "syncProperty", "self.type,key,read,write", self.type, key, read, write);
+    --logger.debug("core->SyncObject", "syncProperty", "self.type,key,read,write", self.type, key, read, write);
     SyncObject._sync[self.type].properties[key] = {
         read = read,
         write = write,
@@ -195,16 +195,16 @@ module.SyncObject = SyncObject;
 local syncClasses = {};
 module.RegisterSyncClass = function(objectClass)
     logger.debug("core->SyncObject", "module.RegisterSyncClass", "objectClass.name", objectClass.name);
-    logger.debug("core->SyncObject", "module.RegisterSyncClass", "#syncClasses", utils.table.size(syncClasses));
+    --logger.debug("core->SyncObject", "module.RegisterSyncClass", "#syncClasses", utils.table.size(syncClasses));
     syncClasses[objectClass.name] = objectClass;
-    logger.debug("core->SyncObject", "module.RegisterSyncClass", "#syncClasses", utils.table.size(syncClasses));
+    --logger.debug("core->SyncObject", "module.RegisterSyncClass", "#syncClasses", utils.table.size(syncClasses));
 end
 
 module.GetSyncObject = function(type, id, ...)
     logger.debug("core->SyncObject", "module.GetSyncObject", "type,id", type, id);
     if not cache[type .. id] then
-        logger.debug("core->SyncObject", "syncClasses", json.encode(utils.table.map(syncClasses, function(v, k) return k, k; end)));
-        logger.debug("core->SyncObject", "module.GetSyncObject", "#syncClasses", utils.table.size(syncClasses));
+        --logger.debug("core->SyncObject", "syncClasses", json.encode(utils.table.map(syncClasses, function(v, k) return k, k; end)));
+        --logger.debug("core->SyncObject", "module.GetSyncObject", "#syncClasses", utils.table.size(syncClasses));
         local syncClass = syncClasses[type];
         cache[type .. id] = syncClass:new(id, ...);
     end

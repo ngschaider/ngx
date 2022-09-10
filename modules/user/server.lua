@@ -21,9 +21,9 @@ end
 function User:getPlayerId()
 	for _,v in pairs(GetPlayers()) do
 		local identifier = utils.getIdentifier(v);
-		logger.debug("User:getPlayerId", "v", v);
-		logger.debug("User:getPlayerId", "identifier", identifier);
-		logger.debug("User:getPlayerId", "self:getIdentifier", self:getIdentifier());
+		logger.debug("user", "User:getPlayerId", "v", v);
+		logger.debug("user", "User:getPlayerId", "identifier", identifier);
+		logger.debug("user", "User:getPlayerId", "self:getIdentifier", self:getIdentifier());
 		if identifier == self:getIdentifier() then
 			return tonumber(v);
 		end

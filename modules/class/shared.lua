@@ -83,42 +83,59 @@ local function _createClass(name, super)
 	local dict = {}
 	dict.__index = dict
 
-	local aClass = { name = name, super = super, static = {},
-										__instanceDict = dict, __declaredMethods = {},
-										subclasses = setmetatable({}, {__mode='k'})  }
+	local aClass = {
+		name = name,
+		super = super,
+		static = {},
+		__instanceDict = dict,
+		__declaredMethods = {},
+		subclasses = setmetatable({}, {__mode='k'});
+	};
 
 	if super then
 		setmetatable(aClass.static, {
 			__index = function(_,k)
-				local result = rawget(dict,k)
+				local result = rawget(dict,k);
 				if result == nil then
-					return super.static[k]
+					return super.static[k];
 				end
-				return result
+				return result;
 			end
-		})
+		});
 	else
-		setmetatable(aClass.static, { __index = function(_,k) return rawget(dict,k) end })
+		setmetatable(aClass.static, { 
+			__index = function(_,k) 
+				return rawget(dict,k);
+			end,
+		});
 	end
 
-	setmetatable(aClass, { __index = aClass.static, __tostring = _tostring,
-													__call = _call, __newindex = _declareInstanceMethod })
+	setmetatable(aClass, {
+		__index = aClass.static,
+		__tostring = _tostring,
+		__call = _call,
+		__newindex = _declareInstanceMethod,
+	});
 
-	return aClass
+	return aClass;
 end
 
 local function _includeMixin(aClass, mixin)
-	assert(type(mixin) == 'table', "mixin must be a table")
+	assert(type(mixin) == 'table', "mixin must be a table");
 
 	for name,method in pairs(mixin) do
-		if name ~= "included" and name ~= "static" then aClass[name] = method end
+		if name ~= "included" and name ~= "static" then
+			aClass[name] = method;
+		end
 	end
 
 	for name,method in pairs(mixin.static or {}) do
-		aClass.static[name] = method
+		aClass.static[name] = method;
 	end
 
-	if type(mixin.included)=="function" then mixin:included(aClass) end
+	if type(mixin.included)=="function" then
+		mixin:included(aClass);
+	end
 	return aClass
 end
 

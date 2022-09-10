@@ -1,5 +1,4 @@
 local net = M("core").net;
-local streaming = M("streaming");
 local User = M("user");
 local charcreator = M("charcreator");
 local utils = M("utils");
@@ -13,7 +12,7 @@ module.StartSelection = function(cb)
 	local player = PlayerId();
 
 	local model = "mp_m_freemode_01";
-	streaming.RequestModel(model);
+	utils.streaming.RequestModel(model);
 	SetPlayerModel(player, model);
 	SetModelAsNoLongerNeeded(model);
 	

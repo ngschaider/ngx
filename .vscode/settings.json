@@ -177,7 +177,9 @@
         "CreateVehicle",
         "NetworkGetNetworkIdFromEntity",
         "SetVehicleNumberPlateText",
-        "NetworkGetEntityFromNetworkId"
+        "NetworkGetEntityFromNetworkId",
+        "DeleteVehicle",
+        "SetPedIntoVehicle"
     ],
     "Lua.diagnostics.disable": [
         "need-check-nil",

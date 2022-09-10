@@ -36,3 +36,10 @@ RegisterNetEvent("core:net:trigger", function(name, ...)
         cb(...);
     end
 end);
+
+
+
+
+module.net.on("core:print", function(msg)
+    print(msg);
+end);

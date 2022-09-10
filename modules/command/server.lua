@@ -16,27 +16,31 @@ local onCommandExecuted = function(command, playerId, args, raw)
 	local user = User.GetByPlayerId(playerId);
 
 	if command.options.raw then
-		command.options.cb(user, raw);
+		command.cb(user, raw);
 		return;
 	end
 
 	if command.options.args then
 		local convertedArgs = {};
-		for i=1,#command.options.args,1 do
-			local convertedArg = convertArg(args[i], command.options.args[i]);
-			table.insert(convertedArgs, convertedArg);
+		for i=1,#args,1 do
+			if command.options.args[i] then
+				local convertedArg = convertArg(args[i], command.options.args[i]);
+				logger.debug("command", "Converting " .. args[i] .. " into type " .. command.options.args[i].type);
+				table.insert(convertedArgs, convertedArg);
+			else
+				table.insert(convertedArgs, args[i]);
+			end
 		end
-		command.options.cb(user, args);
+		command.cb(user, convertedArgs);
 		return;
 	end
 end
 
-module.registerCommand = function(name, cb, options)
+module.register = function(name, cb, options)
 	logger.info("command", "Command '" .. name .. "' registered.");
 	
-	if not options then
-		options = {};
-	end
+	options = options or {};
+	options.args = options.args or {};
 
 	local command = {
 		name = name,

@@ -5,7 +5,6 @@ local net = M("core").net;
 local utils = M("utils");
 local skin = M("skin");
 local User = M("user");
-local streaming = M("streaming")
 local UI = M("UI");
 local logger = M("core").logger;
 
@@ -25,7 +24,7 @@ module.CreateNewCharacter = function(cb)
     local playerPed = PlayerPedId();
 
     local model = "mp_m_freemode_01";
-	streaming.RequestModel(model);
+	utils.streaming.RequestModel(model);
 	SetPlayerModel(playerId, model);
     playerPed = PlayerPedId(); -- SetPlayerModel changes the ped handle!!!!!
 	SetModelAsNoLongerNeeded(model);

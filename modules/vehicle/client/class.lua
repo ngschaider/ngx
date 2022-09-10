@@ -139,13 +139,7 @@ end
 
 module.GetByNetId = function(netId)
     logger.debug("vehicle", "module.GetByNetId", "netId", netId);
-
-    local p = promise.new();
-    callback.trigger("vehicle:getIdByNetId", function(id)
-        p:resolve(id);
-    end, netId);
-    local id = Citizen.Await(p);
-
+    local id = callback.trigger("vehicle:getIdByNetId", netId);
     logger.debug("vehicle", "module.GetByNetId", "id", json.encode(id));
 
     if not id then

@@ -65,29 +65,18 @@ module.GetById = function(id)
 end;
 
 module.GetSelf = function()
-	local p = promise.new();
-	callback.trigger("user:getSelfId", function(id)
-		p:resolve(id);
-	end);
-	local id = Citizen.Await(p);
-
+	local id = callback.trigger("user:getSelfId");
 	local user = module.GetById(id);
 	
 	return user;
 end;
 
 module.GetOnline = function()
-	local p = promise.new();
-	callback.trigger("user:getOnlineIds", function(ids)
-		p:resolve(ids);
-	end);
-	local ids = Citizen.Await(p);
+	local ids = callback.trigger("user:getOnlineIds");
 
-	local users = {};
-	for _,id in pairs(ids) do
-		local user = module.GetById(id);
-		table.insert(users, user);
-	end
+	local users = utils.table.mapValues(ids, function(id)
+		return module.GetById(id);
+	end);
 
 	return users;
 end;

@@ -11,13 +11,19 @@ end;
 
 module.callback = {};
 
-module.callback.trigger = function(name, cb, ...)
+module.callback.trigger = function(name, ...)
 	logger.debug("core->callback", "triggered C->S->C callback " .. name);
 
     local requestId = GetAndConsumeRequestId();
-	serverCallbacks[requestId] = cb;
+
+	local p = promise.new();
+	serverCallbacks[requestId] = function(...)
+		p:resolve(...);
+	end;
 
 	net.send("core:callback:request", name, requestId, ...);
+
+	return Citizen.Await(p);
 end;
 
 net.on("core:callback:response", function(requestId, ...)

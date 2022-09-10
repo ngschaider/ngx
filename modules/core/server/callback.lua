@@ -39,13 +39,19 @@ local GetAndConsumeRequestId = function()
     return lastRequestId;
 end
 
-module.callback.trigger = function(user, name, cb, ...)
+module.callback.trigger = function(user, name, ...)
 	logger.debug("core->callback", "triggered S->C->S callback " .. name);
 
     local requestId = GetAndConsumeRequestId();
-	clientCallbacks[requestId] = cb;
+
+	local p = promise.new();
+	clientCallbacks[requestId] = function(...)
+		p:resolve(...);
+	end;
 
 	net.send(user, "core:callback:request", name, requestId, ...)
+
+	return Citizen.Await(p);
 end;
 
 net.on("core:callback:response", function(playerId, requestId, ...)

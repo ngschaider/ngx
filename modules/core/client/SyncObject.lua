@@ -26,12 +26,7 @@ function SyncObject:initialize(type, id, tableName)
     self.id = id;
     self.table = tableName;
     self._deleted = false;
-
-    local p = promise.new();
-    callback.trigger("core:SyncObject:getObjectData", function(data)
-        p:resolve(data);
-    end, type, id);
-    self._data = Citizen.Await(p);
+    self._data = callback.trigger("core:SyncObject:getObjectData", type, id);
 
     table.insert(cache, self);
 end
@@ -61,11 +56,7 @@ function SyncObject:rpc(name, ...)
         logger.error("core->SyncObject", "SyncObject:rpc", "accessing deleted SyncObject: type,id", self.type, self.id);
         return;
     end
-    local p = promise.new();
-    callback.trigger("core:SyncObject:rpc", function(...)
-        p:resolve(...);
-    end, self.type, self.id, name, ...);
-    return Citizen.Await(p);
+    return callback.trigger("core:SyncObject:rpc", self.type, self.id, name, ...);
 end
 
 net.on("core:SyncObject:setProperty", function(type, id, key, value)

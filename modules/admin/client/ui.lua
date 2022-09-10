@@ -10,13 +10,13 @@ local GetUserMenu = function(user)
     if character then
         local reviveItem = UI.CreateItem("Wiederbeleben", "");
         reviveItem.Activated = function()
-            callback.trigger("admin:reviveCharacter", function(success)
-                if success then
-                    User.GetSelf().showNotification("Charakter " .. character:getName() .. " wurde wiederbelebt");
-                else
-                    User.GetSelf().showNotification("Charakter " .. character:getName() .. " konnte nicht wiederbelebt werden");
-                end
-            end, character.id);
+            local success = callback.trigger("admin:reviveCharacter", character.id);
+
+            if success then
+                User.GetSelf().showNotification("Charakter " .. character:getName() .. " wurde wiederbelebt");
+            else
+                User.GetSelf().showNotification("Charakter " .. character:getName() .. " konnte nicht wiederbelebt werden");
+            end
         end;
     end
 end;

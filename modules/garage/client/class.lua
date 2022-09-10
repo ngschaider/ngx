@@ -107,12 +107,7 @@ end
 
 module.GetAll = function()
     logger.debug("garage->class", "module.GetAll");
-	local p = promise.new();
-	core.callback.trigger("garage:getAllIds", function(ids)
-		p:resolve(ids);
-	end);
-    logger.debug("garage->class", "module.GetAll", "resolving");
-	local ids = Citizen.Await(p);
+	local ids = core.callback.trigger("garage:getAllIds");
 
     logger.debug("garage->class", "module.GetAll", "iterating");
 	local garages = {};

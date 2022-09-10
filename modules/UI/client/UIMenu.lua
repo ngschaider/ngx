@@ -67,7 +67,7 @@ function UIMenu.New(Title, Subtitle, X, Y, TxtDictionary, TxtName)
 			ScaleWithSafezone = true,
 			ResetCursorOnOpen = true,
 			MouseControlsEnabled = true,
-			MouseEdgeEnabled = true,
+			MouseEdgeEnabled = false,
 			ControlDisablingEnabled = true,
 			Audio = {
 				Library = "HUD_FRONTEND_DEFAULT_SOUNDSET",

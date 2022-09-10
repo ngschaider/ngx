@@ -68,15 +68,16 @@ NGX.LoadModule = function(moduleName)
     local entryPoints = GetEntryPoints(moduleName);
 
     local success = true;
-    for k,v in pairs(entryPoints) do
+
+    for _,v in pairs(entryPoints) do
         moduleEnv, success = NGX.EvalFile(resourceName, v, moduleEnv);
         if not success then
             break;
         end
     end
-
+    
     if not success then
-        NGX.LogError('module [' .. moduleName .. '] does not exist', '@' .. resourceName .. ':boot/sh_modules.lua');
+        error("module [" .. moduleName .. "] does not exist");
     end
 
     loadedModules[moduleName] = moduleEnv.module;
@@ -93,6 +94,12 @@ M = function(moduleName)
                 NGX.LoadModule(moduleName);
             end
             return loadedModules[moduleName][key];
+        end,
+        __newindex = function(obj, key, value)
+            if not loadedModules[moduleName] then
+                NGX.LoadModule(moduleName);
+            end
+            loadedModules[moduleName][key] = value;
         end,
         __call = function(obj, ...)
             --print("__call called on " .. moduleName);

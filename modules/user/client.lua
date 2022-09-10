@@ -70,6 +70,7 @@ module.GetSelf = function()
 		p:resolve(id);
 	end);
 	local id = Citizen.Await(p);
+
 	local user = module.GetById(id);
 	
 	return user;

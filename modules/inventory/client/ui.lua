@@ -4,7 +4,9 @@ local logger = M("core").logger;
 local utils = M("utils");
 
 RegisterCommand("inventory", function()
-    OpenOwnCharacterInventory();
+    Citizen.CreateThread(function()
+        OpenOwnCharacterInventory();
+    end);
 end);
 RegisterKeyMapping("inventory", "Inventar öffnen", "keyboard", "F2");
 
@@ -27,7 +29,7 @@ end;
 function OpenInventory(inventory)
     logger.debug("inventory->ui", "creating menu");
     local menu = UI.CreateMenu("Inventar", "");
-
+    
     logger.debug("inventory_ui", "OpenInventory", "inventory.id", inventory.id);
     local items = inventory:getItems();
     logger.debug("inventory->ui", "OpenInventory", "#items", #items);

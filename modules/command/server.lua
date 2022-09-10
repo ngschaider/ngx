@@ -24,7 +24,9 @@ local onCommandExecuted = function(command, playerId, args, raw)
 			local convertedArg = convertArg(args[i], command.options.args[i]);
 			table.insert(convertedArgs, convertedArg);
 		end
-		cb(user, args);
+		Citizen.CreateThread(function()
+			cb(user, args);
+		end);
 		return;
 	end
 end

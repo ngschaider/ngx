@@ -117,11 +117,32 @@ function Vehicle:spawn()
         utils.vehicle.SetDeformation(veh, self:getDeformations())
     end
 
+    local primaryColor = self:getPrimaryColor();
+    local secondaryColor = self:getSecondaryColor();
+    if primaryColor ~= nil and secondaryColor ~= nil then
+        print("setting", veh, primaryColor, secondaryColor);
+        SetVehicleColours(veh, primaryColor, secondaryColor);
+    end
+
     if self:getMods() then
         utils.vehicle.SetMods(veh, self:getMods());
     end
 
     SetVehicleNumberPlateText(veh, self:getPlate());
+end
+
+function Vehicle:save()
+    local netId = self:getNetId();
+    if not netId then
+        return;
+    end
+
+    local veh = NetworkGetEntityFromNetworkId(netId);
+    local deformation = utils.vehicle.GetDeformation(veh);
+    --local modKit = GetVehicleModKit(veh);
+    --local mods = utils.vehicle.GetMods(veh);
+
+    self:rpc("save", deformation);
 end
 
 function Vehicle:despawn()
@@ -131,6 +152,8 @@ function Vehicle:despawn()
 
     local veh = NetworkGetEntityFromNetworkId(self:getNetId());
     DeleteVehicle(veh);
+
+    self:setNetId(nil);
 end
 
 module.GetById = function(id)

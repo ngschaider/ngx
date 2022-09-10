@@ -101,6 +101,11 @@ function Vehicle:getDeformations()
     return json.decode(deformationsStr);
 end
 
+function Vehicle:setDeformations(deformations)
+    local deformationsStr = json.encode(deformations);
+    self:setData("deformations", deformationsStr);
+end
+
 function Vehicle:getOwnerType()
     return self:getData("ownerType");
 end
@@ -134,15 +139,27 @@ function Vehicle:setNetId(netId)
     self:setData("netId", netId);
 end
 
-function Vehicle:save(deformations)
-    self:setDeformations(deformations);
-
+function Vehicle:save(deformation)
     local netId = self:getNetId();
-    if netId then
-        local veh = NetworkGetEntityFromNetworkId(netId);
-        local pos = GetEntityCoords(veh);
-        self:setPosition(pos);
+
+    if not netId then
+        return;
     end
+    --print("deformation", json.encode(deformation))
+    --print("modKit", json.encode(modKit))
+    --print("mods", json.encode(mods))
+    self:setDeformations(deformation);
+    logger.debug("vehicle", "Vehicle:save", "modKit", json.encode(modKit));
+    --self:setModKit(modKit);
+    --self:setMods(mods);
+    
+    local veh = NetworkGetEntityFromNetworkId(netId);
+    local pos = GetEntityCoords(veh);
+    self:setPosition(pos);
+
+    --local primaryColor, secondaryColor = GetVehicleColours(veh);
+    --self:setPrimaryColor(primaryColor);
+    --self:setSecondaryColor(secondaryColor);
 end
 
 function Vehicle:getOwner()
@@ -168,12 +185,17 @@ module.Create = function(model, owner)
     local name = MySQL.scalar.await("SELECT name FROM vehicle_names WHERE model=?", {model});
     name = name or model;
 
-    local id = MySQL.insert.await("INSERT INTO vehicles (plate, model, name, ownerType, ownerId) VALUES (?, ?, ?, ?, ?)", {
+    local primaryColor = 0;
+    local secondaryColor = 0;
+
+    local id = MySQL.insert.await("INSERT INTO vehicles (plate, model, name, ownerType, ownerId, primaryColor, secondaryColor) VALUES (?, ?, ?, ?, ?, ?, ?)", {
         plate,
         model,
         name,
         owner.type,
-        owner.id
+        owner.id,
+        primaryColor,
+        secondaryColor
     });
 
 	return module.GetById(id);

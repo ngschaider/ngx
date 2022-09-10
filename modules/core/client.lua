@@ -1,5 +1,4 @@
-run("client/tick.lua");
-run("client/init.lua");
+run("client/events.lua");
 run("client/net.lua");
 run("client/callback.lua");
 run("client/SyncObject.lua");

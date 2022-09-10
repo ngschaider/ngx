@@ -134,7 +134,7 @@ function SyncObject:setData(key, value)
     --print("below if statement");
     --logger.debug("core->SyncObject", "SyncObject:setData", "self.columns", json.encode(self.columns));
     --print("below log");
-    if self.columns[key] then
+    if self.columns[key] and value ~= self._data[key] then
         --print("saving to db");
         MySQL.update.await("UPDATE `" .. self.table .. "` SET `" .. key .. "`=? WHERE id=?", {value, self.id});
     end
@@ -234,7 +234,7 @@ callback.register("core:SyncObject:rpc", function(user, cb, type, id, name, ...)
         return;
     end
 
-    local ret = obj[name](obj, name, ...);
+    local ret = obj[name](obj, ...);
     cb(ret);
 end)
 

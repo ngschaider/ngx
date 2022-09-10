@@ -179,7 +179,17 @@
         "SetVehicleNumberPlateText",
         "NetworkGetEntityFromNetworkId",
         "DeleteVehicle",
-        "SetPedIntoVehicle"
+        "SetPedIntoVehicle",
+        "RemoveVehiclesFromGeneratorsInArea",
+        "ClearAreaOfVehicles",
+        "SetCreateRandomCopsOnScenarios",
+        "SetCreateRandomCopsNotOnScenarios",
+        "SetCreateRandomCops",
+        "SetRandomBoats",
+        "SetGarbageTrucks",
+        "GetVehicleColours",
+        "GetVehicleModKit",
+        "SetVehicleColours"
     ],
     "Lua.diagnostics.disable": [
         "need-check-nil",

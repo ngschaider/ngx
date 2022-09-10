@@ -136,7 +136,7 @@ module.vehicle.SetDeformation = function(vehicle, deformationPoints)
 
 		iteration = iteration + 1
 
-		Citizen.Wait(100)
+		Citizen.Wait(100);
 	end
 
 	if (printMsg) then

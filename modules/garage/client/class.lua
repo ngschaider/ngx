@@ -19,25 +19,35 @@ function Garage:initialize(id)
     self.marker.scale = vector3(3.0, 3.0, 0.2);
     self.marker.onEnter:Add(function(data)
         if data.playerVehicle then
-            print("1");
             local netId = NetworkGetNetworkIdFromEntity(data.playerVehicle);
-            print("2");
             local vehicle = Vehicle.GetByNetId(netId);
-            print("3");
 
             if vehicle then
-                print("4");
                 self.putInNotification.visible = true;
             end
-            print("5");
         else
             self.takeOutNotification.visible = true;
         end
     end);
+    
     self.marker.onExit:Add(function()
         self.putInNotification.visible = false;
         self.takeOutNotification.visible = false;
     end);
+
+    core.onPlayerVehicleEnter:Add(function()
+        if self.marker.isPlayerInside then
+            self.putInNotification.visible = true;
+            self.takeOutNotification.visible = false;
+        end
+    end)
+
+    core.onPlayerVehicleExit:Add(function()
+        if self.marker.isPlayerInside then
+            self.putInNotification.visible = false;
+            self.takeOutNotification.visible = true;
+        end
+    end)
 
     core.onTick:Add(function(data)
         if self.marker.isPlayerInside and IsControlJustPressed(0, 51) then
@@ -46,6 +56,7 @@ function Garage:initialize(id)
                 local vehicle = Vehicle.GetByNetId(netId);
 
                 if vehicle then
+                    vehicle:save();
                     vehicle:despawn();
                     vehicle:setGarageId(self.id);
                 end
@@ -61,7 +72,7 @@ function Garage:openMenu()
 
     local vehicles = self:getVehicles();
     for _,vehicle in pairs(vehicles) do
-        local item = UI.CreateItem(vehicle:getName());
+        local item = UI.CreateItem(vehicle:getName(), "");
         menu:AddItem(item);
 
         item.Activated = function()

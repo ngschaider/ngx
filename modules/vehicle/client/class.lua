@@ -37,22 +37,6 @@ function Vehicle:getPosition()
     );
 end
 
-function Vehicle:getPrimaryColor()
-    return self:getData("primaryColor");
-end
-
-function Vehicle:getSecondaryColor()
-    return self:getData("secondaryColor");
-end
-
-function Vehicle:getMods()
-    return json.decode(self:getData("mods"));
-end
-
-function Vehicle:getModKit()
-    return self:getData("modKit");
-end
-
 function Vehicle:getDeformations()
     return json.decode(self:getData("deformations"));
 end
@@ -113,20 +97,18 @@ function Vehicle:spawn()
     local netId = NetworkGetNetworkIdFromEntity(veh);
     self:setNetId(netId);
 
-    if self:getDeformations() then
-        utils.vehicle.SetDeformation(veh, self:getDeformations())
+    local deformations = self:getDeformations();
+    if deformations then
+        utils.vehicle.SetDeformation(veh, deformations);
     end
 
-    local primaryColor = self:getPrimaryColor();
-    local secondaryColor = self:getSecondaryColor();
-    if primaryColor ~= nil and secondaryColor ~= nil then
-        print("setting", veh, primaryColor, secondaryColor);
-        SetVehicleColours(veh, primaryColor, secondaryColor);
+    local properties = self:getProperties();
+    if properties then
+        utils.vehicle.SetProperties(veh, properties);
     end
 
-    if self:getMods() then
-        utils.vehicle.SetMods(veh, self:getMods());
-    end
+    SetVehRadioStation(veh, "OFF");
+    SetVehicleEngineOn(veh, true, true);
 
     SetVehicleNumberPlateText(veh, self:getPlate());
 end
@@ -138,11 +120,29 @@ function Vehicle:save()
     end
 
     local veh = NetworkGetEntityFromNetworkId(netId);
-    local deformation = utils.vehicle.GetDeformation(veh);
-    --local modKit = GetVehicleModKit(veh);
-    --local mods = utils.vehicle.GetMods(veh);
 
-    self:rpc("save", deformation);
+    local deformations = utils.vehicle.GetDeformation(veh);
+    self:setDeformations(deformations);
+
+    local properties = utils.vehicle.GetProperties(veh);
+    self:setProperties(properties);
+
+    self:rpc("save");
+end
+
+function Vehicle:getProperties()
+    local str = self:getData("properties");
+    return json.decode(str);
+end
+
+function Vehicle:setProperties(properties)
+    local str = json.encode(properties);
+    self:setData("properties", str);
+end
+
+function Vehicle:setDeformations(deformations)
+    local deformationsStr = json.encode(deformations);
+    self:setData("deformations", deformationsStr);
 end
 
 function Vehicle:despawn()

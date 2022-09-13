@@ -2,7 +2,6 @@ run("client/class.lua");
 
 
 
-
 local core = M("core");
 
 core.onInit:Add(function()

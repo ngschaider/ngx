@@ -1,6 +1,6 @@
 run("client/camera.lua");
 run("client/vehicle_deformations.lua");
-run("client/vehicle_mods.lua");
+run("client/vehicle_properties.lua");
 run("client/streaming.lua");
 
 module.textPrompt = function(title, placeholder, maxLength)

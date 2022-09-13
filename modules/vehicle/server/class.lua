@@ -18,16 +18,13 @@ function Vehicle:initialize(id)
     self:syncProperty("positionX", true, false);
     self:syncProperty("positionY", true, false);
     self:syncProperty("positionZ", true, false);
-    self:syncProperty("deformations", true, false);
+    self:syncProperty("deformations", true, true);
+    self:syncProperty("properties", true, true);
     self:rpcMethod("save", true, false);
     self:syncProperty("ownerType", true, false);
     self:syncProperty("ownerId", true, false);
     self:syncProperty("garageId", true, true);
-    self:syncProperty("primaryColor", true, false);
-    self:syncProperty("secondaryColor", true, false);
-    self:syncProperty("modKit", true, false);
     self:syncProperty("netId", true, true);
-    self:syncProperty("mods", true, false);
 end
 
 function Vehicle:getId()
@@ -64,36 +61,14 @@ function Vehicle:setPosition(vec)
     self:setData("positionZ", vec.z);
 end
 
-function Vehicle:getPrimaryColor()
-    return self:getData("primaryColor");
+function Vehicle:getProperties()
+    local str = self:getData("properties");
+    return json.decode(str);
 end
 
-function Vehicle:setPrimaryColor(primaryColor)
-    self:setData("primaryColor", primaryColor);
-end
-
-function Vehicle:getSecondaryColor()
-    return self:getData("secondaryColor");
-end
-
-function Vehicle:setSecondaryColor(secondaryColor)
-    self:setData("secondaryColor", secondaryColor);
-end
-
-function Vehicle:getMods()
-    return json.decode(self:getData("mods"));
-end
-
-function Vehicle:setMods(mods)
-    self:setData("mods", json.encode(mods));
-end
-
-function Vehicle:getModKit()
-    return self:getData("modKit");
-end
-
-function Vehicle:setModKit(modKit)
-    return self:setData("modKit", modKit);
+function Vehicle:setProperties(properties)
+    local str = json.encode(properties);
+    self:setData("properties", str);
 end
 
 function Vehicle:getDeformations()
@@ -139,27 +114,16 @@ function Vehicle:setNetId(netId)
     self:setData("netId", netId);
 end
 
-function Vehicle:save(deformation)
+function Vehicle:save()
     local netId = self:getNetId();
 
     if not netId then
         return;
     end
-    --print("deformation", json.encode(deformation))
-    --print("modKit", json.encode(modKit))
-    --print("mods", json.encode(mods))
-    self:setDeformations(deformation);
-    logger.debug("vehicle", "Vehicle:save", "modKit", json.encode(modKit));
-    --self:setModKit(modKit);
-    --self:setMods(mods);
     
     local veh = NetworkGetEntityFromNetworkId(netId);
     local pos = GetEntityCoords(veh);
     self:setPosition(pos);
-
-    --local primaryColor, secondaryColor = GetVehicleColours(veh);
-    --self:setPrimaryColor(primaryColor);
-    --self:setSecondaryColor(secondaryColor);
 end
 
 function Vehicle:getOwner()
